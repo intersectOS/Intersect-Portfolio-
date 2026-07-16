@@ -133,7 +133,10 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       <div class="field"><label>Tagline (English)</label><input id="brandTaglineEn" placeholder="Where ideas intersect"></div>
       <div class="field"><label>نبذة عن إنترسكت</label><textarea id="brandAboutAr"></textarea></div>
       <div class="field"><label>About (English)</label><textarea id="brandAboutEn"></textarea></div>
-      <button class="btn" onclick="saveBrand()">حفظ التغييرات</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" onclick="saveBrand()">حفظ التغييرات</button>
+        <button class="btn-outline" onclick="openTr('brand','brand')">🌐 ترجمات لباقي اللغات</button>
+      </div>
     </div>
   </div>
 
@@ -244,9 +247,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
   <div class="card" style="max-width:440px;width:100%;">
     <h3 id="trTitle">إضافة ترجمة</h3>
     <div class="field"><label>اللغة</label><select id="trLang" onchange="loadTrValues()"></select></div>
-    <div class="field"><label>الاسم</label><input id="trName"></div>
-    <div class="field"><label>وصف قصير (Tagline)</label><input id="trTagline"></div>
-    <div class="field"><label>الوصف الكامل</label><textarea id="trDesc"></textarea></div>
+    <div id="trFieldsContainer"></div>
     <div style="display:flex;gap:10px;">
       <button class="btn" onclick="saveTranslation()">حفظ الترجمة</button>
       <button class="btn-outline" onclick="closeTr()">إغلاق</button>
@@ -370,6 +371,7 @@ async function handleGenericLogo(e, cb){
 }
 
 /* ============ LOAD ============ */
+let BRAND_DATA = {};
 async function loadAll(){
   const [{data:settings},{data:sectors},{data:companies},{data:consulting}] = await Promise.all([
     sb.from('intersect_site_settings').select('*'),
@@ -378,6 +380,7 @@ async function loadAll(){
     sb.from('intersect_consulting').select('*').order('sort_order')
   ]);
   const brand = (settings||[]).find(s=>s.key==='brand')?.value || {};
+  BRAND_DATA = brand;
   document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
   document.getElementById('brandTaglineEn').value = brand.tagline_en||'';
   document.getElementById('brandAboutAr').value = brand.about_ar||'';
@@ -393,6 +396,7 @@ async function loadAll(){
 /* ============ BRAND ============ */
 async function saveBrand(){
   const value = {
+    ...BRAND_DATA,
     name_ar:'إنترسكت', name_en:'Intersect',
     tagline_ar: document.getElementById('brandTaglineAr').value,
     tagline_en: document.getElementById('brandTaglineEn').value,
@@ -400,7 +404,9 @@ async function saveBrand(){
     about_en: document.getElementById('brandAboutEn').value,
     logo_url: pendingBrandLogo
   };
-  await sb.from('intersect_site_settings').upsert({key:'brand', value});
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  BRAND_DATA = value;
   showToast('تم الحفظ ✓');
 }
 
@@ -625,43 +631,74 @@ const TR_LANGS = [
   {code:'tr',label:'Türkçe'},{code:'zh',label:'中文'},{code:'ja',label:'日本語'},{code:'ko',label:'한국어'}
 ];
 const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies', consulting:'intersect_consulting'};
+const TR_FIELD_SETS = {
+  sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص (بدل التصنيف القياسي)',kind:'input'}, {key:'reference_text',label:'نص الاقتباس / الشهادة',kind:'textarea'}],
+  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'نوع العلاقة',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  brand: [{key:'tagline',label:'الشعار الفرعي (Tagline)',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
+};
 let trContext = null;
 
 function openTr(type, id){
-  const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING;
-  const item = arr.find(x=>x.id===id);
+  let item;
+  if(type==='brand'){
+    item = BRAND_DATA;
+  } else {
+    const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING;
+    item = arr.find(x=>x.id===id);
+  }
   if(!item) return;
   trContext = {type, id, item};
-  document.getElementById('trTitle').textContent = 'ترجمات: ' + (item.name_ar||'');
+  document.getElementById('trTitle').textContent = 'ترجمات: ' + (type==='brand' ? 'إنترسكت' : (item.name_ar||''));
   const sel = document.getElementById('trLang');
   sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  buildTrFields(type);
   document.getElementById('trOverlay').classList.remove('hidden');
   loadTrValues();
+}
+function buildTrFields(type){
+  const fields = TR_FIELD_SETS[type] || TR_FIELD_SETS.companies;
+  document.getElementById('trFieldsContainer').innerHTML = fields.map(f=>`
+    <div class="field"><label>${f.label}</label>${f.kind==='textarea' ? `<textarea id="tr-field-${f.key}"></textarea>` : `<input id="tr-field-${f.key}">`}</div>
+  `).join('');
 }
 function loadTrValues(){
   const lang = document.getElementById('trLang').value;
   const tr = (trContext.item.translations && trContext.item.translations[lang]) || {};
-  document.getElementById('trName').value = tr.name || '';
-  document.getElementById('trTagline').value = tr.tagline || '';
-  document.getElementById('trDesc').value = tr.description || '';
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    if(el) el.value = tr[f.key] || '';
+  });
 }
 function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
 async function saveTranslation(){
   if(!trContext) return;
   const lang = document.getElementById('trLang').value;
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
   const existing = trContext.item.translations || {};
-  const updated = {...existing, [lang]: {
-    name: document.getElementById('trName').value.trim(),
-    tagline: document.getElementById('trTagline').value.trim(),
-    description: document.getElementById('trDesc').value.trim()
-  }};
-  const table = TR_TABLES[trContext.type];
-  const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
-  if(error){ showToast('خطأ: '+error.message); return; }
-  trContext.item.translations = updated;
+  const values = {};
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    values[f.key] = el ? el.value.trim() : '';
+  });
+  const updated = {...existing, [lang]: values};
+
+  if(trContext.type==='brand'){
+    const value = {...BRAND_DATA, translations: updated};
+    const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
+    if(error){ showToast('خطأ: '+error.message); return; }
+    BRAND_DATA = value;
+  } else {
+    const table = TR_TABLES[trContext.type];
+    const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
+    if(error){ showToast('خطأ: '+error.message); return; }
+    trContext.item.translations = updated;
+  }
   showToast('تم حفظ الترجمة ✓');
   loadAll();
 }
 </script>
+
 </body>
 </html>

@@ -394,6 +394,44 @@ function tf(obj, field, lang){
   if(tr && tr[field]) return tr[field];
   return obj[field+'_en'] || obj[field+'_ar'] || '';
 }
+function hasManualTranslation(obj, field, lang){
+  return !!(obj && obj.translations && obj.translations[lang] && obj.translations[lang][field]);
+}
+
+/* ============ AUTO-TRANSLATE ENGINE (fills any language with no manual translation) ============ */
+let TRANS_CACHE = {};
+try{ TRANS_CACHE = JSON.parse(sessionStorage.getItem('ix_trans_cache')||'{}'); }catch(e){ TRANS_CACHE = {}; }
+function saveTransCache(){ try{ sessionStorage.setItem('ix_trans_cache', JSON.stringify(TRANS_CACHE)); }catch(e){} }
+async function mtTranslate(text, targetLang){
+  if(!text) return text;
+  const key = targetLang+'::'+text;
+  if(TRANS_CACHE[key]) return TRANS_CACHE[key];
+  try{
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const translated = data[0].map(chunk=>chunk[0]).join('');
+    TRANS_CACHE[key] = translated;
+    saveTransCache();
+    return translated;
+  }catch(e){
+    return text; // network hiccup: keep showing the fallback text rather than break the page
+  }
+}
+async function autoTranslateInto(el, sourceText){
+  if(!el || !sourceText || LANG==='ar') return;
+  const langAtCallTime = LANG;
+  const translated = await mtTranslate(sourceText, langAtCallTime);
+  if(el.isConnected && LANG===langAtCallTime) el.textContent = translated;
+}
+/* auto-translate a DB field into the current element unless a manual/authored translation already exists */
+function autoTranslateField(el, obj, field){
+  if(!el || LANG==='ar') return;
+  if(hasManualTranslation(obj, field, LANG)) return; // manual translation already showing, don't override
+  if(LANG==='en' && obj[field+'_en']) return; // genuine authored English text already showing, don't override
+  const source = obj[field+'_en'] || obj[field+'_ar'];
+  autoTranslateInto(el, source);
+}
 
 /* ============ STARFIELD ============ */
 const canvas = document.getElementById('stars');
@@ -451,8 +489,12 @@ async function loadData(){
 /* ============ RENDER: HOME ============ */
 function renderHome(){
   const brand = DATA.settings.brand || {};
-  document.getElementById('homeTagline').textContent = tf(brand,'tagline') || i18n('tagline_default');
-  document.getElementById('homeAbout').textContent = tf(brand,'about') || '';
+  const taglineEl = document.getElementById('homeTagline');
+  const aboutEl = document.getElementById('homeAbout');
+  taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default');
+  aboutEl.textContent = tf(brand,'about') || '';
+  if(brand.tagline_ar || brand.tagline_en) autoTranslateField(taglineEl, brand, 'tagline');
+  if(brand.about_ar || brand.about_en) autoTranslateField(aboutEl, brand, 'about');
   const logoEl = document.getElementById('homeLogo');
   const wordmarkEl = document.getElementById('homeWordmark');
   if(brand.logo_url){
@@ -504,11 +546,12 @@ function renderGalaxy(){
   let legend = `<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px;">`;
   DATA.sectors.forEach(sector=>{
     legend += `<button onclick="showSector('${sector.slug}')" style="background:${sector.color_primary}22;border:1px solid ${sector.color_primary}66;color:#f1f0ea;padding:8px 16px;border-radius:100px;font-family:Tajawal;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px;">
-      <span>${sector.icon||'🪐'}</span><span>${tf(sector,'name')}</span>
+      <span>${sector.icon||'🪐'}</span><span id="leg-${sector.id}">${tf(sector,'name')}</span>
     </button>`;
   });
   legend += `</div>`;
   wrap.insertAdjacentHTML('afterend', `<div id="galaxyLegend">${legend}</div>`);
+  DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
 }
 
 /* ============ RENDER: SECTOR ============ */
@@ -518,8 +561,12 @@ function showSector(slug){
   if(!currentSector) return;
   switchView('view-sector');
   document.getElementById('sectorIcon').textContent = currentSector.icon || '🪐';
-  document.getElementById('sectorName').textContent = tf(currentSector,'name');
-  document.getElementById('sectorDesc').textContent = tf(currentSector,'description');
+  const nameEl = document.getElementById('sectorName');
+  const descEl = document.getElementById('sectorDesc');
+  nameEl.textContent = tf(currentSector,'name');
+  descEl.textContent = tf(currentSector,'description');
+  autoTranslateField(nameEl, currentSector, 'name');
+  autoTranslateField(descEl, currentSector, 'description');
   document.documentElement.style.setProperty('--sector-active', currentSector.color_primary);
   applyAmbient(currentSector.color_primary, currentSector.color_secondary, pickIconKeys(currentSector));
 
@@ -534,14 +581,27 @@ function showSector(slug){
       <div class="company-logo" style="--card-accent:${currentSector.color_primary}">
         ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
       </div>
-      <h3>${tf(c,'name')}</h3>
-      <div class="tag">${tf(c,'tagline')||''}</div>
-      ${relationshipLabel(c) ? `<span class="badge" style="--card-accent:${currentSector.color_primary}">${relationshipLabel(c)}</span>` : ''}
+      <h3 id="cn-${c.id}">${tf(c,'name')}</h3>
+      <div class="tag" id="ct-${c.id}">${tf(c,'tagline')||''}</div>
+      ${relationshipLabel(c) ? `<span class="badge" id="rl-${c.id}" style="--card-accent:${currentSector.color_primary}">${relationshipLabel(c)}</span>` : ''}
     </div>
   `).join('');
+  list.forEach(c=>{
+    autoTranslateField(document.getElementById('cn-'+c.id), c, 'name');
+    if(c.tagline_en || c.tagline_ar) autoTranslateField(document.getElementById('ct-'+c.id), c, 'tagline');
+    autoTranslateRelationshipLabel(c, document.getElementById('rl-'+c.id));
+  });
+}
+function autoTranslateRelationshipLabel(c, el){
+  if(!el || !c.relationship_label_ar || LANG==='ar') return;
+  const manual = c.translations && c.translations[LANG] && c.translations[LANG].relationship_label;
+  if(manual) return; // already showing the manual translation
+  mtTranslate(c.relationship_label_ar, LANG).then(t=>{ if(el.isConnected) el.textContent = t; });
 }
 function relationshipLabel(c){
   if(!c.relationship_type) return '';
+  const manual = c.translations && c.translations[LANG] && c.translations[LANG].relationship_label;
+  if(manual) return manual;
   if(c.relationship_label_ar && LANG==='ar') return c.relationship_label_ar;
   const map = {owned:'rel_owned', jv:'rel_jv', collaboration:'rel_collaboration', subsidiary:'rel_subsidiary', initiative:'rel_initiative'};
   return i18n(map[c.relationship_type] || 'rel_owned');
@@ -655,10 +715,14 @@ function showConsulting(){
       <div class="company-logo" style="--card-accent:#9ba3b8">
         ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
       </div>
-      <h3>${tf(c,'name')}</h3>
-      <div class="tag">${c.type_ar||''}</div>
+      <h3 id="con-${c.id}">${tf(c,'name')}</h3>
+      <div class="tag" id="cot-${c.id}">${tf(c,'type')||''}</div>
     </div>
   `).join('');
+  DATA.consulting.forEach(c=>{
+    autoTranslateField(document.getElementById('con-'+c.id), c, 'name');
+    autoTranslateField(document.getElementById('cot-'+c.id), c, 'type');
+  });
 }
 
 /* ============ MODALS ============ */
@@ -672,20 +736,34 @@ function openCompany(id){
     <div class="modal-top">
       <div class="modal-logo" style="--modal-accent:${accent}">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
       <div>
-        <h3>${tf(c,'name')}</h3>
-        <div class="tag">${tf(c,'tagline')||''}</div>
+        <h3 id="modalName">${tf(c,'name')}</h3>
+        <div class="tag" id="modalTag">${tf(c,'tagline')||''}</div>
       </div>
     </div>
-    ${relationshipLabel(c) ? `<span class="badge" style="--card-accent:${accent}">${relationshipLabel(c)}</span>` : ''}
-    <p class="modal-desc">${tf(c,'description')||''}</p>
-    ${c.reference_text ? `<div class="modal-ref">${c.reference_text}${c.reference_author?`<cite>— ${c.reference_author}</cite>`:''}</div>` : ''}
+    ${relationshipLabel(c) ? `<span class="badge" id="modalRelBadge" style="--card-accent:${accent}">${relationshipLabel(c)}</span>` : ''}
+    <p class="modal-desc" id="modalDesc">${tf(c,'description')||''}</p>
+    ${c.reference_text ? `<div class="modal-ref" id="modalRef">${c.reference_text}${c.reference_author?`<cite>— ${c.reference_author}</cite>`:''}</div>` : ''}
     ${(c.gallery&&c.gallery.length) ? `<div class="modal-gallery">${c.gallery.map(g=>`<img src="${g}">`).join('')}</div>` : ''}
     <div class="modal-actions">
       ${c.website_url?`<a class="btn-primary" style="--modal-accent:${accent}" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
-      <span class="btn-ghost">${currentSector?tf(currentSector,'name'):''}</span>
+      <span class="btn-ghost" id="modalSectorTag">${currentSector?tf(currentSector,'name'):''}</span>
     </div>
   `;
   document.getElementById('modalOverlay').classList.add('active');
+  autoTranslateField(document.getElementById('modalName'), c, 'name');
+  if(c.tagline_en || c.tagline_ar) autoTranslateField(document.getElementById('modalTag'), c, 'tagline');
+  autoTranslateField(document.getElementById('modalDesc'), c, 'description');
+  if(currentSector) autoTranslateField(document.getElementById('modalSectorTag'), currentSector, 'name');
+  autoTranslateRelationshipLabel(c, document.getElementById('modalRelBadge'));
+  if(c.reference_text && LANG!=='ar'){
+    const refEl = document.getElementById('modalRef');
+    const manualRef = c.translations && c.translations[LANG] && c.translations[LANG].reference_text;
+    if(refEl && manualRef){
+      refEl.childNodes[0].textContent = manualRef;
+    } else if(refEl){
+      mtTranslate(c.reference_text, LANG).then(t=>{ if(refEl.isConnected) refEl.childNodes[0].textContent = t; });
+    }
+  }
 }
 function openConsulting(id){
   const c = DATA.consulting.find(x=>x.id===id);
@@ -695,14 +773,17 @@ function openConsulting(id){
     <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-top">
       <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
-      <div><h3>${tf(c,'name')}</h3><div class="tag">${c.type_ar||''}</div></div>
+      <div><h3 id="modalConName">${tf(c,'name')}</h3><div class="tag" id="modalConType">${tf(c,'type')||''}</div></div>
     </div>
-    <p class="modal-desc">${tf(c,'description')||''}</p>
+    <p class="modal-desc" id="modalConDesc">${tf(c,'description')||''}</p>
     <div class="modal-actions">
       ${c.website_url?`<a class="btn-primary" style="--modal-accent:#9ba3b8" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
     </div>
   `;
   document.getElementById('modalOverlay').classList.add('active');
+  autoTranslateField(document.getElementById('modalConName'), c, 'name');
+  autoTranslateField(document.getElementById('modalConDesc'), c, 'description');
+  autoTranslateField(document.getElementById('modalConType'), c, 'type');
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });

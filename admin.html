@@ -117,6 +117,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
     <button class="tab" data-tab="sectors" onclick="switchTab('sectors')">القطاعات</button>
     <button class="tab" data-tab="companies" onclick="switchTab('companies')">الشركات</button>
     <button class="tab" data-tab="consulting" onclick="switchTab('consulting')">شراكات واستشارات</button>
+    <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت</button>
   </div>
 
   <!-- BRAND -->
@@ -240,6 +241,87 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       </div>
     </div>
     <div class="card"><h3>الشراكات الحالية</h3><div id="consultingList"></div></div>
+  </div>
+
+  <!-- ABOUT INTERSECT -->
+  <div class="panel" id="panel-about">
+    <div class="card">
+      <h3>الرؤية والرسالة</h3>
+      <div class="field"><label>Vision (English)</label><textarea id="visionEn"></textarea></div>
+      <div class="field"><label>Mission (English)</label><textarea id="missionEn"></textarea></div>
+      <button class="btn" onclick="saveVisionMission()">حفظ</button>
+    </div>
+
+    <div class="card">
+      <h3>القيم الأساسية</h3>
+      <div id="valuesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('core_values',{title_en:'',desc_en:''})">+ إضافة قيمة</button>
+        <button class="btn btn-sm" onclick="saveListSection('core_values')">حفظ القيم</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>الخدمات</h3>
+      <div id="servicesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('services',{title_en:'',desc_en:''})">+ إضافة خدمة</button>
+        <button class="btn btn-sm" onclick="saveListSection('services')">حفظ الخدمات</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>القطاعات التي نخدمها</h3>
+      <div id="industriesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addSimpleListRow('industries')">+ إضافة</button>
+        <button class="btn btn-sm" onclick="saveSimpleListSection('industries')">حفظ</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>شريط الإحصائيات</h3>
+      <div id="statsList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('stats',{value:'',label_en:''})">+ إضافة رقم</button>
+        <button class="btn btn-sm" onclick="saveListSection('stats')">حفظ الإحصائيات</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>الفريق</h3>
+      <div id="teamList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('team',{name:'',title_en:'',photo_url:null})">+ إضافة عضو</button>
+        <button class="btn btn-sm" onclick="saveListSection('team')">حفظ الفريق</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>المستشارون</h3>
+      <div id="advisorsList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('advisors',{name:'',title_en:'',bio_en:'',photo_url:null})">+ إضافة مستشار</button>
+        <button class="btn btn-sm" onclick="saveListSection('advisors')">حفظ المستشارين</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>شعارات عملاء/شركاء (نص فقط)</h3>
+      <div id="logosList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addSimpleListRow('client_logos')">+ إضافة</button>
+        <button class="btn btn-sm" onclick="saveSimpleListSection('client_logos')">حفظ</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>بيانات التواصل</h3>
+      <div class="field"><label>الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://"></div>
+      <div class="field"><label>الإيميل</label><input id="contactEmail"></div>
+      <div class="field"><label>الجوال</label><input id="contactPhone"></div>
+      <button class="btn" onclick="saveContactInfo()">حفظ</button>
+    </div>
   </div>
 </div>
 
@@ -372,6 +454,7 @@ async function handleGenericLogo(e, cb){
 
 /* ============ LOAD ============ */
 let BRAND_DATA = {};
+let ABOUT = { vision_mission:{}, core_values:[], services:[], industries:[], stats:[], team:[], advisors:[], client_logos:[], contact_info:{} };
 async function loadAll(){
   const [{data:settings},{data:sectors},{data:companies},{data:consulting}] = await Promise.all([
     sb.from('intersect_site_settings').select('*'),
@@ -379,7 +462,9 @@ async function loadAll(){
     sb.from('intersect_companies').select('*').order('sort_order'),
     sb.from('intersect_consulting').select('*').order('sort_order')
   ]);
-  const brand = (settings||[]).find(s=>s.key==='brand')?.value || {};
+  const settingsMap = {};
+  (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
+  const brand = settingsMap.brand || {};
   BRAND_DATA = brand;
   document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
   document.getElementById('brandTaglineEn').value = brand.tagline_en||'';
@@ -387,10 +472,106 @@ async function loadAll(){
   document.getElementById('brandAboutEn').value = brand.about_en||'';
   if(brand.logo_url){ pendingBrandLogo=brand.logo_url; const im=document.getElementById('brandLogoPreview'); im.src=brand.logo_url; im.style.display='block'; }
 
+  ABOUT.vision_mission = settingsMap.vision_mission || {};
+  ABOUT.core_values = settingsMap.core_values || [];
+  ABOUT.services = settingsMap.services || [];
+  ABOUT.industries = settingsMap.industries || [];
+  ABOUT.stats = settingsMap.stats || [];
+  ABOUT.team = settingsMap.team || [];
+  ABOUT.advisors = settingsMap.advisors || [];
+  ABOUT.client_logos = settingsMap.client_logos || [];
+  ABOUT.contact_info = settingsMap.contact_info || {};
+  document.getElementById('visionEn').value = ABOUT.vision_mission.vision_en || '';
+  document.getElementById('missionEn').value = ABOUT.vision_mission.mission_en || '';
+  document.getElementById('contactWebsite').value = ABOUT.contact_info.website || '';
+  document.getElementById('contactEmail').value = ABOUT.contact_info.email || '';
+  document.getElementById('contactPhone').value = ABOUT.contact_info.phone || '';
+  renderListSection('core_values'); renderListSection('services'); renderListSection('stats');
+  renderListSection('team'); renderListSection('advisors');
+  renderSimpleListSection('industries'); renderSimpleListSection('client_logos');
+
   SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
   renderSectors(); renderCompanies(); renderConsulting();
   const sel = document.getElementById('compSector');
   sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
+}
+
+/* ============ ABOUT INTERSECT ============ */
+const LIST_FIELD_SETS = {
+  core_values: [{key:'title_en',label:'العنوان (English)',kind:'input'},{key:'desc_en',label:'الوصف (English)',kind:'textarea'}],
+  services: [{key:'title_en',label:'العنوان (English)',kind:'input'},{key:'desc_en',label:'الوصف (English)',kind:'textarea'}],
+  stats: [{key:'value',label:'الرقم (مثال: 15+)',kind:'input'},{key:'label_en',label:'الوصف (English)',kind:'input'}],
+  team: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'}],
+  advisors: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'},{key:'bio_en',label:'نبذة (English)',kind:'textarea'}]
+};
+const LIST_TABLES = {core_values:'valuesList', services:'servicesList', stats:'statsList', team:'teamList', advisors:'advisorsList'};
+const HAS_PHOTO = {team:true, advisors:true};
+
+function renderListSection(key){
+  const container = document.getElementById(LIST_TABLES[key]);
+  const fields = LIST_FIELD_SETS[key];
+  const arr = ABOUT[key];
+  container.innerHTML = arr.map((item,i)=>`
+    <div class="card" style="background:var(--panel-2);margin-bottom:10px;">
+      ${HAS_PHOTO[key] ? `
+        <div class="upload-row" style="margin-bottom:10px;">
+          <img src="${item.photo_url||''}" style="${item.photo_url?'':'display:none'}" id="photo-${key}-${i}">
+          <input type="file" accept="image/*" onchange="handleListPhoto(event,'${key}',${i})">
+        </div>` : ''}
+      ${fields.map(f=>`
+        <div class="field"><label>${f.label}</label>${f.kind==='textarea'
+          ? `<textarea onblur="updateListField('${key}',${i},'${f.key}',this.value)">${item[f.key]||''}</textarea>`
+          : `<input value="${(item[f.key]||'').toString().replace(/"/g,'&quot;')}" onblur="updateListField('${key}',${i},'${f.key}',this.value)">`}</div>
+      `).join('')}
+      <button class="btn-danger btn-sm" onclick="removeListRow('${key}',${i})">حذف هذا العنصر</button>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد عناصر بعد.</p>';
+}
+function updateListField(key, i, field, value){ ABOUT[key][i][field] = value; }
+function addListRow(key, blank){ ABOUT[key].push(blank); renderListSection(key); }
+function removeListRow(key, i){ ABOUT[key].splice(i,1); renderListSection(key); }
+async function handleListPhoto(e, key, i){
+  const file = e.target.files[0];
+  if(!file) return;
+  showToast('جارٍ رفع الصورة…');
+  const url = await uploadImage(file);
+  if(url){ ABOUT[key][i].photo_url = url; renderListSection(key); }
+}
+async function saveListSection(key){
+  const {error} = await sb.from('intersect_site_settings').upsert({key, value: ABOUT[key]});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast('تم الحفظ ✓');
+}
+
+function renderSimpleListSection(key){
+  const container = document.getElementById(key==='industries'?'industriesList':'logosList');
+  container.innerHTML = ABOUT[key].map((name,i)=>`
+    <div class="item-row">
+      <input style="flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;" value="${(name||'').replace(/"/g,'&quot;')}" onblur="ABOUT['${key}'][${i}]=this.value">
+      <button class="btn-danger btn-sm" onclick="ABOUT['${key}'].splice(${i},1); renderSimpleListSection('${key}')">حذف</button>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد عناصر بعد.</p>';
+}
+function addSimpleListRow(key){ ABOUT[key].push(''); renderSimpleListSection(key); }
+async function saveSimpleListSection(key){
+  const {error} = await sb.from('intersect_site_settings').upsert({key, value: ABOUT[key]});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast('تم الحفظ ✓');
+}
+
+async function saveVisionMission(){
+  const value = {...ABOUT.vision_mission, vision_en: document.getElementById('visionEn').value, mission_en: document.getElementById('missionEn').value};
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'vision_mission', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  ABOUT.vision_mission = value;
+  showToast('تم الحفظ ✓');
+}
+async function saveContactInfo(){
+  const value = {website: document.getElementById('contactWebsite').value.trim(), email: document.getElementById('contactEmail').value.trim(), phone: document.getElementById('contactPhone').value.trim()};
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  ABOUT.contact_info = value;
+  showToast('تم الحفظ ✓');
 }
 
 /* ============ BRAND ============ */

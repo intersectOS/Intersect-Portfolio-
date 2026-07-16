@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Intersect — إنترسكت | حيث تتقاطع الأفكار</title>
+<meta name="description" content="بروفايل تفاعلي لمحفظة مشاريع إنترسكت الرقمية في السوق السعودي">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --void:#05060a;
+  --nebula:#0b0f1f;
+  --panel:#10142a;
+  --panel-2:#161b38;
+  --text:#f1f0ea;
+  --muted:#8a8fa3;
+  --gold:#d4af6a;
+  --gold-dim:#a8894f;
+  --line:rgba(241,240,234,0.08);
+  --sector-1:#7b5cff; --sector-1b:#4fd8e0;
+  --consulting:#9ba3b8;
+  --r-sm:10px; --r-md:16px; --r-lg:26px;
+  --ff-display:'Aref Ruqaa', serif;
+  --ff-body:'Tajawal', sans-serif;
+  --ff-mono:'Space Grotesk', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--ff-body);
+  overflow-x:hidden;
+  min-height:100vh;
+  position:relative;
+}
+body.lang-en{font-family:var(--ff-mono);}
+::selection{background:var(--gold);color:var(--void);}
+
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 32px;
+  pointer-events:none;
+}
+.topbar > *{pointer-events:auto;}
+.brand-mini{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--ff-display);font-size:22px;letter-spacing:.5px;
+  cursor:pointer;color:var(--text);text-decoration:none;
+  opacity:0;transition:opacity .6s ease;
+}
+.brand-mini.show{opacity:1;}
+.brand-mini .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);}
+.lang-toggle{
+  background:transparent;border:1px solid var(--line);color:var(--muted);
+  font-family:var(--ff-mono);font-size:12px;letter-spacing:1px;
+  padding:8px 16px;border-radius:100px;cursor:pointer;
+  transition:.25s;
+}
+.lang-toggle:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ---------- layout / views ---------- */
+.view{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:none;
+  align-items:center;justify-content:center;
+  flex-direction:column;
+  padding:120px 24px 80px;
+}
+.view.active{display:flex;}
+
+/* ---------- HOME ---------- */
+#view-home{text-align:center;gap:28px;max-width:760px;margin:0 auto;}
+.home-logo{
+  width:92px;height:92px;border-radius:50%;
+  border:1px solid rgba(212,175,106,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--ff-display);font-size:34px;color:var(--gold);
+  box-shadow:0 0 40px rgba(212,175,106,.25), inset 0 0 20px rgba(212,175,106,.1);
+  animation:pulse-glow 4s ease-in-out infinite;
+  background:radial-gradient(circle at 35% 30%, rgba(212,175,106,.15), transparent 70%);
+}
+.home-logo.has-image{
+  width:min(360px,72vw);height:auto;border-radius:0;border:none;box-shadow:none;
+  background:none;animation:none;padding:0;
+}
+.home-logo.has-image img{width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 0 30px rgba(212,175,106,.25));}
+@keyframes pulse-glow{
+  0%,100%{box-shadow:0 0 40px rgba(212,175,106,.25), inset 0 0 20px rgba(212,175,106,.1);}
+  50%{box-shadow:0 0 60px rgba(212,175,106,.4), inset 0 0 26px rgba(212,175,106,.18);}
+}
+.home-wordmark{font-family:var(--ff-display);font-size:clamp(40px,7vw,68px);font-weight:700;letter-spacing:1px;}
+.home-tagline{color:var(--gold);font-size:17px;letter-spacing:.3px;}
+.home-about{color:var(--muted);font-size:15.5px;line-height:1.9;max-width:600px;}
+.home-stats{display:flex;gap:36px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+.home-stat{text-align:center;}
+.home-stat b{display:block;font-family:var(--ff-mono);font-size:26px;color:var(--text);}
+.home-stat span{font-size:12px;color:var(--muted);letter-spacing:.5px;}
+.cta-btn{
+  margin-top:18px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  color:#1a1306;border:none;padding:16px 40px;border-radius:100px;
+  font-family:var(--ff-body);font-weight:700;font-size:15px;cursor:pointer;
+  box-shadow:0 8px 30px rgba(212,175,106,.3);
+  transition:transform .25s, box-shadow .25s;
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(212,175,106,.45);}
+
+/* ---------- GALAXY ---------- */
+#view-galaxy{padding-top:110px;}
+.galaxy-head{text-align:center;margin-bottom:6px;}
+.galaxy-head h2{font-family:var(--ff-display);font-size:30px;font-weight:700;}
+.galaxy-head p{color:var(--muted);font-size:14px;margin-top:6px;}
+.orbit-wrap{position:relative;width:min(720px,92vw);aspect-ratio:1/1;margin:20px auto 10px;}
+.orbit-wrap svg{width:100%;height:100%;overflow:visible;}
+.orbit-path{fill:none;stroke-width:1;transition:stroke-opacity .3s;}
+.planet-node{cursor:pointer;}
+.planet-dot{filter:drop-shadow(0 0 8px currentColor);}
+.planet-label{
+  font-family:var(--ff-body);font-weight:700;font-size:11px;fill:var(--text);
+  pointer-events:none;
+}
+.sun{filter:drop-shadow(0 0 18px var(--gold));}
+.consulting-link{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:18px;color:var(--consulting);text-decoration:none;
+  font-size:13px;border:1px solid var(--line);padding:10px 22px;border-radius:100px;
+  transition:.25s;
+}
+.consulting-link:hover{border-color:var(--consulting);background:rgba(155,163,184,.08);}
+
+/* ---------- SECTOR ---------- */
+#view-sector{padding-top:110px;width:100%;max-width:1080px;}
+.sector-ambient{
+  position:fixed;inset:0;z-index:0;opacity:0;transition:opacity .8s ease;pointer-events:none;
+}
+.sector-ambient.active{opacity:1;animation:ambient-breathe 7s ease-in-out infinite;}
+@keyframes ambient-breathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.18);}}
+.icon-field{position:absolute;inset:0;overflow:hidden;}
+.floating-icon{
+  position:absolute;left:var(--x,50%);top:var(--y,50%);
+  width:var(--sz,34px);height:var(--sz,34px);
+  opacity:var(--op,.32);
+  animation:float-drift var(--dur,20s) ease-in-out infinite;
+  animation-delay:var(--delay,0s);
+  will-change:transform;transition:transform .4s ease-out;
+}
+.floating-icon svg{
+  width:100%;height:100%;display:block;
+  filter:drop-shadow(0 0 3px currentColor) drop-shadow(0 0 11px currentColor);
+}
+@keyframes float-drift{
+  0%,100%{transform:translate(0,0) rotate(0deg) scale(1);}
+  33%{transform:translate(var(--dx,18px),var(--dy,-24px)) rotate(var(--rot,10deg)) scale(1.06);}
+  66%{transform:translate(calc(var(--dx,18px)*-0.6),calc(var(--dy,-24px)*0.5)) rotate(calc(var(--rot,10deg)*-0.6)) scale(.96);}
+}
+.back-link{
+  align-self:flex-start;color:var(--muted);text-decoration:none;font-size:13px;
+  display:flex;align-items:center;gap:6px;margin-bottom:26px;transition:.2s;
+}
+.back-link:hover{color:var(--text);}
+.sector-header{text-align:center;margin-bottom:44px;}
+.sector-icon{font-size:44px;margin-bottom:10px;display:block;}
+.sector-header h2{font-family:var(--ff-display);font-size:34px;font-weight:700;}
+.sector-header p{color:var(--muted);font-size:14.5px;margin-top:10px;max-width:560px;margin-inline:auto;line-height:1.8;}
+.company-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;width:100%;
+}
+.company-card{
+  background:linear-gradient(180deg,var(--panel),var(--nebula));
+  border:1px solid var(--line);border-radius:var(--r-md);
+  padding:26px 22px;cursor:pointer;transition:.3s;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.company-card:hover{transform:translateY(-4px);border-color:var(--card-accent,var(--gold));box-shadow:0 14px 34px rgba(0,0,0,.35);}
+.company-logo{
+  width:64px;height:64px;border-radius:16px;background:var(--panel-2);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  font-family:var(--ff-display);font-size:24px;color:var(--card-accent,var(--gold));
+  border:1px solid var(--line);
+}
+.company-logo img{width:100%;height:100%;object-fit:cover;}
+.company-card h3{font-size:16px;font-weight:700;}
+.company-card .tag{color:var(--muted);font-size:12.5px;line-height:1.6;}
+.badge{
+  font-family:var(--ff-mono);font-size:10.5px;letter-spacing:.5px;
+  padding:4px 12px;border-radius:100px;border:1px solid var(--card-accent,var(--gold));
+  color:var(--card-accent,var(--gold));
+}
+.empty-state{color:var(--muted);text-align:center;padding:60px 20px;font-size:14px;}
+
+/* ---------- MODAL ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(3,4,10,.82);backdrop-filter:blur(6px);
+  z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
+}
+.modal-overlay.active{display:flex;}
+.modal-box{
+  background:linear-gradient(180deg,var(--panel),var(--nebula));
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  max-width:560px;width:100%;max-height:86vh;overflow-y:auto;
+  padding:36px;position:relative;
+}
+.modal-close{
+  position:absolute;top:18px;left:18px;background:transparent;border:none;
+  color:var(--muted);font-size:22px;cursor:pointer;line-height:1;
+}
+.modal-close:hover{color:var(--text);}
+.modal-top{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.modal-logo{
+  width:64px;height:64px;border-radius:16px;background:var(--panel-2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  font-family:var(--ff-display);font-size:26px;color:var(--modal-accent,var(--gold));
+  border:1px solid var(--line);
+}
+.modal-logo img{width:100%;height:100%;object-fit:cover;}
+.modal-top h3{font-size:21px;font-weight:700;}
+.modal-top .tag{color:var(--muted);font-size:13px;margin-top:3px;}
+.modal-desc{color:#cfced9;font-size:14.5px;line-height:1.9;margin:18px 0;}
+.modal-ref{
+  border-inline-start:3px solid var(--modal-accent,var(--gold));padding:12px 16px;
+  background:rgba(255,255,255,.03);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  font-size:13.5px;color:var(--muted);margin:18px 0;font-style:italic;
+}
+.modal-ref cite{display:block;margin-top:8px;font-style:normal;font-size:12px;color:var(--modal-accent,var(--gold));}
+.modal-gallery{display:flex;gap:8px;overflow-x:auto;margin:18px 0;}
+.modal-gallery img{width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.modal-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+.modal-actions a, .modal-actions span{
+  font-size:13px;padding:11px 22px;border-radius:100px;text-decoration:none;
+}
+.btn-primary{background:var(--modal-accent,var(--gold));color:#111;font-weight:700;}
+.btn-ghost{border:1px solid var(--line);color:var(--muted);}
+
+/* ---------- footer ---------- */
+.site-footer{
+  position:relative;z-index:1;text-align:center;padding:30px 20px 40px;color:var(--muted);font-size:11.5px;
+}
+.site-footer a{color:var(--muted);text-decoration:none;opacity:.6;transition:.2s;}
+.site-footer a:hover{opacity:1;color:var(--gold);}
+
+/* ---------- misc ---------- */
+.loading{color:var(--muted);font-size:13px;padding:40px;text-align:center;}
+@media (max-width:640px){
+  .topbar{padding:16px 18px;}
+  .home-stats{gap:22px;}
+  .modal-box{padding:26px 20px;}
+}
+body.lang-ltr{direction:ltr;}
+select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:28px;}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="topbar">
+  <a href="#" class="brand-mini" id="brandMini" onclick="goHome();return false;">
+    <span class="dot"></span>
+    <span data-i18n="brand_name">إنترسكت</span>
+  </a>
+  <select class="lang-toggle" id="langSelect" onchange="setLang(this.value)"></select>
+</div>
+
+<!-- HOME -->
+<section class="view active" id="view-home">
+  <div class="home-logo" id="homeLogo">IX</div>
+  <h1 class="home-wordmark" id="homeWordmark" data-i18n="brand_name">إنترسكت</h1>
+  <p class="home-tagline" id="homeTagline">حيث تتقاطع الأفكار وتُبنى المشاريع</p>
+  <p class="home-about" id="homeAbout">جارٍ التحميل…</p>
+  <div class="home-stats" id="homeStats"></div>
+  <button class="cta-btn" onclick="showGalaxy()">
+    <span data-i18n="explore_cta">استكشف الكون ←</span>
+  </button>
+</section>
+
+<!-- GALAXY -->
+<section class="view" id="view-galaxy">
+  <div class="galaxy-head">
+    <h2 data-i18n="sectors_title">القطاعات</h2>
+    <p data-i18n="sectors_sub">اختر كوكبًا لاستكشاف مشاريعه</p>
+  </div>
+  <div class="orbit-wrap" id="orbitWrap"></div>
+  <a class="consulting-link" href="#" onclick="showConsulting();return false;">
+    <span data-i18n="partnerships_link">🤝 شراكات واستشارات ←</span>
+  </a>
+</section>
+
+<!-- SECTOR -->
+<section class="view" id="view-sector">
+  <a class="back-link" href="#" onclick="showGalaxy();return false;">
+    <span data-i18n="back_to_sectors">→ رجوع للقطاعات</span>
+  </a>
+  <div class="sector-header">
+    <span class="sector-icon" id="sectorIcon">🪐</span>
+    <h2 id="sectorName">—</h2>
+    <p id="sectorDesc"></p>
+  </div>
+  <div class="company-grid" id="companyGrid"></div>
+</section>
+
+<!-- CONSULTING -->
+<section class="view" id="view-consulting">
+  <a class="back-link" href="#" onclick="showGalaxy();return false;">
+    <span data-i18n="back_to_sectors">→ رجوع للقطاعات</span>
+  </a>
+  <div class="sector-header">
+    <span class="sector-icon">🤝</span>
+    <h2 data-i18n="partnerships_title">شراكات واستشارات</h2>
+    <p data-i18n="partnerships_sub">مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة</p>
+  </div>
+  <div class="company-grid" id="consultingGrid"></div>
+</section>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<footer class="site-footer">
+  <span data-i18n="footer_rights">© 2026 إنترسكت. جميع الحقوق محفوظة.</span>
+  &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
+</footer>
+
+<script>
+/* ============ CONFIG ============ */
+const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let DATA = { settings:{}, sectors:[], companies:[], consulting:[] };
+
+/* ============ 12-LANGUAGE SYSTEM ============ */
+const LANGS = [
+  {code:'ar', label:'العربية'}, {code:'en', label:'English'}, {code:'fr', label:'Français'},
+  {code:'es', label:'Español'}, {code:'de', label:'Deutsch'}, {code:'it', label:'Italiano'},
+  {code:'pt', label:'Português'}, {code:'ru', label:'Русский'}, {code:'tr', label:'Türkçe'},
+  {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
+];
+const I18N = {
+  ar:{brand_name:'إنترسكت',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…'},
+  en:{brand_name:'Intersect',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…'},
+  fr:{brand_name:'Intersect',tagline_default:"Là où les idées se croisent et les projets se construisent",explore_cta:"Explorer l'univers →",sectors_title:'Secteurs',sectors_sub:'Choisissez une planète pour explorer ses projets',partnerships_link:'🤝 Partenariats et conseil →',back_to_sectors:'← Retour aux secteurs',partnerships_title:'Partenariats et conseil',partnerships_sub:'Projets clients et partenariats stratégiques hors de notre portefeuille',no_ventures:'Aucune entreprise dans ce secteur pour le moment.',no_partnerships:'Aucun partenariat ajouté pour le moment.',visit_website:'Visiter le site ↗',stat_ventures:'Projets',stat_sectors:'Secteurs',stat_partnerships:'Partenariats',footer_rights:'© 2026 Intersect. Tous droits réservés.',footer_admin:'Administration',rel_owned:'Propriété exclusive',rel_jv:'Coentreprise',rel_collaboration:'Collaboration',rel_subsidiary:'Filiale',rel_initiative:'Initiative',loading:'Chargement…'},
+  es:{brand_name:'Intersect',tagline_default:'Donde las ideas se cruzan y los proyectos se construyen',explore_cta:'Explorar el universo →',sectors_title:'Sectores',sectors_sub:'Elige un planeta para explorar sus proyectos',partnerships_link:'🤝 Alianzas y consultoría →',back_to_sectors:'← Volver a los sectores',partnerships_title:'Alianzas y consultoría',partnerships_sub:'Proyectos de clientes y alianzas estratégicas fuera de nuestro portafolio',no_ventures:'Aún no hay empresas en este sector.',no_partnerships:'Aún no se han añadido alianzas.',visit_website:'Visitar sitio web ↗',stat_ventures:'Proyectos',stat_sectors:'Sectores',stat_partnerships:'Alianzas',footer_rights:'© 2026 Intersect. Todos los derechos reservados.',footer_admin:'Administración',rel_owned:'Propiedad total',rel_jv:'Empresa conjunta',rel_collaboration:'Colaboración',rel_subsidiary:'Filial',rel_initiative:'Iniciativa',loading:'Cargando…'},
+  de:{brand_name:'Intersect',tagline_default:'Wo Ideen sich kreuzen und Unternehmen entstehen',explore_cta:'Universum erkunden →',sectors_title:'Sektoren',sectors_sub:'Wählen Sie einen Planeten, um seine Projekte zu erkunden',partnerships_link:'🤝 Partnerschaften & Beratung →',back_to_sectors:'← Zurück zu den Sektoren',partnerships_title:'Partnerschaften & Beratung',partnerships_sub:'Kundenprojekte und strategische Partnerschaften außerhalb unseres Portfolios',no_ventures:'Noch keine Unternehmen in diesem Sektor.',no_partnerships:'Noch keine Partnerschaften hinzugefügt.',visit_website:'Website besuchen ↗',stat_ventures:'Projekte',stat_sectors:'Sektoren',stat_partnerships:'Partnerschaften',footer_rights:'© 2026 Intersect. Alle Rechte vorbehalten.',footer_admin:'Verwaltung',rel_owned:'Im Eigentum',rel_jv:'Joint Venture',rel_collaboration:'Zusammenarbeit',rel_subsidiary:'Tochtergesellschaft',rel_initiative:'Initiative',loading:'Wird geladen…'},
+  it:{brand_name:'Intersect',tagline_default:"Dove le idee si incontrano e i progetti prendono vita",explore_cta:"Esplora l'universo →",sectors_title:'Settori',sectors_sub:'Scegli un pianeta per esplorare i suoi progetti',partnerships_link:'🤝 Partnership e consulenza →',back_to_sectors:'← Torna ai settori',partnerships_title:'Partnership e consulenza',partnerships_sub:'Progetti clienti e partnership strategiche al di fuori del nostro portafoglio',no_ventures:'Nessuna azienda in questo settore ancora.',no_partnerships:'Nessuna partnership aggiunta ancora.',visit_website:'Visita il sito ↗',stat_ventures:'Progetti',stat_sectors:'Settori',stat_partnerships:'Partnership',footer_rights:'© 2026 Intersect. Tutti i diritti riservati.',footer_admin:'Amministrazione',rel_owned:'Proprietà esclusiva',rel_jv:'Joint Venture',rel_collaboration:'Collaborazione',rel_subsidiary:'Controllata',rel_initiative:'Iniziativa',loading:'Caricamento…'},
+  pt:{brand_name:'Intersect',tagline_default:'Onde as ideias se cruzam e os projetos são construídos',explore_cta:'Explorar o universo →',sectors_title:'Setores',sectors_sub:'Escolha um planeta para explorar seus projetos',partnerships_link:'🤝 Parcerias e consultoria →',back_to_sectors:'← Voltar aos setores',partnerships_title:'Parcerias e consultoria',partnerships_sub:'Projetos de clientes e parcerias estratégicas fora do nosso portfólio',no_ventures:'Ainda não há empresas neste setor.',no_partnerships:'Ainda não há parcerias adicionadas.',visit_website:'Visitar site ↗',stat_ventures:'Projetos',stat_sectors:'Setores',stat_partnerships:'Parcerias',footer_rights:'© 2026 Intersect. Todos os direitos reservados.',footer_admin:'Administração',rel_owned:'Propriedade total',rel_jv:'Joint Venture',rel_collaboration:'Colaboração',rel_subsidiary:'Subsidiária',rel_initiative:'Iniciativa',loading:'Carregando…'},
+  ru:{brand_name:'Intersect',tagline_default:'Там, где идеи пересекаются и рождаются проекты',explore_cta:'Исследовать вселенную →',sectors_title:'Секторы',sectors_sub:'Выберите планету, чтобы изучить её проекты',partnerships_link:'🤝 Партнёрства и консалтинг →',back_to_sectors:'← Назад к секторам',partnerships_title:'Партнёрства и консалтинг',partnerships_sub:'Клиентские проекты и стратегические партнёрства вне нашего портфеля',no_ventures:'В этом секторе пока нет компаний.',no_partnerships:'Партнёрства ещё не добавлены.',visit_website:'Перейти на сайт ↗',stat_ventures:'Проекты',stat_sectors:'Секторы',stat_partnerships:'Партнёрства',footer_rights:'© 2026 Intersect. Все права защищены.',footer_admin:'Админ-панель',rel_owned:'В собственности',rel_jv:'Совместное предприятие',rel_collaboration:'Сотрудничество',rel_subsidiary:'Дочерняя компания',rel_initiative:'Инициатива',loading:'Загрузка…'},
+  tr:{brand_name:'Intersect',tagline_default:'Fikirlerin kesiştiği, girişimlerin inşa edildiği yer',explore_cta:'Evreni keşfet →',sectors_title:'Sektörler',sectors_sub:'Projelerini keşfetmek için bir gezegen seçin',partnerships_link:'🤝 Ortaklıklar ve danışmanlık →',back_to_sectors:'← Sektörlere dön',partnerships_title:'Ortaklıklar ve danışmanlık',partnerships_sub:'Portföyümüz dışındaki müşteri projeleri ve stratejik ortaklıklar',no_ventures:'Bu sektörde henüz şirket yok.',no_partnerships:'Henüz ortaklık eklenmedi.',visit_website:'Web sitesini ziyaret et ↗',stat_ventures:'Girişim',stat_sectors:'Sektör',stat_partnerships:'Ortaklık',footer_rights:'© 2026 Intersect. Tüm hakları saklıdır.',footer_admin:'Yönetim',rel_owned:'Tam sahiplik',rel_jv:'Ortak girişim',rel_collaboration:'İşbirliği',rel_subsidiary:'Bağlı şirket',rel_initiative:'Girişim',loading:'Yükleniyor…'},
+  zh:{brand_name:'Intersect',tagline_default:'思想交汇、事业成形之地',explore_cta:'探索宇宙 →',sectors_title:'行业板块',sectors_sub:'选择一个星球以探索其项目',partnerships_link:'🤝 合作与咨询 →',back_to_sectors:'← 返回板块',partnerships_title:'合作与咨询',partnerships_sub:'我们自有业务组合之外的客户项目与战略合作',no_ventures:'该板块暂无企业。',no_partnerships:'暂无合作项目。',visit_website:'访问网站 ↗',stat_ventures:'企业',stat_sectors:'板块',stat_partnerships:'合作',footer_rights:'© 2026 Intersect. 保留所有权利。',footer_admin:'管理后台',rel_owned:'全资拥有',rel_jv:'合资企业',rel_collaboration:'合作',rel_subsidiary:'子公司',rel_initiative:'公益项目',loading:'加载中…'},
+  ja:{brand_name:'Intersect',tagline_default:'アイデアが交わり、事業が生まれる場所',explore_cta:'宇宙を探索する →',sectors_title:'セクター',sectors_sub:'惑星を選んでプロジェクトを探索',partnerships_link:'🤝 パートナーシップ・コンサルティング →',back_to_sectors:'← セクター一覧へ戻る',partnerships_title:'パートナーシップ・コンサルティング',partnerships_sub:'自社ポートフォリオ外のクライアント案件と戦略的パートナーシップ',no_ventures:'このセクターにはまだ企業がありません。',no_partnerships:'まだパートナーシップが追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'事業',stat_sectors:'セクター',stat_partnerships:'パートナー',footer_rights:'© 2026 Intersect. 無断複製を禁じます。',footer_admin:'管理画面',rel_owned:'完全所有',rel_jv:'合弁事業',rel_collaboration:'協業',rel_subsidiary:'子会社',rel_initiative:'非営利イニシアチブ',loading:'読み込み中…'},
+  ko:{brand_name:'Intersect',tagline_default:'아이디어가 교차하고 사업이 만들어지는 곳',explore_cta:'우주 탐험하기 →',sectors_title:'섹터',sectors_sub:'행성을 선택해 프로젝트를 탐험하세요',partnerships_link:'🤝 파트너십 및 컨설팅 →',back_to_sectors:'← 섹터로 돌아가기',partnerships_title:'파트너십 및 컨설팅',partnerships_sub:'자사 포트폴리오 외부의 클라이언트 프로젝트 및 전략적 파트너십',no_ventures:'아직 이 섹터에 등록된 기업이 없습니다.',no_partnerships:'아직 추가된 파트너십이 없습니다.',visit_website:'웹사이트 방문 ↗',stat_ventures:'프로젝트',stat_sectors:'섹터',stat_partnerships:'파트너십',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'관리자',rel_owned:'단독 소유',rel_jv:'합작 투자',rel_collaboration:'협업',rel_subsidiary:'자회사',rel_initiative:'이니셔티브',loading:'로딩 중…'}
+};
+let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+
+function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || key; }
+function applyI18N(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = i18n(el.dataset.i18n); });
+}
+function setLang(code){
+  LANG = code;
+  try{ sessionStorage.setItem('ix_lang', code); }catch(e){}
+  document.documentElement.lang = code;
+  document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-ltr', code!=='ar');
+  document.getElementById('langSelect').value = code;
+  applyI18N();
+  renderAll();
+}
+function initLangSelect(){
+  const sel = document.getElementById('langSelect');
+  sel.innerHTML = LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  sel.value = LANG;
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG==='ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-ltr', LANG!=='ar');
+  applyI18N();
+}
+initLangSelect();
+
+/* translation-aware field getter for DB content: name/tagline/description */
+function tf(obj, field, lang){
+  lang = lang || LANG;
+  if(lang==='ar') return obj[field+'_ar'] || obj[field+'_en'] || '';
+  if(lang==='en') return obj[field+'_en'] || obj[field+'_ar'] || '';
+  const tr = obj.translations && obj.translations[lang];
+  if(tr && tr[field]) return tr[field];
+  return obj[field+'_en'] || obj[field+'_ar'] || '';
+}
+
+/* ============ STARFIELD ============ */
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const count = Math.floor((canvas.width*canvas.height)/3800);
+  stars = Array.from({length:count},()=>({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*1.3+0.2,
+    a:Math.random(),
+    speed:Math.random()*0.015+0.003
+  }));
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#05060a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.a += s.speed;
+    const op = (Math.sin(s.a)+1)/2*0.7+0.15;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(241,240,234,${op})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+drawStars();
+
+/* ============ DATA LOAD ============ */
+async function loadData(){
+  try{
+    const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}] = await Promise.all([
+      sb.from('intersect_site_settings').select('*'),
+      sb.from('intersect_sectors').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('intersect_companies').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('intersect_consulting').select('*').eq('is_active',true).order('sort_order')
+    ]);
+    (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
+    DATA.sectors = sectors || [];
+    DATA.companies = companies || [];
+    DATA.consulting = consulting || [];
+  }catch(e){
+    console.error('Supabase load error', e);
+  }
+  renderAll();
+}
+
+/* ============ RENDER: HOME ============ */
+function renderHome(){
+  const brand = DATA.settings.brand || {};
+  document.getElementById('homeTagline').textContent = tf(brand,'tagline') || i18n('tagline_default');
+  document.getElementById('homeAbout').textContent = tf(brand,'about') || '';
+  const logoEl = document.getElementById('homeLogo');
+  const wordmarkEl = document.getElementById('homeWordmark');
+  if(brand.logo_url){
+    logoEl.classList.add('has-image');
+    logoEl.innerHTML = `<img src="${brand.logo_url}" alt="Intersect">`;
+    wordmarkEl.style.display = 'none';
+  } else {
+    logoEl.classList.remove('has-image');
+    logoEl.textContent = 'IX';
+    wordmarkEl.style.display = '';
+  }
+  const sectorsCount = DATA.sectors.length;
+  const companiesCount = DATA.companies.length;
+  document.getElementById('homeStats').innerHTML = `
+    <div class="home-stat"><b>${companiesCount}</b><span>${i18n('stat_ventures')}</span></div>
+    <div class="home-stat"><b>${sectorsCount}</b><span>${i18n('stat_sectors')}</span></div>
+    <div class="home-stat"><b>${DATA.consulting.length}</b><span>${i18n('stat_partnerships')}</span></div>
+  `;
+}
+
+/* ============ RENDER: GALAXY (intersecting orbits) ============ */
+const orbitOffsets = [
+  {ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},
+  {ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}
+];
+function renderGalaxy(){
+  const wrap = document.getElementById('orbitWrap');
+  const cx=360, cy=360;
+  let svg = `<svg viewBox="0 0 720 720">`;
+  svg += `<circle class="sun" cx="${cx}" cy="${cy}" r="22" fill="#d4af6a"/>`;
+  svg += `<text x="${cx}" y="${cy+5}" text-anchor="middle" font-family="Aref Ruqaa" font-size="14" fill="#1a1306" font-weight="700">IX</text>`;
+  DATA.sectors.forEach((sector,i)=>{
+    const off = orbitOffsets[i % orbitOffsets.length];
+    const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
+    const dur = 40 + i*9;
+    const color = sector.color_primary || '#7b5cff';
+    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-opacity="0.28"/>`;
+    const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
+    svg += `<g class="planet-node" onclick="showSector('${sector.slug}')">
+      <circle class="planet-dot" r="15" fill="${color}" style="color:${color}">
+        <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
+      </circle>
+    </g>`;
+  });
+  svg += `</svg>`;
+  wrap.innerHTML = svg;
+
+  // labels as HTML overlay under orbit (since text-following-motion in SVG is fiddly) — simple legend instead
+  let legend = `<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px;">`;
+  DATA.sectors.forEach(sector=>{
+    legend += `<button onclick="showSector('${sector.slug}')" style="background:${sector.color_primary}22;border:1px solid ${sector.color_primary}66;color:#f1f0ea;padding:8px 16px;border-radius:100px;font-family:Tajawal;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <span>${sector.icon||'🪐'}</span><span>${tf(sector,'name')}</span>
+    </button>`;
+  });
+  legend += `</div>`;
+  wrap.insertAdjacentHTML('afterend', `<div id="galaxyLegend">${legend}</div>`);
+}
+
+/* ============ RENDER: SECTOR ============ */
+let currentSector = null;
+function showSector(slug){
+  currentSector = DATA.sectors.find(s=>s.slug===slug);
+  if(!currentSector) return;
+  switchView('view-sector');
+  document.getElementById('sectorIcon').textContent = currentSector.icon || '🪐';
+  document.getElementById('sectorName').textContent = tf(currentSector,'name');
+  document.getElementById('sectorDesc').textContent = tf(currentSector,'description');
+  document.documentElement.style.setProperty('--sector-active', currentSector.color_primary);
+  applyAmbient(currentSector.color_primary, currentSector.color_secondary, pickIconKeys(currentSector));
+
+  const list = DATA.companies.filter(c=>c.sector_id===currentSector.id);
+  const grid = document.getElementById('companyGrid');
+  if(list.length===0){
+    grid.innerHTML = `<div class="empty-state">${i18n('no_ventures')}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(c=>`
+    <div class="company-card" style="--card-accent:${currentSector.color_primary}" onclick="openCompany('${c.id}')">
+      <div class="company-logo" style="--card-accent:${currentSector.color_primary}">
+        ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
+      </div>
+      <h3>${tf(c,'name')}</h3>
+      <div class="tag">${tf(c,'tagline')||''}</div>
+      ${relationshipLabel(c) ? `<span class="badge" style="--card-accent:${currentSector.color_primary}">${relationshipLabel(c)}</span>` : ''}
+    </div>
+  `).join('');
+}
+function relationshipLabel(c){
+  if(!c.relationship_type) return '';
+  if(c.relationship_label_ar && LANG==='ar') return c.relationship_label_ar;
+  const map = {owned:'rel_owned', jv:'rel_jv', collaboration:'rel_collaboration', subsidiary:'rel_subsidiary', initiative:'rel_initiative'};
+  return i18n(map[c.relationship_type] || 'rel_owned');
+}
+/* ============ NEON ICON LIBRARY (21 hand-drawn icons) ============ */
+const NEON_ICONS = {
+  ai: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="13" r="5"/><circle cx="13" cy="47" r="5"/><circle cx="51" cy="47" r="5"/><path d="M32 18 L17 43 M32 18 L47 43 M18 47 H46"/><circle cx="32" cy="33" r="2.2" fill="currentColor" stroke="none"/></svg>`,
+  health: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 34 H19 L25 19 L34 47 L40 34 H59"/><path d="M32 8 V18 M27 13 H37" stroke-width="3.2"/></svg>`,
+  tourism: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="32" cy="32" r="24"/><path d="M32 10 V17 M32 47 V54 M10 32 H17 M47 32 H54"/><path d="M41 23 L27 29 L23 43 L37 37 Z" stroke-linejoin="round"/></svg>`,
+  mobility: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 20 H32 M5 32 H40 M5 44 H24"/><path d="M44 32 H58 M50 24 L58 32 L50 40" stroke-linejoin="round"/></svg>`,
+  intelligence: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="32" r="5.5"/><circle cx="32" cy="32" r="16" stroke-dasharray="3 6"/><circle cx="32" cy="32" r="26" stroke-dasharray="1.5 7"/><circle cx="32" cy="6" r="2.4" fill="currentColor" stroke="none"/><circle cx="55" cy="45" r="2.4" fill="currentColor" stroke="none"/></svg>`,
+  culture: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M39 11 A20 20 0 1 0 39 53 A16 16 0 1 1 39 11 Z"/><path d="M50 13 L52 18 L57 20 L52 22 L50 27 L48 22 L43 20 L48 18 Z" fill="currentColor" stroke="none"/></svg>`,
+  partnerships: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="24" cy="32" r="16"/><circle cx="40" cy="32" r="16"/></svg>`,
+  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`,
+  satellite: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="26" y="26" width="12" height="12" rx="2"/><rect x="4" y="22" width="14" height="20" rx="1.5"/><rect x="46" y="22" width="14" height="20" rx="1.5"/><path d="M18 32 H26 M38 32 H46 M38 26 L48 16"/><circle cx="50" cy="14" r="2.4" fill="currentColor" stroke="none"/></svg>`,
+  rocket: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6 C40 16 42 28 42 38 L22 38 C22 28 24 16 32 6 Z"/><circle cx="32" cy="26" r="4"/><path d="M22 34 L12 44 M42 34 L52 44"/><path d="M27 40 L24 52 M37 40 L40 52 M32 40 L32 54"/></svg>`,
+  car: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 38 L12 26 L22 20 H42 L52 26 L56 38"/><path d="M8 38 H56 V44 H8 Z"/><circle cx="18" cy="44" r="5"/><circle cx="46" cy="44" r="5"/><path d="M20 26 H40"/></svg>`,
+  train: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="10" width="36" height="34" rx="8"/><path d="M14 26 H50"/><circle cx="24" cy="18" r="3"/><circle cx="40" cy="18" r="3"/><path d="M20 50 V56 M44 50 V56 M10 44 H54"/></svg>`,
+  tower: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="48"/><path d="M26 16 H30 M34 16 H38 M26 24 H30 M34 24 H38 M26 32 H30 M34 32 H38 M26 40 H30 M34 40 H38"/><path d="M12 56 H52"/></svg>`,
+  plane: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 32 L58 12 L36 34 L58 52 Z"/><path d="M36 34 L26 44"/></svg>`,
+  coffee: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 26 H42 V40 C42 48 36 52 28 52 C20 52 14 48 14 40 Z"/><path d="M42 30 H48 C52 30 52 38 48 38 H42"/><path d="M22 10 C22 14 26 14 26 18 M32 10 C32 14 36 14 36 18"/></svg>`,
+  arabic_letter: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M46 20 C46 12 36 10 28 14 C18 18 14 28 20 34 C26 40 38 38 40 30 C42 24 34 22 32 28 C30 34 38 36 40 30"/></svg>`,
+  japanese_kanji: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="10" width="28" height="44" rx="2"/><path d="M18 32 H46"/></svg>`,
+  mosaic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="14" y="14" width="36" height="36"/><rect x="14" y="14" width="36" height="36" transform="rotate(45 32 32)"/></svg>`,
+  lightning: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M36 6 L16 36 H30 L26 58 L50 26 H36 Z"/></svg>`,
+  chart: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 54 H54"/><rect x="14" y="38" width="8" height="16"/><rect x="28" y="28" width="8" height="26"/><rect x="42" y="16" width="8" height="38"/><path d="M14 24 L26 14 L36 20 L52 6 M44 6 H52 V14"/></svg>`,
+  guide: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="26" cy="14" r="7"/><path d="M26 21 V42 M18 30 H26 M26 26 L44 20 V32 L26 30" stroke-linejoin="round"/><path d="M18 42 L14 56 M26 42 L30 56"/></svg>`
+};
+function pickIconKeys(sector){
+  if(!sector) return ['generic'];
+  if(sector.forceKeys) return sector.forceKeys;
+  if(Array.isArray(sector.icon_keys) && sector.icon_keys.length){
+    const valid = sector.icon_keys.filter(k=>NEON_ICONS[k]);
+    if(valid.length) return valid;
+  }
+  return [autoDetectIconKey(sector)];
+}
+function autoDetectIconKey(sector){
+  const s = ((sector.slug||'')+' '+(sector.name_en||'')+' '+(sector.name_ar||'')).toLowerCase();
+  if(/ai\b|artificial|game|gaming|robot|ذكاء|ألعاب|العاب/.test(s)) return 'ai';
+  if(/health|medic|pharma|clinic|hospital|صح|طب|صيدل/.test(s)) return 'health';
+  if(/tour|travel|guide|trip|سياح|سفر/.test(s)) return 'tourism';
+  if(/mobil|transport|ride|car|logistic|نقل|تنقل|مواصلات/.test(s)) return 'mobility';
+  if(/intel|data|market|analytic|استخبار|بيانات|سوق/.test(s)) return 'intelligence';
+  if(/cultur|herit|impact|communit|nonprofit|ثقاف|تراث|مجتمع|أثر/.test(s)) return 'culture';
+  return 'generic';
+}
+
+function applyAmbient(c1,c2,iconKeys){
+  const keys = Array.isArray(iconKeys) ? iconKeys : [iconKeys || 'generic'];
+  let amb = document.getElementById('sectorAmbient');
+  if(!amb){
+    amb = document.createElement('div');
+    amb.className='sector-ambient';
+    amb.id='sectorAmbient';
+    document.body.appendChild(amb);
+  }
+  amb.style.background = `radial-gradient(circle at 50% 20%, ${c1}22, transparent 55%), radial-gradient(circle at 80% 80%, ${c2}18, transparent 50%)`;
+
+  // build a fresh field of hand-drawn neon icons matching this sector's palette (mixing all chosen icon types)
+  let field = '<div class="icon-field" id="iconField">';
+  const COUNT = 14;
+  for(let i=0;i<COUNT;i++){
+    const svg = NEON_ICONS[keys[Math.floor(Math.random()*keys.length)]] || NEON_ICONS.generic;
+    const x = Math.random()*100, y = Math.random()*100;
+    const sz = 26 + Math.random()*44;
+    const op = 0.22 + Math.random()*0.28;
+    const dur = 14 + Math.random()*16;
+    const delay = -(Math.random()*dur);
+    const dx = (Math.random()*60-30).toFixed(0);
+    const dy = (Math.random()*60-30).toFixed(0);
+    const rot = (Math.random()*24-12).toFixed(0);
+    const color = i%2===0 ? c1 : c2;
+    field += `<span class="floating-icon" style="--x:${x}%;--y:${y}%;--sz:${sz}px;--op:${op};--dur:${dur}s;--delay:${delay}s;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;color:${color}">${svg}</span>`;
+  }
+  field += '</div>';
+  amb.innerHTML = field;
+
+  requestAnimationFrame(()=>amb.classList.add('active'));
+}
+/* subtle cursor-driven parallax on the ambient icon field */
+let parallaxRAF = null;
+document.addEventListener('mousemove', e=>{
+  if(parallaxRAF) return;
+  parallaxRAF = requestAnimationFrame(()=>{
+    const field = document.getElementById('iconField');
+    if(field){
+      const px = (e.clientX/window.innerWidth - 0.5) * 26;
+      const py = (e.clientY/window.innerHeight - 0.5) * 26;
+      field.style.transform = `translate(${px}px, ${py}px)`;
+    }
+    parallaxRAF = null;
+  });
+});
+function clearAmbient(){
+  const amb = document.getElementById('sectorAmbient');
+  if(amb) amb.classList.remove('active');
+}
+
+/* ============ RENDER: CONSULTING ============ */
+function showConsulting(){
+  switchView('view-consulting');
+  applyAmbient('#9ba3b8','#5c6272',['partnerships']);
+  const grid = document.getElementById('consultingGrid');
+  if(DATA.consulting.length===0){
+    grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`;
+    return;
+  }
+  grid.innerHTML = DATA.consulting.map(c=>`
+    <div class="company-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
+      <div class="company-logo" style="--card-accent:#9ba3b8">
+        ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
+      </div>
+      <h3>${tf(c,'name')}</h3>
+      <div class="tag">${c.type_ar||''}</div>
+    </div>
+  `).join('');
+}
+
+/* ============ MODALS ============ */
+function openCompany(id){
+  const c = DATA.companies.find(x=>x.id===id);
+  if(!c) return;
+  const accent = currentSector ? currentSector.color_primary : '#d4af6a';
+  document.getElementById('modalBox').style.setProperty('--modal-accent', accent);
+  document.getElementById('modalBox').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-top">
+      <div class="modal-logo" style="--modal-accent:${accent}">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
+      <div>
+        <h3>${tf(c,'name')}</h3>
+        <div class="tag">${tf(c,'tagline')||''}</div>
+      </div>
+    </div>
+    ${relationshipLabel(c) ? `<span class="badge" style="--card-accent:${accent}">${relationshipLabel(c)}</span>` : ''}
+    <p class="modal-desc">${tf(c,'description')||''}</p>
+    ${c.reference_text ? `<div class="modal-ref">${c.reference_text}${c.reference_author?`<cite>— ${c.reference_author}</cite>`:''}</div>` : ''}
+    ${(c.gallery&&c.gallery.length) ? `<div class="modal-gallery">${c.gallery.map(g=>`<img src="${g}">`).join('')}</div>` : ''}
+    <div class="modal-actions">
+      ${c.website_url?`<a class="btn-primary" style="--modal-accent:${accent}" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
+      <span class="btn-ghost">${currentSector?tf(currentSector,'name'):''}</span>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function openConsulting(id){
+  const c = DATA.consulting.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('modalBox').style.setProperty('--modal-accent', '#9ba3b8');
+  document.getElementById('modalBox').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-top">
+      <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
+      <div><h3>${tf(c,'name')}</h3><div class="tag">${c.type_ar||''}</div></div>
+    </div>
+    <p class="modal-desc">${tf(c,'description')||''}</p>
+    <div class="modal-actions">
+      ${c.website_url?`<a class="btn-primary" style="--modal-accent:#9ba3b8" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+/* ============ VIEW ROUTER ============ */
+function switchView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('brandMini').classList.toggle('show', id!=='view-home');
+  if(id==='view-galaxy' || id==='view-home') clearAmbient();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){ switchView('view-home'); clearAmbient(); }
+function showGalaxy(){ switchView('view-galaxy'); clearAmbient(); }
+
+function renderAll(){
+  renderHome();
+  renderGalaxy();
+  if(currentSector) showSector(currentSector.slug);
+}
+
+loadData();
+</script>
+</body>
+</html>

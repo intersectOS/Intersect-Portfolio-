@@ -149,10 +149,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
         <div class="field"><label>الاسم (عربي)</label><input id="secNameAr"></div>
         <div class="field"><label>Name (English)</label><input id="secNameEn"></div>
       </div>
-      <div class="row2">
-        <div class="field"><label>الرمز (emoji)</label><input id="secIcon" placeholder="🪐"></div>
-        <div class="field"><label>slug (حروف انجليزية بدون مسافات)</label><input id="secSlug" placeholder="ai-gaming"></div>
-      </div>
+      <div class="field"><label>slug (حروف انجليزية بدون مسافات)</label><input id="secSlug" placeholder="ai-gaming"></div>
       <div class="row2">
         <div class="field"><label>اللون الأساسي</label><input type="color" id="secColor1" value="#7b5cff"></div>
         <div class="field"><label>اللون الثانوي</label><input type="color" id="secColor2" value="#4fd8e0"></div>
@@ -595,7 +592,7 @@ async function saveBrand(){
 function renderSectors(){
   document.getElementById('sectorsList').innerHTML = SECTORS.map(s=>`
     <div class="item-row">
-      <div class="thumb-fallback" style="color:${s.color_primary}">${s.icon||'🪐'}</div>
+      <div class="thumb-fallback" style="color:${s.color_primary}">${(s.icon_keys&&s.icon_keys.length&&ICON_LIBRARY[s.icon_keys[0]]) ? `<span style="width:24px;height:24px;display:inline-flex;">${ICON_LIBRARY[s.icon_keys[0]].svg}</span>` : (s.name_ar||'?').charAt(0)}</div>
       <div class="meta"><b>${s.name_ar}</b><span>${s.slug} · ${COMPANIES.filter(c=>c.sector_id===s.id).length} شركة</span></div>
       <div class="item-actions"><button class="btn-outline btn-sm" onclick="editSector('${s.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('sectors','${s.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteSector('${s.id}')">حذف</button></div>
     </div>
@@ -608,8 +605,7 @@ async function saveSector(){
   if(!name_ar||!slug){ showToast('عبّي الاسم و slug'); return; }
   const row = {
     name_ar, name_en: document.getElementById('secNameEn').value.trim(),
-    slug, icon: document.getElementById('secIcon').value.trim()||'🪐',
-    color_primary: document.getElementById('secColor1').value,
+    slug, color_primary: document.getElementById('secColor1').value,
     color_secondary: document.getElementById('secColor2').value,
     description_ar: document.getElementById('secDescAr').value.trim(),
     icon_keys: Array.from(selectedIconKeys)
@@ -633,7 +629,6 @@ function editSector(id){
   document.getElementById('secNameAr').value = s.name_ar||'';
   document.getElementById('secNameEn').value = s.name_en||'';
   document.getElementById('secSlug').value = s.slug||'';
-  document.getElementById('secIcon').value = s.icon||'';
   document.getElementById('secColor1').value = s.color_primary||'#7b5cff';
   document.getElementById('secColor2').value = s.color_secondary||'#4fd8e0';
   document.getElementById('secDescAr').value = s.description_ar||'';
@@ -646,7 +641,7 @@ function editSector(id){
 }
 function cancelSectorEdit(){
   editingSectorId = null;
-  ['secNameAr','secNameEn','secSlug','secIcon','secDescAr'].forEach(id=>document.getElementById(id).value='');
+  ['secNameAr','secNameEn','secSlug','secDescAr'].forEach(id=>document.getElementById(id).value='');
   setSelectedIconKeys([]);
   document.getElementById('secFormTitle').textContent = 'إضافة قطاع جديد';
   document.getElementById('secSaveBtn').textContent = 'إضافة القطاع';

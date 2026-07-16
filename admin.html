@@ -307,8 +307,8 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       <h3>شعارات عملاء/شركاء (نص فقط)</h3>
       <div id="logosList"></div>
       <div style="display:flex;gap:10px;margin-top:10px;">
-        <button class="btn-outline btn-sm" onclick="addSimpleListRow('client_logos')">+ إضافة</button>
-        <button class="btn btn-sm" onclick="saveSimpleListSection('client_logos')">حفظ</button>
+        <button class="btn-outline btn-sm" onclick="addListRow('client_logos',{name:'',logo_url:null})">+ إضافة</button>
+        <button class="btn btn-sm" onclick="saveListSection('client_logos')">حفظ</button>
       </div>
     </div>
 
@@ -485,7 +485,7 @@ async function loadAll(){
   document.getElementById('contactPhone').value = ABOUT.contact_info.phone || '';
   renderListSection('core_values'); renderListSection('services'); renderListSection('stats');
   renderListSection('team'); renderListSection('advisors');
-  renderSimpleListSection('industries'); renderSimpleListSection('client_logos');
+  renderSimpleListSection('industries'); renderListSection('client_logos');
 
   SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
   renderSectors(); renderCompanies(); renderConsulting();
@@ -499,10 +499,11 @@ const LIST_FIELD_SETS = {
   services: [{key:'title_en',label:'العنوان (English)',kind:'input'},{key:'desc_en',label:'الوصف (English)',kind:'textarea'}],
   stats: [{key:'value',label:'الرقم (مثال: 15+)',kind:'input'},{key:'label_en',label:'الوصف (English)',kind:'input'}],
   team: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'}],
-  advisors: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'},{key:'bio_en',label:'نبذة (English)',kind:'textarea'}]
+  advisors: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'},{key:'bio_en',label:'نبذة (English)',kind:'textarea'}],
+  client_logos: [{key:'name',label:'اسم الشركة/الشريك',kind:'input'}]
 };
-const LIST_TABLES = {core_values:'valuesList', services:'servicesList', stats:'statsList', team:'teamList', advisors:'advisorsList'};
-const HAS_PHOTO = {team:true, advisors:true};
+const LIST_TABLES = {core_values:'valuesList', services:'servicesList', stats:'statsList', team:'teamList', advisors:'advisorsList', client_logos:'logosList'};
+const HAS_PHOTO = {team:true, advisors:true, client_logos:true};
 
 function renderListSection(key){
   const container = document.getElementById(LIST_TABLES[key]);

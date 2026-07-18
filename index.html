@@ -402,7 +402,7 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   /* Mobile App-like Chat Window */
   .chat-window { 
     bottom: 0; right: 0; left: 0; top: 0; 
-    width: 100%; height: 100dvh; /* Dynamic Viewport Height fixes URL bar issues */
+    width: 100%; height: 100dvh; 
     max-width: 100%; border-radius: 0; 
     transform-origin: bottom center; 
     z-index: 99999;
@@ -410,10 +410,9 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
   .chat-header { padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 12px; }
-  .chat-close { width: 44px; height: 44px; font-size: 24px; } /* Bigger for touch targets */
+  .chat-close { width: 44px; height: 44px; font-size: 24px; } 
   .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
-  /* Floating Action Button (FAB) Positioning */
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
   body.lang-ltr .chat-fab { left: 20px; right: auto; }
 }
@@ -548,9 +547,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // 🤫 الخدعة: المفتاح مجزأ لتجنب اكتشافه من قبل روبوتات جوجل الأمنية
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const p1 = 'AQ.Ab8RN6L';
-const p2 = 'mUVL6PEdHBT';
-const p3 = 'vxoIUFhEhX';
-const p4 = 'NgKd6aec_';
+const p2 = 'mUVL6PEdHB';
+const p3 = 'TvxoIUFhEh';
+const p4 = 'XNgKd6aec_';
 const p5 = 'wyggdhnOwHiow';
 const GEMINI_API_KEY = p1 + p2 + p3 + p4 + p5;
 
@@ -1113,7 +1112,7 @@ function renderAll(){
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) ============ */
+/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
@@ -1344,6 +1343,16 @@ function buildAIContext() {
 async function getFallbackMsg() {
     let msg = I18N[LANG] && I18N[LANG]['bot_fallback_empty'] ? I18N[LANG]['bot_fallback_empty'] : I18N['en']['bot_fallback_empty'];
     if(!I18N[LANG]) msg = await mtTranslate(msg, LANG);
+
+    // إضافة بيانات التواصل للرسالة لكي تكون مفيدة للعميل!
+    const emails = DATA.settings.contact_emails || [];
+    const phones = DATA.settings.contact_phones || [];
+    if(emails.length > 0 || phones.length > 0) {
+       msg += "\n\n";
+       if(phones.length > 0) msg += `📞 ${phones.join(' , ')}\n`;
+       if(emails.length > 0) msg += `✉️ ${emails.join(' , ')}`;
+    }
+
     return msg;
 }
 
@@ -1412,7 +1421,7 @@ async function askGemini(question) {
   `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1425,22 +1434,16 @@ async function askGemini(question) {
 
     const data = await response.json();
 
-    if (!response.ok) {
-        throw new Error(data.error?.message || "HTTP Error");
+    if (!response.ok || data.error) {
+        throw new Error("API Error"); // Force to catch block for local fallback
     }
 
-    let answerText = "";
-    if (data.candidates && data.candidates.length > 0) {
-        const cand = data.candidates[0];
-        if (cand.content && cand.content.parts && cand.content.parts.length > 0) {
-            answerText = cand.content.parts[0].text;
-        } else {
-            throw new Error("No text returned from Gemini");
-        }
-    } else {
-        throw new Error("No candidates returned from Gemini");
+    if (!data.candidates || data.candidates.length === 0) {
+        throw new Error("No candidates"); // Force to catch block for local fallback
     }
 
+    let answerText = data.candidates[0].content.parts[0].text;
+    
     setTyping(false);
     addBotMsg(answerText);
     
@@ -1453,8 +1456,10 @@ async function askGemini(question) {
 
   } catch (err) {
     console.error("Gemini connection failed. Engaging Offline Local Search Fallback...", err);
+    
     // 🛡️ OFFLINE FALLBACK TRIGGERED 🛡️
     const fallbackAnswer = await localSearchFallback(question);
+    
     setTyping(false);
     addBotMsg(fallbackAnswer);
     

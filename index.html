@@ -240,11 +240,11 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 
 /* ========== GALAXY - ORGANIC ORBITS ========== */
-#view-galaxy{padding-top:100px;}
+#view-galaxy{padding-top:60px;}
 #view-galaxy::before{
-  content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;
+  content:'';position:absolute;top:50%;left:50%;width:800px;height:800px;
   transform:translate(-50%,-50%);
-  background:radial-gradient(circle, rgba(139,108,240,0.08) 0%, transparent 70%);
+  background:radial-gradient(circle, rgba(139,108,240,0.05) 0%, transparent 70%);
   pointer-events:none;
 }
 .galaxy-head{text-align:center;margin-bottom:10px;position:relative;z-index:2;}
@@ -256,15 +256,43 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .galaxy-head p{color:var(--muted);font-size:15px;margin-top:10px;letter-spacing:.5px;}
 
-.orbit-wrap{position:relative;width:min(800px,95vw);aspect-ratio:1/1;margin:10px auto 20px;}
+.orbit-wrap{position:relative;width:min(900px,100vw);aspect-ratio:1/1;margin:0 auto 20px;}
 .orbit-wrap svg{width:100%;height:100%;overflow:visible;}
-.orbit-path{fill:none;stroke-width:1.5;transition:stroke-opacity .3s;}
+.orbit-path{fill:none;stroke-width:1;transition:stroke-opacity .3s;}
 .planet-node{cursor:pointer;}
-.planet-dot{filter:drop-shadow(0 0 12px currentColor) drop-shadow(0 0 24px currentColor);}
+
+.ix-sun-glow { animation: sunPulse 4s ease-in-out infinite alternate; }
+@keyframes sunPulse { 0% { filter: blur(30px); opacity: 0.6; } 100% { filter: blur(40px); opacity: 1; } }
+
+.sun-image {
+  border-radius: 50%;
+  box-shadow: 0 0 30px var(--gold), 0 0 60px var(--gold-glow);
+  animation: sunPulse 4s ease-in-out infinite alternate;
+}
+
+.planet-dot{
+  filter: drop-shadow(0 0 15px currentColor) drop-shadow(0 0 30px currentColor);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.planet-node:hover .planet-dot {
+  transform: scale(1.3);
+  filter: drop-shadow(0 0 25px currentColor) drop-shadow(0 0 50px currentColor);
+}
+.planet-label{
+  font-family:var(--ff-body);font-size:12px;font-weight:700;fill:rgba(255,255,255,0.7);
+  pointer-events:none; text-anchor:middle; alignment-baseline:middle;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.planet-node:hover .planet-label {
+  opacity: 1;
+  transform: translateY(-25px);
+}
 
 .galaxy-legend{
   display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
-  margin-top:24px;position:relative;z-index:2;
+  margin-top:-20px;position:relative;z-index:2;
 }
 .legend-pill{
   background:var(--glass-bg);border:1px solid var(--glass-border);
@@ -344,7 +372,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   opacity:0;transition:opacity .4s;
 }
 
-/* FIX: Ensure the logo image fits perfectly inside the logo container without cropping */
 .company-logo{
   width:72px;height:72px;border-radius:20px;
   background:linear-gradient(135deg, var(--panel-2), rgba(255,255,255,0.02));
@@ -357,8 +384,8 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .company-logo img {
   width: 100%; 
   height: 100%; 
-  object-fit: contain; /* Prevents the image from stretching or being cropped */
-  padding: 8px; /* Adds breathing room around the logo inside the box */
+  object-fit: contain; 
+  padding: 8px; 
 }
 
 .company-card h3{font-size:18px;font-weight:800;}
@@ -507,7 +534,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   border:1px solid var(--glass-border);box-shadow:0 4px 20px rgba(0,0,0,0.2);
 }
 
-/* FIX: Ensure modal logo image also uses contain to avoid being cropped */
 .modal-logo img{
   width:100%;
   height:100%;
@@ -573,6 +599,75 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   transition:opacity .3s;opacity:0;
 }
 @media (pointer:fine){ .cursor-glow{opacity:1;} }
+
+/* ========== AI CHATBOT ========== */
+.ai-fab {
+  position: fixed; bottom: 30px; right: 30px; z-index: 99;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--sector-1), var(--sector-1b));
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 32px rgba(139,108,240,0.4), inset 0 0 20px rgba(255,255,255,0.2);
+  color: #fff; transition: transform 0.3s cubic-bezier(.16,1,.3,1), box-shadow 0.3s;
+}
+.ai-fab:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(139,108,240,0.6), inset 0 0 20px rgba(255,255,255,0.4);
+}
+.ai-fab svg { width: 30px; height: 30px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+
+.ai-chat-window {
+  position: fixed; bottom: 100px; right: 30px; z-index: 98;
+  width: 360px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 120px);
+  background: var(--panel); border: 1px solid var(--glass-border); border-radius: var(--r-lg);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139,108,240,0.15);
+  display: flex; flex-direction: column; overflow: hidden;
+  opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95);
+  transition: all 0.4s cubic-bezier(.16,1,.3,1);
+}
+.ai-chat-window.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+
+.ai-chat-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.02);
+}
+.ai-chat-title { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #fff; font-family: var(--ff-body); }
+.ai-chat-title span { color: var(--sector-1b); font-size: 12px; padding: 2px 8px; border-radius: 100px; background: rgba(93,232,240,0.1); border: 1px solid rgba(93,232,240,0.2); }
+.ai-close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; transition: color 0.2s; }
+.ai-close-btn:hover { color: #fff; }
+
+.ai-chat-body {
+  flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+}
+.ai-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+.ai-msg.bot { background: rgba(139,108,240,0.1); border: 1px solid rgba(139,108,240,0.2); align-self: flex-start; border-bottom-left-radius: 4px; color: #eaeaea; }
+.ai-msg.user { background: var(--gold); color: #111; font-weight: 500; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+.ai-chat-input-area {
+  padding: 16px; border-top: 1px solid var(--glass-border); display: flex; gap: 10px;
+  background: rgba(0,0,0,0.2);
+}
+.ai-chat-input-area input {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+  color: #fff; padding: 12px 16px; border-radius: 100px; outline: none; font-family: var(--ff-body);
+  transition: border-color 0.3s;
+}
+.ai-chat-input-area input:focus { border-color: var(--sector-1b); }
+.ai-chat-input-area button {
+  background: linear-gradient(135deg, var(--sector-1), var(--sector-1b));
+  border: none; width: 44px; height: 44px; border-radius: 50%; color: #fff;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: transform 0.2s;
+}
+.ai-chat-input-area button:hover { transform: scale(1.05); }
+.ai-chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.typing-indicator { display: none; align-items: center; gap: 4px; padding: 12px 16px; background: rgba(139,108,240,0.1); border-radius: 16px; align-self: flex-start; border-bottom-left-radius: 4px; }
+.typing-indicator span { width: 6px; height: 6px; background: var(--sector-1b); border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+@keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 </style>
 <base target="_blank">
 </head>
@@ -736,6 +831,37 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
 </footer>
 
+<!-- ========== AI CHATBOT UI ========== -->
+<button class="ai-fab gs-hover" onclick="toggleAIChat()" aria-label="Ask Intersect AI">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
+    <path d="M12 8v4"></path>
+    <path d="M12 16h.01"></path>
+    <path d="M8 12h.01"></path>
+    <path d="M16 12h.01"></path>
+  </svg>
+</button>
+
+<div class="ai-chat-window" id="aiChatWindow" dir="auto">
+  <div class="ai-chat-header">
+    <div class="ai-chat-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sector-1b)" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+      Intersect AI <span>Powered by Gemini</span>
+    </div>
+    <button class="ai-close-btn" onclick="toggleAIChat()">×</button>
+  </div>
+  <div class="ai-chat-body" id="aiChatBody">
+    <div class="ai-msg bot">مرحباً! أنا المساعد الذكي لشركة إنترسكت. كيف يمكنني مساعدتك في استكشاف محفظتنا الاستثمارية أو التعرف علينا أكثر؟</div>
+    <div class="typing-indicator" id="aiTyping"><span></span><span></span><span></span></div>
+  </div>
+  <div class="ai-chat-input-area">
+    <input type="text" id="aiChatInput" placeholder="Ask about our companies..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
+    <button id="aiSendBtn" onclick="sendAIMessage()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </div>
+</div>
+
 <script>
 /* ============ CONFIG ============ */
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
@@ -745,7 +871,6 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let DATA = { settings:{}, sectors:[], companies:[], consulting:[] };
 
 /* ============ URL HELPER FIX ============ */
-// هذه الدالة تتأكد من أن الرابط يحتوي دائماً على https:// لكي لا يظهر خطأ 404
 function makeValidUrl(url) {
   if (!url) return '#';
   url = url.trim();
@@ -755,10 +880,148 @@ function makeValidUrl(url) {
   return url;
 }
 
-/* ============ PARTICLE SYSTEM ============ */
+/* ============ GEMINI AI INTEGRATION ============ */
+const GEMINI_API_KEY = "AQ.Ab8RN6JGCqU-Ptqu-cQoCaeejGm-iIEtLsenyZ1Cfr-aATh27Q"; 
+let aiChatHistory = [];
+let isChatOpen = false;
+
+function toggleAIChat() {
+  const windowEl = document.getElementById('aiChatWindow');
+  isChatOpen = !isChatOpen;
+  if (isChatOpen) {
+    windowEl.classList.add('open');
+    document.getElementById('aiChatInput').focus();
+  } else {
+    windowEl.classList.remove('open');
+  }
+}
+
+function buildAIContext() {
+  const brand = DATA.settings.brand || {};
+  const about = DATA.settings.vision_mission || {};
+  
+  let contextStr = `Company Name: Intersect Holding Company\n`;
+  contextStr += `Tagline: ${brand.tagline_en || brand.tagline_ar || ''}\n`;
+  contextStr += `Vision: ${about.vision_en || about.vision_ar || ''}\n`;
+  contextStr += `Mission: ${about.mission_en || about.mission_ar || ''}\n\n`;
+  
+  contextStr += `Sectors We Operate In:\n`;
+  DATA.sectors.forEach(s => {
+    contextStr += `- ${s.name_en || s.name_ar}: ${s.description_en || s.description_ar || ''}\n`;
+  });
+  
+  contextStr += `\nPortfolio Companies:\n`;
+  DATA.companies.forEach(c => {
+    const sec = DATA.sectors.find(s => s.id === c.sector_id);
+    contextStr += `- ${c.name_en || c.name_ar} (Sector: ${sec ? (sec.name_en || sec.name_ar) : 'Unknown'}): ${c.description_en || c.description_ar || c.tagline_en || ''}. Relationship: ${c.relationship_type}\n`;
+  });
+
+  return contextStr;
+}
+
+async function sendAIMessage() {
+  const inputEl = document.getElementById('aiChatInput');
+  const sendBtn = document.getElementById('aiSendBtn');
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  appendMessage(text, 'user');
+  inputEl.value = '';
+  inputEl.disabled = true;
+  sendBtn.disabled = true;
+
+  const typingInd = document.getElementById('aiTyping');
+  typingInd.style.display = 'flex';
+  scrollToBottom();
+
+  if(!GEMINI_API_KEY) {
+      setTimeout(() => {
+          appendMessage("عذراً، لم يتم إعداد مفتاح API الخاص بالذكاء الاصطناعي (Gemini) بعد.", 'bot');
+          typingInd.style.display = 'none';
+          inputEl.disabled = false; sendBtn.disabled = false; inputEl.focus(); scrollToBottom();
+      }, 1000);
+      return;
+  }
+
+  try {
+    const response = await fetchWithRetry(text);
+    if (response) {
+      appendMessage(response, 'bot');
+      aiChatHistory.push({ role: "user", parts: [{ text: text }] });
+      aiChatHistory.push({ role: "model", parts: [{ text: response }] });
+    } else {
+      appendMessage("عذراً، أواجه مشكلة في الاتصال حالياً.", 'bot');
+    }
+  } catch (error) {
+    console.error("Gemini Error:", error);
+    appendMessage("حدث خطأ أثناء إنشاء الرد.", 'bot');
+  } finally {
+    typingInd.style.display = 'none';
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
+    scrollToBottom();
+  }
+}
+
+function appendMessage(text, sender) {
+  const body = document.getElementById('aiChatBody');
+  const typingInd = document.getElementById('aiTyping');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `ai-msg ${sender}`;
+  msgDiv.textContent = text;
+  body.insertBefore(msgDiv, typingInd);
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  const body = document.getElementById('aiChatBody');
+  body.scrollTop = body.scrollHeight;
+}
+
+async function fetchWithRetry(userText, retries = 3, delay = 1000) {
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  
+  const systemInstructionText = `You are 'Intersect AI', the official AI assistant for Intersect Holding Company. 
+  Your job is to answer visitor questions accurately based ONLY on the provided context about our company, sectors, and portfolio. 
+  If someone asks something unrelated to Intersect, politely steer the conversation back. 
+  Keep your answers concise, professional, and friendly. 
+  IMPORTANT: Always reply in the same language the user used to ask the question (Translate your knowledge to Arabic if they ask in Arabic, etc.).
+  
+  CONTEXT:
+  ${buildAIContext()}`;
+
+  const payload = {
+    contents: [...aiChatHistory, { role: "user", parts: [{ text: userText }] }],
+    systemInstruction: { parts: [{ text: systemInstructionText }] }
+  };
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts) {
+        return result.candidates[0].content.parts[0].text;
+      }
+      throw new Error("Invalid response structure");
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await new Promise(res => setTimeout(res, delay * Math.pow(2, i))); 
+    }
+  }
+}
+
+
+/* ============ PARTICLE SYSTEM (METEORS INCLUDED) ============ */
 const pCanvas = document.getElementById('particleCanvas');
 const pCtx = pCanvas.getContext('2d');
 let particles = [];
+let meteors = [];
 let mouseX = 0, mouseY = 0;
 
 function resizePCanvas(){
@@ -774,6 +1037,17 @@ function resizePCanvas(){
     alpha: Math.random() * 0.5 + 0.1,
     pulse: Math.random() * Math.PI * 2
   }));
+}
+function spawnMeteor() {
+  meteors.push({
+    x: Math.random() * pCanvas.width + pCanvas.width/2,
+    y: -50,
+    vx: - (Math.random() * 4 + 4),
+    vy: Math.random() * 4 + 4,
+    length: Math.random() * 80 + 40,
+    life: 1,
+    fadeRate: Math.random() * 0.02 + 0.01
+  });
 }
 function drawParticles(){
   pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
@@ -812,6 +1086,25 @@ function drawParticles(){
     pCtx.beginPath(); pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
     pCtx.fillStyle = `rgba(241,240,234,${op})`; pCtx.fill();
   });
+
+  // Meteors
+  if(Math.random() < 0.015) spawnMeteor();
+  for(let i=meteors.length-1; i>=0; i--){
+    let m = meteors[i];
+    m.x += m.vx; m.y += m.vy; m.life -= m.fadeRate;
+    if(m.life <= 0 || m.y > pCanvas.height || m.x < 0) { meteors.splice(i,1); continue; }
+    
+    pCtx.beginPath();
+    pCtx.moveTo(m.x, m.y);
+    pCtx.lineTo(m.x - (m.vx * m.length/10), m.y - (m.vy * m.length/10));
+    
+    let grad = pCtx.createLinearGradient(m.x, m.y, m.x - (m.vx * m.length/10), m.y - (m.vy * m.length/10));
+    grad.addColorStop(0, `rgba(255, 255, 255, ${m.life})`);
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    pCtx.strokeStyle = grad; pCtx.lineWidth = 1.5; pCtx.stroke();
+  }
+
   requestAnimationFrame(drawParticles);
 }
 resizePCanvas(); window.addEventListener('resize', resizePCanvas); drawParticles();
@@ -952,8 +1245,6 @@ function switchView(id){
     }
     else if(id === 'view-sector' || id === 'view-consulting'){
       if(id === 'view-sector' && currentSector) showSector(currentSector.slug, true);
-      else if(id === 'view-consulting') renderConsulting(); // Added this to trigger render!
-      
       gsap.fromTo('.back-link', {x: -20, opacity: 0}, {x: 0, opacity: 1, duration: 0.5});
       gsap.fromTo('.sector-header > *', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1}, "-=0.3");
       gsap.fromTo('.company-card', {y: 40, opacity: 0, scale: 0.95}, {y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"}, "-=0.4");
@@ -1008,18 +1299,69 @@ function renderHome(){
 const orbitOffsets = [{ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},{ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}];
 function renderGalaxy(){
   const wrap = document.getElementById('orbitWrap'); const legend = document.getElementById('galaxyLegend');
-  if(!wrap) return; const cx=400, cy=400;
-  let svg = `<svg viewBox="0 0 800 800"><circle class="sun" cx="${cx}" cy="${cy}" r="24" fill="#e8c87a"/><text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="16" fill="#1a1306" font-weight="700">IX</text>`;
+  if(!wrap) return; const cx=450, cy=450;
+  
+  // Center logo from Admin (if exists)
+  const brand = DATA.settings.brand || {};
+  const centerLogo = brand.galaxy_center_logo_url;
+  
+  let svg = `<svg viewBox="0 0 900 900">
+    <defs>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff8d6" stop-opacity="1"/>
+        <stop offset="40%" stop-color="#e8c87a" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#b89850" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    
+    <!-- Central Galactic Core -->
+    <g class="sun-image" style="transform-origin: ${cx}px ${cy}px;">
+      <circle cx="${cx}" cy="${cy}" r="45" fill="url(#sunGlow)"/>
+      ${centerLogo 
+        ? `<image href="${centerLogo}" x="${cx-22}" y="${cy-22}" width="44" height="44" preserveAspectRatio="xMidYMid slice" clip-path="inset(0% round 50%)"/>` 
+        : `<text x="${cx}" y="${cy+7}" text-anchor="middle" font-family="Aref Ruqaa" font-size="20" fill="#1a1306" font-weight="700">IX</text>`
+      }
+      <!-- Galactic Rings -->
+      <circle cx="${cx}" cy="${cy}" r="60" stroke="#e8c87a" stroke-width="1" fill="none" stroke-opacity="0.4" stroke-dasharray="2,6">
+        <animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="20s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="${cx}" cy="${cy}" r="75" stroke="#e8c87a" stroke-width="0.5" fill="none" stroke-opacity="0.2" stroke-dasharray="10,4">
+        <animateTransform attributeName="transform" type="rotate" from="360 ${cx} ${cy}" to="0 ${cx} ${cy}" dur="30s" repeatCount="indefinite"/>
+      </circle>
+    </g>`;
+
+  // Planets & Orbits
   DATA.sectors.forEach((sector,i)=>{
     const off = orbitOffsets[i % orbitOffsets.length]; const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
     const dur = 40 + i*9; const color = sector.color_primary || '#8b6cf0';
-    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-opacity="0.28"/>`;
+    
+    // Neon light orbit path
+    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-width="1.5" stroke-opacity="0.15" fill="none" stroke-dasharray="4,8"/>`;
+    
     const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
-    svg += `<g class="planet-node gs-hover" onclick="showSector('${sector.slug}')"><circle class="planet-dot" r="16" fill="${color}" style="color:${color}"><animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/></circle></g>`;
+    
+    svg += `<g class="planet-node gs-hover" onclick="showSector('${sector.slug}')">
+      <circle class="planet-dot" r="14" fill="${color}" style="color:${color}" filter="url(#neonGlow)">
+        <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
+      </circle>
+      <text class="planet-label" x="0" y="0">
+        ${tf(sector,'name')}
+        <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
+      </text>
+    </g>`;
   });
+  
   svg += `</svg>`; wrap.innerHTML = svg;
+  
   if(legend){
-    legend.innerHTML = DATA.sectors.map(sector=>`<button class="legend-pill" onclick="showSector('${sector.slug}')">${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}<span id="leg-${sector.id}">${tf(sector,'name')}</span></button>`).join('');
+    legend.innerHTML = DATA.sectors.map(sector=>`<button class="legend-pill gs-hover" onclick="showSector('${sector.slug}')">${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}<span id="leg-${sector.id}">${tf(sector,'name')}</span></button>`).join('');
     DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
   }
 }
@@ -1063,32 +1405,6 @@ function relationshipLabel(c){
   return i18n(map[c.relationship_type] || 'rel_owned');
 }
 
-/* ============ CONSULTING RENDER ============ */
-function renderConsulting() {
-  const grid = document.getElementById('consultingGrid');
-  if(DATA.consulting.length === 0){
-    grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`;
-    return;
-  }
-  
-  grid.innerHTML = DATA.consulting.map(c => `
-    <div class="company-card gs-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
-      <div class="company-logo" style="--card-accent:#9ba3b8">
-        ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
-      </div>
-      <h3 id="con-${c.id}">${tf(c,'name')}</h3>
-      <div class="tag" id="cot-${c.id}">${tf(c,'type')||''}</div>
-      <span class="badge" style="--card-accent:#9ba3b8">${i18n(c.relationship_kind === 'partner' ? 'kind_partner' : 'kind_client')}</span>
-    </div>
-  `).join('');
-
-  DATA.consulting.forEach(c => {
-    autoTranslateField(document.getElementById('con-'+c.id), c, 'name');
-    autoTranslateField(document.getElementById('cot-'+c.id), c, 'type');
-  });
-  setTimeout(attachGSAPInteractions, 50);
-}
-
 /* ============ MODAL (GSAP ENABLED) ============ */
 function openCompany(id){
   const c = DATA.companies.find(x=>x.id===id); if(!c) return;
@@ -1128,6 +1444,12 @@ function openConsulting(id){
   const overlay = document.getElementById('modalOverlay');
   const box = document.getElementById('modalBox');
 
+  let relLabel = '';
+  if(c.relationship_kind === 'partner') relLabel = i18n('kind_partner');
+  else if(c.relationship_kind === 'client') relLabel = i18n('kind_client');
+  else if(c.relationship_kind === 'none') relLabel = '';
+  else if(c.relationship_kind === 'custom') relLabel = c.custom_relationship_kind || '';
+
   box.style.setProperty('--modal-accent', '#9ba3b8');
   box.innerHTML = `
     <button class="modal-close gs-hover" onclick="closeModal()">×</button>
@@ -1135,7 +1457,7 @@ function openConsulting(id){
       <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
       <div><h3 id="modalConName">${tf(c,'name')}</h3><div class="tag" id="modalConType">${tf(c,'type')||''}</div></div>
     </div>
-    <span class="badge" style="--card-accent:#9ba3b8">${i18n(c.relationship_kind === 'partner' ? 'kind_partner' : 'kind_client')}</span>
+    ${relLabel ? `<span class="badge" id="modalConRel" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
     <p class="modal-desc" id="modalConDesc">${tf(c,'description')||''}</p>
     <div class="modal-actions">
       ${c.website_url?`<a class="btn-primary gs-hover" style="--modal-accent:#9ba3b8" href="${makeValidUrl(c.website_url)}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
@@ -1149,8 +1471,11 @@ function openConsulting(id){
   autoTranslateField(document.getElementById('modalConName'), c, 'name');
   autoTranslateField(document.getElementById('modalConDesc'), c, 'description');
   autoTranslateField(document.getElementById('modalConType'), c, 'type');
+  
+  if (c.relationship_kind === 'custom' && LANG !== 'ar' && c.custom_relationship_kind) {
+      autoTranslateInto(document.getElementById('modalConRel'), c.custom_relationship_kind);
+  }
 }
-
 
 function closeModal(){
   gsap.to('#modalBox', {scale: 0.95, y: -20, opacity: 0, duration: 0.3});
@@ -1204,25 +1529,37 @@ function renderAbout(){
   document.getElementById('missionText').textContent = bl(vm,'mission');
 
   document.getElementById('valuesGrid').innerHTML = (DATA.settings.core_values||[]).map((v,i)=>`
-    <div class="value-card"><h4>◆ <span>${bl(v,'title')}</span></h4><p>${bl(v,'desc')}</p></div>
+    <div class="value-card gs-card"><h4>◆ <span>${bl(v,'title')}</span></h4><p>${bl(v,'desc')}</p></div>
   `).join('');
 
   document.getElementById('servicesGrid').innerHTML = (DATA.settings.services||[]).map((s,i)=>`
-    <div class="service-card"><h4><span class="snum">0${i+1}</span> <span>${bl(s,'title')}</span></h4><p>${bl(s,'desc')}</p></div>
+    <div class="service-card gs-card"><h4><span class="snum">0${i+1}</span> <span>${bl(s,'title')}</span></h4><p>${bl(s,'desc')}</p></div>
   `).join('');
 
-  document.getElementById('industriesCloud').innerHTML = (DATA.settings.industries||[]).map(name=>`<span>${name}</span>`).join('');
+  document.getElementById('industriesCloud').innerHTML = (DATA.settings.industries||[]).map(name=>`<span class="gs-hover">${name}</span>`).join('');
   document.getElementById('statsGrid').innerHTML = (DATA.settings.stats||[]).map(s=>`
-    <div class="stat-block"><b>${s.value}</b><span>${bl(s,'label')}</span></div>
+    <div class="stat-block gs-card"><b>${s.value}</b><span>${bl(s,'label')}</span></div>
   `).join('');
 
   document.getElementById('teamGrid').innerHTML = (DATA.settings.team||[]).map(p=>`
-    <div class="person-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div></div>
+    <div class="person-card gs-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div></div>
   `).join('');
 
+  document.getElementById('advisorsGrid').innerHTML = (DATA.settings.advisors||[]).map(p=>`
+    <div class="person-card gs-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div><div class="pbio">${bl(p,'bio')}</div></div>
+  `).join('');
+
+  document.getElementById('logosCloud').innerHTML = (DATA.settings.client_logos||[]).map(l=>{
+    const name = typeof l === 'string' ? l : (l.name||'');
+    const logoUrl = typeof l === 'string' ? null : l.logo_url;
+    return logoUrl ? `<span class="logo-chip-img gs-hover"><img src="${logoUrl}" alt="${name}"></span>` : `<span class="gs-hover">${name}</span>`;
+  }).join('');
+
+  const contact = DATA.settings.contact_info || {};
   document.getElementById('contactRow').innerHTML = `
-    ${DATA.settings.contact_info?.website?`<a class="gs-hover" href="${makeValidUrl(DATA.settings.contact_info.website)}" target="_blank" rel="noopener">🌐 ${DATA.settings.contact_info.website.replace(/^https?:\/\//,'')}</a>`:''}
-    ${DATA.settings.contact_info?.email?`<a class="gs-hover" href="mailto:${DATA.settings.contact_info.email}">✉️ ${DATA.settings.contact_info.email}</a>`:''}
+    ${contact.website?`<a class="gs-hover" href="${makeValidUrl(contact.website)}" target="_blank" rel="noopener">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`:''}
+    ${contact.email?`<a class="gs-hover" href="mailto:${contact.email}">✉️ ${contact.email}</a>`:''}
+    ${contact.phone?`<a class="gs-hover" href="tel:${contact.phone.replace(/\s/g,'')}">📞 ${contact.phone}</a>`:''}
   `;
   setTimeout(attachGSAPInteractions, 50);
 }
@@ -1230,7 +1567,39 @@ function renderAbout(){
 function renderAll(){
   renderHome(); renderGalaxy();
   if(currentSector) showSector(currentSector.slug, true);
-  if(document.getElementById('view-consulting').classList.contains('active')) renderConsulting();
+  
+  const grid = document.getElementById('consultingGrid');
+  if(document.getElementById('view-consulting').classList.contains('active')){
+      if(DATA.consulting.length===0){
+        grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`;
+      } else {
+        grid.innerHTML = DATA.consulting.map(c=>{
+          let relLabel = '';
+          if(c.relationship_kind === 'partner') relLabel = i18n('kind_partner');
+          else if(c.relationship_kind === 'client') relLabel = i18n('kind_client');
+          else if(c.relationship_kind === 'custom') relLabel = c.custom_relationship_kind || '';
+          
+          return `
+          <div class="company-card gs-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
+            <div class="company-logo" style="--card-accent:#9ba3b8">
+              ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
+            </div>
+            <h3 id="con-${c.id}">${tf(c,'name')}</h3>
+            <div class="tag" id="cot-${c.id}">${tf(c,'type')||''}</div>
+            ${relLabel ? `<span class="badge" id="crl-${c.id}" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
+          </div>
+        `}).join('');
+        
+        DATA.consulting.forEach(c=>{
+          autoTranslateField(document.getElementById('con-'+c.id), c, 'name');
+          autoTranslateField(document.getElementById('cot-'+c.id), c, 'type');
+          if (c.relationship_kind === 'custom' && LANG !== 'ar' && c.custom_relationship_kind) {
+              autoTranslateInto(document.getElementById('crl-'+c.id), c.custom_relationship_kind);
+          }
+        });
+      }
+  }
+  
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 

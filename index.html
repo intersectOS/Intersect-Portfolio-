@@ -508,7 +508,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </section>
 
 <!-- AI CHAT BOT UI -->
-<div class="chat-fab" onclick="toggleChat()">
+<div class="chat-fab" id="chatFabBtn" onclick="toggleChat()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
 </div>
 
@@ -543,7 +543,8 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const GEMINI_API_KEY = 'AQ.Ab8RN6JGCqU-Ptqu-cQoCaeejGm-iIEtLsenyZ1Cfr-aATh27Q';
+
+const GEMINI_API_KEY = 'AQ.Ab8RN6JxUeZSETg-i1iD0JNtQkp4Sb3pc21y6ezlSI8KRZ1fMw'; 
 
 let DATA = { settings:{}, sectors:[], companies:[], consulting:[], knowledge_base:[] };
 let USER_IP_DATA = {};
@@ -780,6 +781,12 @@ async function loadData(){
     (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
     DATA.sectors = sectors || []; DATA.companies = companies || []; DATA.consulting = consulting || [];
     DATA.knowledge_base = kb || [];
+    
+    // Check Bot Status from Admin settings
+    if(DATA.settings.bot_status === 'disabled') {
+      const fab = document.getElementById('chatFabBtn');
+      if(fab) fab.style.display = 'none';
+    }
   }catch(e){ console.error('Supabase load error', e); }
   renderAll();
   
@@ -1224,7 +1231,7 @@ function askSector() {
 
 function finishOnboarding() { chatState = 'CHAT'; botSay('bot_ready'); }
 
-/* --- Submit Logic & API Connection --- */
+/* --- Submit Logic & FALLBACK Search --- */
 async function handleChatSubmit() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
@@ -1295,6 +1302,58 @@ function buildAIContext() {
   return ctx;
 }
 
+// 🛡️ OFFLINE LOCAL SEARCH (Fuzzy Search Fallback) 🛡️
+async function localSearchFallback(query) {
+    const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    if(words.length === 0) return await getFallbackMsg();
+
+    let results = [];
+
+    const scoreText = (text) => {
+        if(!text) return 0;
+        let t = text.toLowerCase();
+        let score = 0;
+        words.forEach(w => { if(t.includes(w)) score++; });
+        return score;
+    };
+
+    // 1. Search Knowledge Base
+    DATA.knowledge_base.forEach(k => {
+        let score = scoreText(k.content);
+        if(score > 0) results.push({score, text: k.content});
+    });
+
+    // 2. Search Companies
+    DATA.companies.forEach(c => {
+        let score = scoreText(c.name_ar) + scoreText(c.name_en) + scoreText(c.description_ar) + scoreText(c.description_en);
+        if(score > 0) results.push({score, text: `🏢 ${tf(c, 'name')}: ${tf(c, 'description')}`});
+    });
+
+    // 3. Search Sectors
+    DATA.sectors.forEach(s => {
+        let score = scoreText(s.name_ar) + scoreText(s.name_en) + scoreText(s.description_ar);
+        if(score > 0) results.push({score, text: `🌌 ${tf(s, 'name')}: ${tf(s, 'description')}`});
+    });
+
+    results.sort((a, b) => b.score - a.score);
+
+    if(results.length > 0) {
+        let prefix = LANG === 'ar' ? "💡 أواجه ضغطاً بالاتصال بالخادم الذكي حالياً، لكن من خلال سجلاتي وجدت التالي:\n\n" : "💡 I'm experiencing server load, but found this in my local records:\n\n";
+        if(LANG !== 'ar' && LANG !== 'en') prefix = await mtTranslate(prefix, LANG);
+        
+        let ans = prefix + results.slice(0, 2).map(r => r.text).join('\n\n');
+        return ans;
+    }
+
+    return await getFallbackMsg();
+}
+
+async function getFallbackMsg() {
+    let msg = LANG === 'ar' ? "عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة." : "Sorry, I am currently facing server load and couldn't find a direct answer in my local records. Feel free to browse the site or contact us directly.";
+    if(LANG !== 'ar' && LANG !== 'en') msg = await mtTranslate(msg, LANG);
+    return msg;
+}
+
 async function askGemini(question) {
   const context = buildAIContext();
   const currentLangObj = LANGS.find(l => l.code === LANG) || {label: 'English'};
@@ -1329,8 +1388,7 @@ async function askGemini(question) {
     const data = await response.json();
 
     if (!response.ok) {
-        let errorMsg = data.error?.message || "HTTP Error: " + response.status;
-        throw new Error(errorMsg);
+        throw new Error(data.error?.message || "HTTP Error");
     }
 
     let answerText = "";
@@ -1356,9 +1414,19 @@ async function askGemini(question) {
     }).then(() => {});
 
   } catch (err) {
-    console.error("Gemini Details:", err);
+    console.error("Gemini connection failed. Engaging Offline Local Search Fallback...", err);
+    // 🛡️ OFFLINE FALLBACK TRIGGERED 🛡️
+    const fallbackAnswer = await localSearchFallback(question);
     setTyping(false);
-    addBotMsg("⚠️ تنبيه نظام: السيرفر رفض الطلب. السبب من جوجل: <br><br><code>" + err.message + "</code><br><br>يرجى التأكد من صلاحية مفتاح الـ API وتفعيل Generative Language API في Google Cloud.");
+    addBotMsg(fallbackAnswer);
+    
+    // Save the interaction anyway
+    sb.from('intersect_chat_logs').insert({
+      ip_location: USER_IP_DATA || {}, 
+      lead_data: leadData, 
+      question: question, 
+      answer: fallbackAnswer + " [OFFLINE FALLBACK]"
+    }).then(() => {});
   }
 }
 

@@ -130,15 +130,15 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="brand" onclick="switchTab('brand')">الهوية والتواصل</button>
+    <button class="tab active" data-tab="brand" onclick="switchTab('brand')">الهوية والوصف</button>
     <button class="tab" data-tab="sectors" onclick="switchTab('sectors')">القطاعات</button>
     <button class="tab" data-tab="companies" onclick="switchTab('companies')">الشركات</button>
     <button class="tab" data-tab="consulting" onclick="switchTab('consulting')">شراكات واستشارات</button>
-    <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت</button>
+    <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت (ومعلومات التواصل)</button>
     <button class="tab" style="background:var(--panel-2);border-color:var(--gold);color:var(--gold)" data-tab="ai" onclick="switchTab('ai')">🤖 الذكاء الاصطناعي</button>
   </div>
 
-  <!-- BRAND & CONTACT -->
+  <!-- BRAND -->
   <div class="panel active" id="panel-brand">
     <div class="card">
       <h3>معلومات إنترسكت الأساسية</h3>
@@ -157,37 +157,10 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
         <button class="btn-outline" onclick="openTr('brand','brand')">🌐 ترجمات لباقي اللغات</button>
       </div>
     </div>
-
-    <div class="card">
-      <h3>بيانات التواصل والسوشيال ميديا</h3>
-      <div class="field"><label>الموقع الإلكتروني الرسمي</label><input id="contactWebsite" placeholder="https://"></div>
-      
-      <div class="row2" style="margin-bottom:14px; align-items: stretch;">
-        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2);">
-          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">أرقام الجوال / الهواتف</h4>
-          <div id="contact_phonesList"></div>
-          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_phones')" style="margin-top:8px;">+ إضافة رقم</button>
-        </div>
-        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2);">
-          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">الإيميلات الرسمية</h4>
-          <div id="contact_emailsList"></div>
-          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_emails')" style="margin-top:8px;">+ إضافة إيميل</button>
-        </div>
-      </div>
-      
-      <h4 style="margin:20px 0 10px; font-size:14px; color:var(--muted);">منصات التواصل الاجتماعي</h4>
-      <div class="row3">
-        <div class="field"><label>LinkedIn</label><input id="contactLinkedIn" placeholder="https://linkedin.com/company/..."></div>
-        <div class="field"><label>Twitter (X)</label><input id="contactTwitter" placeholder="https://twitter.com/..."></div>
-        <div class="field"><label>Instagram</label><input id="contactInstagram" placeholder="https://instagram.com/..."></div>
-      </div>
-      <button class="btn" onclick="saveContactInfo()">حفظ بيانات التواصل</button>
-    </div>
   </div>
 
   <!-- AI & CHAT LOGS -->
   <div class="panel" id="panel-ai">
-    
     <!-- CONTROLS -->
     <div class="card" style="border: 1px solid var(--ok); background: rgba(79, 216, 160, 0.05);">
       <h3 style="color:var(--ok);">⚙️ حالة المساعد الذكي (التحكم العام)</h3>
@@ -341,7 +314,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
     <div class="card"><h3>الشراكات الحالية</h3><div id="consultingList"></div></div>
   </div>
 
-  <!-- ABOUT INTERSECT -->
+  <!-- ABOUT INTERSECT & CONTACTS -->
   <div class="panel" id="panel-about">
     <div class="card">
       <h3>الرؤية والرسالة</h3>
@@ -411,6 +384,33 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
         <button class="btn-outline btn-sm" onclick="addListRow('client_logos',{name:'',logo_url:null})">+ إضافة</button>
         <button class="btn btn-sm" onclick="saveListSection('client_logos')">حفظ</button>
       </div>
+    </div>
+
+    <!-- CONTACTS SECTION MOVED HERE -->
+    <div class="card" style="border-color:var(--gold);">
+      <h3 style="color:var(--gold);">بيانات التواصل والسوشيال ميديا</h3>
+      <div class="field"><label>الموقع الإلكتروني الرسمي</label><input id="contactWebsite" placeholder="https://"></div>
+      
+      <div class="row2" style="margin-bottom:14px; align-items: stretch;">
+        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2); border:none;">
+          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">أرقام الجوال / الهواتف</h4>
+          <div id="contact_phonesList"></div>
+          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_phones')" style="margin-top:8px;">+ إضافة رقم</button>
+        </div>
+        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2); border:none;">
+          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">الإيميلات الرسمية</h4>
+          <div id="contact_emailsList"></div>
+          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_emails')" style="margin-top:8px;">+ إضافة إيميل</button>
+        </div>
+      </div>
+      
+      <h4 style="margin:20px 0 10px; font-size:14px; color:var(--muted);">منصات التواصل الاجتماعي</h4>
+      <div class="row3">
+        <div class="field"><label>LinkedIn</label><input id="contactLinkedIn" placeholder="https://linkedin.com/company/..."></div>
+        <div class="field"><label>Twitter (X)</label><input id="contactTwitter" placeholder="https://twitter.com/..."></div>
+        <div class="field"><label>Instagram</label><input id="contactInstagram" placeholder="https://instagram.com/..."></div>
+      </div>
+      <button class="btn" onclick="saveContactInfo()">حفظ بيانات التواصل</button>
     </div>
   </div>
 </div>
@@ -563,7 +563,6 @@ async function loadAll(){
   ABOUT.contact_emails = settingsMap.contact_emails || [];
   ABOUT.contact_phones = settingsMap.contact_phones || [];
   
-  // Backward compatibility
   if(ABOUT.contact_emails.length === 0 && ABOUT.contact_info.email) ABOUT.contact_emails.push(ABOUT.contact_info.email);
   if(ABOUT.contact_phones.length === 0 && ABOUT.contact_info.phone) ABOUT.contact_phones.push(ABOUT.contact_info.phone);
   
@@ -582,7 +581,6 @@ async function loadAll(){
   renderSimpleListSection('contact_emails');
   renderSimpleListSection('contact_phones');
 
-  // Load Bot Status
   const botStatus = settingsMap.bot_status || 'enabled';
   document.getElementById('botStatusSelect').value = botStatus;
 
@@ -943,20 +941,28 @@ const TR_LANGS = [
 const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies', consulting:'intersect_consulting'};
 const TR_FIELD_SETS = {
   sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
-  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص',kind:'input'}, {key:'reference_text',label:'نص الاقتباس',kind:'textarea'}],
+  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص (بدل التصنيف القياسي)',kind:'input'}, {key:'reference_text',label:'نص الاقتباس / الشهادة',kind:'textarea'}],
   consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'فئة المشروع',kind:'input'}, {key:'relationship_label',label:'وصف العلاقة المخصص',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
-  brand: [{key:'tagline',label:'الشعار الفرعي',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
+  brand: [{key:'tagline',label:'الشعار الفرعي (Tagline)',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
 };
 let trContext = null;
 
 function openTr(type, id){
   let item;
-  if(type==='brand'){ item = BRAND_DATA; } else { const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING; item = arr.find(x=>x.id===id); }
+  if(type==='brand'){
+    item = BRAND_DATA;
+  } else {
+    const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING;
+    item = arr.find(x=>x.id===id);
+  }
   if(!item) return;
   trContext = {type, id, item};
   document.getElementById('trTitle').textContent = 'ترجمات: ' + (type==='brand' ? 'إنترسكت' : (item.name_ar||''));
-  const sel = document.getElementById('trLang'); sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
-  buildTrFields(type); document.getElementById('trOverlay').classList.remove('hidden'); loadTrValues();
+  const sel = document.getElementById('trLang');
+  sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  buildTrFields(type);
+  document.getElementById('trOverlay').classList.remove('hidden');
+  loadTrValues();
 }
 function buildTrFields(type){
   const fields = TR_FIELD_SETS[type] || TR_FIELD_SETS.companies;
@@ -968,29 +974,40 @@ function loadTrValues(){
   const lang = document.getElementById('trLang').value;
   const tr = (trContext.item.translations && trContext.item.translations[lang]) || {};
   const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
-  fields.forEach(f=>{ const el = document.getElementById('tr-field-'+f.key); if(el) el.value = tr[f.key] || ''; });
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    if(el) el.value = tr[f.key] || '';
+  });
 }
 function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
 async function saveTranslation(){
   if(!trContext) return;
-  const lang = document.getElementById('trLang').value; const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
-  const existing = trContext.item.translations || {}; const values = {};
-  fields.forEach(f=>{ const el = document.getElementById('tr-field-'+f.key); values[f.key] = el ? el.value.trim() : ''; });
+  const lang = document.getElementById('trLang').value;
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  const existing = trContext.item.translations || {};
+  const values = {};
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    values[f.key] = el ? el.value.trim() : '';
+  });
   const updated = {...existing, [lang]: values};
 
   if(trContext.type==='brand'){
     const value = {...BRAND_DATA, translations: updated};
     const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
-    if(error){ showToast('خطأ: '+error.message); return; } BRAND_DATA = value;
+    if(error){ showToast('خطأ: '+error.message); return; }
+    BRAND_DATA = value;
   } else {
     const table = TR_TABLES[trContext.type];
     const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
-    if(error){ showToast('خطأ: '+error.message); return; } trContext.item.translations = updated;
+    if(error){ showToast('خطأ: '+error.message); return; }
+    trContext.item.translations = updated;
   }
-  showToast('تم حفظ الترجمة ✓'); loadAll();
+  showToast('تم حفظ الترجمة ✓');
+  loadAll();
 }
-
 </script>
+
 </body>
 </html>
 

@@ -160,13 +160,22 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
 
     <div class="card">
       <h3>بيانات التواصل والسوشيال ميديا</h3>
-      <div class="row2">
-        <div class="field"><label>الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://"></div>
-        <div class="field"><label>الإيميل</label><input id="contactEmail"></div>
-      </div>
-      <div class="field"><label>الجوال</label><input id="contactPhone"></div>
+      <div class="field"><label>الموقع الإلكتروني الرسمي</label><input id="contactWebsite" placeholder="https://"></div>
       
-      <h4 style="margin:16px 0 10px; font-size:14px; color:var(--muted);">منصات التواصل الاجتماعي</h4>
+      <div class="row2" style="margin-bottom:14px; align-items: stretch;">
+        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2);">
+          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">أرقام الجوال / الهواتف</h4>
+          <div id="contact_phonesList"></div>
+          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_phones')" style="margin-top:8px;">+ إضافة رقم</button>
+        </div>
+        <div class="card" style="padding:16px; margin-bottom:0; background:var(--panel-2);">
+          <h4 style="font-size:13px; color:var(--muted); margin-bottom:10px;">الإيميلات الرسمية</h4>
+          <div id="contact_emailsList"></div>
+          <button class="btn-outline btn-sm" onclick="addSimpleListRow('contact_emails')" style="margin-top:8px;">+ إضافة إيميل</button>
+        </div>
+      </div>
+      
+      <h4 style="margin:20px 0 10px; font-size:14px; color:var(--muted);">منصات التواصل الاجتماعي</h4>
       <div class="row3">
         <div class="field"><label>LinkedIn</label><input id="contactLinkedIn" placeholder="https://linkedin.com/company/..."></div>
         <div class="field"><label>Twitter (X)</label><input id="contactTwitter" placeholder="https://twitter.com/..."></div>
@@ -499,7 +508,11 @@ async function handleGenericLogo(e, cb){
 
 /* ============ LOAD ============ */
 let BRAND_DATA = {};
-let ABOUT = { vision_mission:{}, core_values:[], services:[], industries:[], stats:[], team:[], advisors:[], client_logos:[], contact_info:{} };
+let ABOUT = { 
+  vision_mission:{}, core_values:[], services:[], industries:[], 
+  stats:[], team:[], advisors:[], client_logos:[], contact_info:{},
+  contact_emails:[], contact_phones:[] 
+};
 
 async function loadAll(){
   const [{data:settings},{data:sectors},{data:companies},{data:consulting},{data:knowledge}] = await Promise.all([
@@ -529,20 +542,28 @@ async function loadAll(){
   ABOUT.advisors = settingsMap.advisors || [];
   ABOUT.client_logos = settingsMap.client_logos || [];
   ABOUT.contact_info = settingsMap.contact_info || {};
+  ABOUT.contact_emails = settingsMap.contact_emails || [];
+  ABOUT.contact_phones = settingsMap.contact_phones || [];
+  
+  // Backward compatibility for old single email/phone
+  if(ABOUT.contact_emails.length === 0 && ABOUT.contact_info.email) ABOUT.contact_emails.push(ABOUT.contact_info.email);
+  if(ABOUT.contact_phones.length === 0 && ABOUT.contact_info.phone) ABOUT.contact_phones.push(ABOUT.contact_info.phone);
   
   document.getElementById('visionEn').value = ABOUT.vision_mission.vision_en || '';
   document.getElementById('missionEn').value = ABOUT.vision_mission.mission_en || '';
   
   document.getElementById('contactWebsite').value = ABOUT.contact_info.website || '';
-  document.getElementById('contactEmail').value = ABOUT.contact_info.email || '';
-  document.getElementById('contactPhone').value = ABOUT.contact_info.phone || '';
   document.getElementById('contactLinkedIn').value = ABOUT.contact_info.linkedin || '';
   document.getElementById('contactTwitter').value = ABOUT.contact_info.twitter || '';
   document.getElementById('contactInstagram').value = ABOUT.contact_info.instagram || '';
 
   renderListSection('core_values'); renderListSection('services'); renderListSection('stats');
   renderListSection('team'); renderListSection('advisors');
-  renderSimpleListSection('industries'); renderListSection('client_logos');
+  renderSimpleListSection('industries'); renderSimpleListSection('client_logos');
+  
+  // New Multiple Contacts Lists
+  renderSimpleListSection('contact_emails');
+  renderSimpleListSection('contact_phones');
 
   SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
   renderSectors(); renderCompanies(); renderConsulting();
@@ -646,17 +667,24 @@ async function saveListSection(key){
 }
 
 function renderSimpleListSection(key){
-  const container = document.getElementById(key==='industries'?'industriesList':'logosList');
+  let containerId = key + 'List';
+  if(key === 'industries') containerId = 'industriesList';
+  if(key === 'client_logos') containerId = 'logosList';
+  
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  
   container.innerHTML = ABOUT[key].map((name,i)=>`
-    <div class="item-row">
-      <input style="flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;" value="${(name||'').replace(/"/g,'&quot;')}" onblur="ABOUT['${key}'][${i}]=this.value">
+    <div class="item-row" style="padding:8px 12px; margin-bottom:8px;">
+      <input style="flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;text-align:left;direction:ltr;" value="${(name||'').replace(/"/g,'&quot;')}" onblur="ABOUT['${key}'][${i}]=this.value">
       <button class="btn-danger btn-sm" onclick="ABOUT['${key}'].splice(${i},1); renderSimpleListSection('${key}')">حذف</button>
     </div>
-  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد عناصر بعد.</p>';
+  `).join('') || '<p style="color:var(--muted);font-size:12px;margin-bottom:8px;">لا يوجد.</p>';
 }
 function addSimpleListRow(key){ ABOUT[key].push(''); renderSimpleListSection(key); }
 async function saveSimpleListSection(key){
-  const {error} = await sb.from('intersect_site_settings').upsert({key, value: ABOUT[key]});
+  const cleanedArray = ABOUT[key].filter(item => typeof item === 'string' && item.trim() !== '');
+  const {error} = await sb.from('intersect_site_settings').upsert({key, value: cleanedArray});
   if(error){ showToast('خطأ: '+error.message); return; } showToast('تم الحفظ ✓');
 }
 
@@ -666,18 +694,31 @@ async function saveVisionMission(){
   if(error){ showToast('خطأ: '+error.message); return; }
   ABOUT.vision_mission = value; showToast('تم الحفظ ✓');
 }
+
 async function saveContactInfo(){
   const value = {
     website: document.getElementById('contactWebsite').value.trim(), 
-    email: document.getElementById('contactEmail').value.trim(), 
-    phone: document.getElementById('contactPhone').value.trim(),
     linkedin: document.getElementById('contactLinkedIn').value.trim(),
     twitter: document.getElementById('contactTwitter').value.trim(),
     instagram: document.getElementById('contactInstagram').value.trim()
   };
-  const {error} = await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
-  if(error){ showToast('خطأ: '+error.message); return; }
-  ABOUT.contact_info = value; showToast('تم الحفظ ✓');
+  
+  const cleanEmails = ABOUT.contact_emails.filter(e => e.trim() !== '');
+  const cleanPhones = ABOUT.contact_phones.filter(p => p.trim() !== '');
+  
+  try {
+    await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
+    await sb.from('intersect_site_settings').upsert({key:'contact_emails', value: cleanEmails});
+    await sb.from('intersect_site_settings').upsert({key:'contact_phones', value: cleanPhones});
+    ABOUT.contact_info = value;
+    ABOUT.contact_emails = cleanEmails;
+    ABOUT.contact_phones = cleanPhones;
+    showToast('تم الحفظ ✓');
+    renderSimpleListSection('contact_emails');
+    renderSimpleListSection('contact_phones');
+  } catch(error) {
+    showToast('خطأ: ' + error.message);
+  }
 }
 
 async function saveBrand(){

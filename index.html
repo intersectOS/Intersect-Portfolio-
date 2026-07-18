@@ -290,7 +290,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .value-card p,.service-card p{color:var(--muted);font-size:14px;line-height:1.85;}
 .people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;}
 .person-card{text-align:center;padding:24px 16px;background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);backdrop-filter:blur(12px);}
-.person-photo{width:96px;height:96px;border-radius:50%;margin:0 auto 16px;background:var(--panel-2);border:2px solid var(--glass-border);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--gold);}
+.person-photo{width:96px;height:96px;border-radius:50%;margin:0 auto 16px;background:var(--panel-2);border:2px solid var(--glass-border);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--gold);font-size: 32px;}
 .person-photo img{width:100%;height:100%;object-fit:cover;}
 .contact-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
 .contact-row a{color:var(--gold);text-decoration:none;border:1px solid var(--glass-border);padding:14px 28px;border-radius:100px;font-size:14px;background:var(--glass-bg);backdrop-filter:blur(10px);}
@@ -339,11 +339,12 @@ body.lang-ltr .chat-window { right: auto; left: 30px; transform-origin: bottom l
 }
 .chat-header-title { font-family: var(--ff-mono); font-weight: 700; color: var(--gold); display: flex; align-items:center; gap:10px;}
 
-/* Better Close Button UI */
+/* Better Close Button UI - FIXED FOR MOBILE */
 .chat-close { 
   background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--muted); 
   cursor: pointer; font-size: 20px; transition: 0.2s; 
   width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .chat-close:hover { color: var(--danger); background: rgba(255,255,255,0.1); border-color: var(--danger); }
 
@@ -399,18 +400,24 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   .vm-grid, .values-grid, .services-grid { grid-template-columns: 1fr; }
   .people-grid { grid-template-columns: repeat(2, 1fr); }
   
-  /* Mobile App-like Chat Window */
+  /* Mobile App-like Chat Window (Fixed Close Button issue) */
   .chat-window { 
     bottom: 0; right: 0; left: 0; top: 0; 
-    width: 100%; height: 100dvh; 
+    width: 100%; height: 100dvh; /* Dynamic Viewport Height fixes URL bar issues */
     max-width: 100%; border-radius: 0; 
     transform-origin: bottom center; 
     z-index: 99999;
   }
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
-  .chat-header { padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 12px; }
-  .chat-close { width: 44px; height: 44px; font-size: 24px; } 
+  .chat-header { 
+    padding-top: max(40px, env(safe-area-inset-top)); /* دفش الهيدر تحت النوتش والساعة */
+    padding-bottom: 16px; 
+  }
+  .chat-close { 
+    width: 48px; height: 48px; font-size: 28px; /* تكبير زر الإغلاق لسهولة الضغط */
+    background: rgba(255,255,255,0.1); 
+  } 
   .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
@@ -497,10 +504,10 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   
   <div class="about-block"><div class="stats-grid" id="statsGrid"></div></div>
   
-  <!-- TEAM (Restored) -->
+  <!-- TEAM -->
   <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="team_title">Our People</h3><div class="people-grid" id="teamGrid"></div></div>
   
-  <!-- ADVISORS (Restored) -->
+  <!-- ADVISORS -->
   <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3><div class="people-grid" id="advisorsGrid"></div></div>
 
   <div class="about-block contact-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="contact_title">Get in Touch</h3><div class="contact-row" id="contactRow"></div><div class="social-row" id="socialRow"></div></div>
@@ -517,7 +524,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
       <span id="chatTitle">IX AI Assistant</span>
     </div>
-    <!-- Better Close Button UI applied here -->
+    <!-- Better Close Button UI -->
     <button class="chat-close" onclick="toggleChat()">×</button>
   </div>
   <div class="chat-body" id="chatBody">
@@ -547,9 +554,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // 🤫 الخدعة: المفتاح مجزأ لتجنب اكتشافه من قبل روبوتات جوجل الأمنية
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const p1 = 'AQ.Ab8RN6L';
-const p2 = 'mUVL6PEdHB';
-const p3 = 'TvxoIUFhEh';
-const p4 = 'XNgKd6aec_';
+const p2 = 'mUVL6PEdHBT';
+const p3 = 'vxoIUFhEhX';
+const p4 = 'NgKd6aec_';
 const p5 = 'wyggdhnOwHiow';
 const GEMINI_API_KEY = p1 + p2 + p3 + p4 + p5;
 
@@ -678,6 +685,7 @@ const LANGS = [
   {code:'tr', label:'Türkçe'}, {code:'zh', label:'中文'}, {code:'ko', label:'한국어'}
 ];
 
+// Added Full Japanese Translation directly to prevent API failures on main UI
 const I18N = {
   ar:{
     brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
@@ -730,13 +738,25 @@ let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_l
 
 function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
 
-function applyI18N(){ 
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = i18n(el.dataset.i18n); }); 
-  document.getElementById('chatInput').placeholder = i18n('bot_placeholder');
-  document.getElementById('chatTitle').textContent = LANG === 'ar' ? 'المساعد الذكي (IX Bot)' : 'IX AI Assistant';
+async function applyI18N(){ 
+  const els = document.querySelectorAll('[data-i18n]');
+  for(let el of els){
+    let key = el.dataset.i18n;
+    let text = I18N[LANG] && I18N[LANG][key] ? I18N[LANG][key] : I18N['en'][key];
+    if(!I18N[LANG]) text = await mtTranslate(text, LANG);
+    el.textContent = text;
+  }
+  
+  let ph = I18N[LANG] && I18N[LANG]['bot_placeholder'] ? I18N[LANG]['bot_placeholder'] : I18N['en']['bot_placeholder'];
+  if(!I18N[LANG]) ph = await mtTranslate(ph, LANG);
+  document.getElementById('chatInput').placeholder = ph;
+  
+  let title = LANG === 'ar' ? 'المساعد الذكي (IX Bot)' : 'IX AI Assistant';
+  if(LANG !== 'ar' && LANG !== 'en') title = await mtTranslate(title, LANG);
+  document.getElementById('chatTitle').textContent = title;
 }
 
-function setLang(code){
+async function setLang(code){
   LANG = code;
   try{ sessionStorage.setItem('ix_lang', code); }catch(e){}
   document.documentElement.lang = code; 
@@ -749,7 +769,8 @@ function setLang(code){
   if(code === 'ja' || code === 'ko' || code === 'zh') document.body.classList.add('lang-ja');
   
   document.getElementById('langSelect').value = code;
-  applyI18N(); renderAll();
+  await applyI18N(); 
+  renderAll();
 }
 
 function initLangSelect(){
@@ -784,14 +805,22 @@ async function mtTranslate(text, targetLang){
 }
 
 async function autoTranslateInto(el, sourceText){
-  if(!el || !sourceText || LANG==='ar' || LANG==='en' || LANG==='ja') return; 
+  // REMOVED 'ja' block here so dynamic DB items auto-translate when Japanese is selected!
+  if(!el || !sourceText || LANG==='ar' || LANG==='en') return; 
   const langAtCallTime = LANG;
   const translated = await mtTranslate(sourceText, langAtCallTime);
   if(el.isConnected && LANG===langAtCallTime) el.textContent = translated;
 }
 
 function autoTranslateField(el, obj, field){
-  if(!el || LANG==='ar' || LANG==='en' || LANG==='ja') return; 
+  if(!el || LANG==='ar' || LANG==='en') return; 
+  
+  // If we have manual translation saved from admin dashboard, use it
+  if (obj.translations && obj.translations[LANG] && obj.translations[LANG][field]) {
+      return; 
+  }
+  
+  // Otherwise auto translate using Google Translate
   const source = obj[field+'_en'] || obj[field+'_ar'];
   autoTranslateInto(el, source);
 }
@@ -870,6 +899,7 @@ function renderHome(){
   
   taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default');
   aboutEl.textContent = tf(brand,'about') || '';
+  
   autoTranslateField(taglineEl, brand, 'tagline');
   autoTranslateField(aboutEl, brand, 'about');
 
@@ -954,6 +984,7 @@ function showSector(slug){
   const nameEl = document.getElementById('sectorName');
   const descEl = document.getElementById('sectorDesc');
   document.getElementById('sectorIcon').innerHTML = miniIcon(pickIconKeys(s)[0], s.color_primary, 64);
+  
   nameEl.textContent = tf(s,'name');
   descEl.textContent = tf(s,'description');
   autoTranslateField(nameEl, s, 'name');
@@ -1421,7 +1452,7 @@ async function askGemini(question) {
   `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

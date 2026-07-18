@@ -400,24 +400,18 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   .vm-grid, .values-grid, .services-grid { grid-template-columns: 1fr; }
   .people-grid { grid-template-columns: repeat(2, 1fr); }
   
-  /* Mobile App-like Chat Window (Fixed Close Button issue) */
+  /* Mobile App-like Chat Window */
   .chat-window { 
     bottom: 0; right: 0; left: 0; top: 0; 
-    width: 100%; height: 100dvh; /* Dynamic Viewport Height fixes URL bar issues */
+    width: 100%; height: 100dvh; 
     max-width: 100%; border-radius: 0; 
     transform-origin: bottom center; 
     z-index: 99999;
   }
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
-  .chat-header { 
-    padding-top: max(40px, env(safe-area-inset-top)); /* دفش الهيدر تحت النوتش والساعة */
-    padding-bottom: 16px; 
-  }
-  .chat-close { 
-    width: 48px; height: 48px; font-size: 28px; /* تكبير زر الإغلاق لسهولة الضغط */
-    background: rgba(255,255,255,0.1); 
-  } 
+  .chat-header { padding-top: max(40px, env(safe-area-inset-top)); padding-bottom: 16px; }
+  .chat-close { width: 48px; height: 48px; font-size: 28px; background: rgba(255,255,255,0.1); } 
   .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
@@ -459,7 +453,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <p class="home-about" id="homeAbout">Loading…</p>
   <div class="home-stats" id="homeStats"></div>
   <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
-    <span data-i18n="explore_cta">Explore the Universe →</span>
+    <span data-i18n="explore_cta">Explore Intersect's World "Our Companies"</span>
   </button>
   <a class="consulting-link gs-hover" href="#" onclick="switchView('view-about');return false;" style="margin-top:2px;">
     <span data-i18n="about_link">📖 About Intersect in detail →</span>
@@ -510,6 +504,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <!-- ADVISORS -->
   <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3><div class="people-grid" id="advisorsGrid"></div></div>
 
+  <!-- CONTACTS & SOCIAL -->
   <div class="about-block contact-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="contact_title">Get in Touch</h3><div class="contact-row" id="contactRow"></div><div class="social-row" id="socialRow"></div></div>
 </section>
 
@@ -685,10 +680,11 @@ const LANGS = [
   {code:'tr', label:'Türkçe'}, {code:'zh', label:'中文'}, {code:'ko', label:'한국어'}
 ];
 
-// Added Full Japanese Translation directly to prevent API failures on main UI
 const I18N = {
   ar:{
-    brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
+    brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',
+    explore_cta:'اكتشف عالم تقاطع "شركاتنا"', // التعديل الجديد للزر الرئيسي
+    sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
     bot_placeholder: 'اكتب رسالتك هنا...',
     bot_ask_lang: 'مرحباً بك! يرجى اختيار لغتك المفضلة لبدء المحادثة:\nWelcome! Please select your preferred language:',
     bot_ask_region: 'أهلاً بك في إنترسكت! لتكون إجاباتنا دقيقة ومخصصة لك، من أي منطقة تتواصل معنا؟',
@@ -703,7 +699,9 @@ const I18N = {
     bot_error: 'عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً.'
   },
   en:{
-    brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
+    brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',
+    explore_cta:'Explore Intersect\'s World "Our Companies"', // Base translation for auto-translate
+    sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
     bot_placeholder: 'Type your message here...',
     bot_ask_lang: 'Welcome! Please select your preferred language:\nمرحباً بك! يرجى اختيار لغتك المفضلة:',
     bot_ask_region: 'Welcome to Intersect! To provide you with tailored answers, which region are you reaching out from?',
@@ -718,7 +716,9 @@ const I18N = {
     bot_error: 'Sorry, I am having trouble connecting to the server right now. Please try again later.'
   },
   ja:{
-    brand_name:'Intersect Holding Company',tagline_default:'アイデアが交差し、ベンチャーが構築される場所',explore_cta:'ユニバースを探索する ←',sectors_title:'セクター',sectors_sub:'惑星を選んでベンチャーを探索',partnerships_link:'🤝 パートナーシップとコンサルティング ←',back_to_sectors:'← セクターに戻る',partnerships_title:'パートナーシップとコンサルティング',partnerships_sub:'クライアントワークと戦略的パートナーシップ',no_ventures:'このセクターにはまだベンチャーがありません。',no_partnerships:'パートナーシップはまだ追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'ベンチャー',stat_sectors:'セクター',stat_partnerships:'パートナーシップ',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'管理パネル',about_link:'📖 Intersect について詳しく ←',about_title:'Intersect について',back_home:'← ホームに戻る',vision_title:'私たちのビジョン',mission_title:'私たちのミッション',values_title:'コアバリュー',services_title:'サービス',team_title:'チーム',advisors_title:'アドバイザー',contact_title:'お問い合わせ',kind_client:'クライアント',kind_partner:'戦略的パートナー',
+    brand_name:'Intersect Holding Company',tagline_default:'アイデアが交差し、ベンチャーが構築される場所',
+    explore_cta:'Intersectの世界を探索する「私たちの企業」',
+    sectors_title:'セクター',sectors_sub:'惑星を選んでベンチャーを探索',partnerships_link:'🤝 パートナーシップとコンサルティング ←',back_to_sectors:'← セクターに戻る',partnerships_title:'パートナーシップとコンサルティング',partnerships_sub:'クライアントワークと戦略的パートナーシップ',no_ventures:'このセクターにはまだベンチャーがありません。',no_partnerships:'パートナーシップはまだ追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'ベンチャー',stat_sectors:'セクター',stat_partnerships:'パートナーシップ',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'管理パネル',about_link:'📖 Intersect について詳しく ←',about_title:'Intersect について',back_home:'← ホームに戻る',vision_title:'私たちのビジョン',mission_title:'私たちのミッション',values_title:'コアバリュー',services_title:'サービス',team_title:'私たちのチーム',advisors_title:'アドバイザー',contact_title:'お問い合わせ',kind_client:'クライアント',kind_partner:'戦略的パートナー',
     bot_placeholder: 'ここにメッセージを入力してください...',
     bot_ask_lang: 'ようこそ！希望する言語を選択してください：',
     bot_ask_region: 'Intersectへようこそ！最適な回答を提供するため、どの地域からお問い合わせですか？',
@@ -805,7 +805,7 @@ async function mtTranslate(text, targetLang){
 }
 
 async function autoTranslateInto(el, sourceText){
-  // REMOVED 'ja' block here so dynamic DB items auto-translate when Japanese is selected!
+  // All languages except AR/EN will pass through google translate
   if(!el || !sourceText || LANG==='ar' || LANG==='en') return; 
   const langAtCallTime = LANG;
   const translated = await mtTranslate(sourceText, langAtCallTime);
@@ -1109,6 +1109,7 @@ function renderAbout(){
       });
   }
 
+  // Render Contacts
   const contact = DATA.settings.contact_info || {};
   const emails = DATA.settings.contact_emails || [];
   const phones = DATA.settings.contact_phones || [];
@@ -1143,7 +1144,7 @@ function renderAll(){
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
+/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION & RETRY ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
@@ -1452,7 +1453,7 @@ async function askGemini(question) {
   `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

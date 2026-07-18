@@ -8,7 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<!-- GSAP & Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
 <style>
 :root{
   --void:#020308;
@@ -45,6 +48,19 @@ body{
 body.lang-en{font-family:var(--ff-mono);}
 body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 ::selection{background:var(--gold);color:var(--void);}
+
+/* ========== INITIAL LOADER ========== */
+#init-loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--void);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.loader-text {
+  color: var(--gold); font-family: var(--ff-mono); font-size: 14px;
+  letter-spacing: 4px; text-transform: uppercase; margin-top: 30px;
+  animation: pulse-op 1s infinite alternate;
+}
+@keyframes pulse-op { from {opacity: 0.5;} to {opacity: 1;} }
 
 /* ========== PARTICLE CANVAS ========== */
 #particleCanvas{
@@ -91,34 +107,20 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .lang-toggle:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px var(--gold-glow);}
 
-/* ========== GLASS CARD ========== */
-.glass-card{
-  background:var(--panel);
-  border:1px solid var(--glass-border);
-  border-radius:var(--r-lg);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-  transition:transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s ease, border-color .3s ease;
-}
-.glass-card:hover{
-  transform:translateY(-6px) scale(1.01);
-  box-shadow:0 20px 60px rgba(0,0,0,0.4), 0 0 40px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.08);
-  border-color:rgba(232,200,122,0.2);
-}
-
 /* ========== VIEW SYSTEM ========== */
 .view{
-  position:relative;z-index:2;
+  position:absolute; inset:0; z-index:2;
   min-height:100vh;
-  display:none;
-  align-items:center;justify-content:center;
+  display:none; 
   flex-direction:column;
+  align-items:center; justify-content:center;
   padding:120px 24px 80px;
+  opacity: 0;
 }
-.view.active{display:flex;}
+.view.active{display:flex; opacity: 1; position:relative;}
 
 /* ========== HOME - CINEMATIC HERO ========== */
-#view-home{text-align:center;gap:32px;max-width:800px;margin:0 auto;position:relative;}
+#view-home{text-align:center;gap:32px;max-width:800px;margin:0 auto;}
 .hero-orb{
   position:relative;width:180px;height:180px;margin:0 auto;
   display:flex;align-items:center;justify-content:center;
@@ -215,11 +217,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .cta-btn:hover::before{transform:translateX(100%);}
 
-.portfolio-caption{
-  color:var(--muted);font-size:11px;letter-spacing:3px;text-transform:uppercase;
-  margin-top:14px;opacity:.7;
-}
-
 /* ========== SCROLL INDICATOR ========== */
 .scroll-hint{
   position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
@@ -243,7 +240,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 
 /* ========== GALAXY - ORGANIC ORBITS ========== */
-#view-galaxy{padding-top:100px;position:relative;overflow:hidden;}
+#view-galaxy{padding-top:100px;}
 #view-galaxy::before{
   content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;
   transform:translate(-50%,-50%);
@@ -264,15 +261,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .orbit-path{fill:none;stroke-width:1.5;transition:stroke-opacity .3s;}
 .planet-node{cursor:pointer;}
 .planet-dot{filter:drop-shadow(0 0 12px currentColor) drop-shadow(0 0 24px currentColor);}
-.planet-label{
-  font-family:var(--ff-body);font-weight:700;font-size:11px;fill:var(--text);
-  pointer-events:none;
-}
-.sun{
-  filter:drop-shadow(0 0 30px var(--gold)) drop-shadow(0 0 60px var(--gold-glow));
-}
 
-/* Galaxy legend as floating glass pills */
 .galaxy-legend{
   display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
   margin-top:24px;position:relative;z-index:2;
@@ -283,11 +272,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   font-family:var(--ff-body);font-size:13px;cursor:pointer;
   display:flex;align-items:center;gap:8px;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  transition:all .3s cubic-bezier(.16,1,.3,1);
-}
-.legend-pill:hover{
-  transform:translateY(-3px) scale(1.05);
-  border-color:var(--gold);box-shadow:0 8px 24px rgba(0,0,0,0.3), 0 0 20px var(--gold-glow);
+  transition:border-color .3s, box-shadow .3s;
 }
 
 .consulting-link{
@@ -298,19 +283,13 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   background:var(--glass-bg);backdrop-filter:blur(12px);
   transition:all .3s ease;position:relative;z-index:2;
 }
-.consulting-link:hover{
-  border-color:var(--consulting);background:rgba(155,163,184,.1);
-  box-shadow:0 0 30px rgba(155,163,184,.2);
-  transform:translateY(-2px);
-}
 
 /* ========== SECTOR PAGE ========== */
-#view-sector{padding-top:100px;width:100%;max-width:1200px;position:relative;}
+#view-sector{padding-top:100px;width:100%;max-width:1200px;position:relative; align-items: stretch;}
 .sector-ambient{
   position:fixed;inset:0;z-index:0;opacity:0;transition:opacity 1.2s ease;pointer-events:none;
 }
 .sector-ambient.active{opacity:1;}
-@keyframes ambient-breathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.15);}}
 .icon-field{position:absolute;inset:0;overflow:hidden;}
 .floating-icon{
   position:absolute;left:var(--x,50%);top:var(--y,50%);
@@ -354,7 +333,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .company-card{
   background:var(--panel);
   border:1px solid var(--glass-border);border-radius:var(--r-lg);
-  padding:36px 28px;cursor:pointer;transition:all .4s cubic-bezier(.16,1,.3,1);
+  padding:36px 28px;cursor:pointer;
   text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   position:relative;overflow:hidden;
@@ -364,12 +343,8 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   background:linear-gradient(90deg, transparent, var(--card-accent,var(--gold)), transparent);
   opacity:0;transition:opacity .4s;
 }
-.company-card:hover{
-  transform:translateY(-8px) scale(1.02);
-  border-color:rgba(232,200,122,0.25);
-  box-shadow:0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(232,200,122,0.08);
-}
-.company-card:hover::before{opacity:1;}
+
+/* FIX: Ensure the logo image fits perfectly inside the logo container without cropping */
 .company-logo{
   width:72px;height:72px;border-radius:20px;
   background:linear-gradient(135deg, var(--panel-2), rgba(255,255,255,0.02));
@@ -379,8 +354,13 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   box-shadow:0 4px 20px rgba(0,0,0,0.2);
   transition:transform .4s;
 }
-.company-card:hover .company-logo{transform:scale(1.1) rotate(-3deg);}
-.company-logo img{width:100%;height:100%;object-fit:cover;}
+.company-logo img {
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain; /* Prevents the image from stretching or being cropped */
+  padding: 8px; /* Adds breathing room around the logo inside the box */
+}
+
 .company-card h3{font-size:18px;font-weight:800;}
 .company-card .tag{color:var(--muted);font-size:13px;line-height:1.7;}
 .badge{
@@ -410,19 +390,16 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   background-clip:text;
 }
 
-/* Vision/Mission as large glass cards */
 .vm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 @media(max-width:640px){.vm-grid{grid-template-columns:1fr;}}
 .vm-card{
   background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);
   padding:36px 28px;backdrop-filter:blur(16px);position:relative;overflow:hidden;
-  transition:all .4s cubic-bezier(.16,1,.3,1);
 }
 .vm-card::before{
   content:'';position:absolute;top:0;left:0;width:100%;height:3px;
   background:linear-gradient(90deg, var(--gold), var(--gold-dim), transparent);
 }
-.vm-card:hover{transform:translateY(-4px);border-color:rgba(232,200,122,0.2);}
 .vm-card h3{
   font-family:var(--ff-display);font-size:22px;color:var(--gold);margin-bottom:14px;
   display:flex;align-items:center;gap:10px;
@@ -430,12 +407,10 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .vm-card h3 .vm-icon{width:28px;height:28px;color:var(--gold);}
 .vm-card p{color:#cfced9;font-size:15px;line-height:2;}
 
-/* Values & Services as bento grid */
 .values-grid,.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
 .value-card,.service-card{
   background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-md);
   padding:28px 24px;backdrop-filter:blur(12px);
-  transition:all .35s cubic-bezier(.16,1,.3,1);
   position:relative;overflow:hidden;
 }
 .value-card::before,.service-card::before{
@@ -443,12 +418,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   background:linear-gradient(to bottom, var(--gold), transparent);
   opacity:0;transition:opacity .3s;
 }
-.value-card:hover,.service-card:hover{
-  transform:translateY(-5px);
-  border-color:rgba(232,200,122,0.2);
-  box-shadow:0 12px 40px rgba(0,0,0,0.3);
-}
-.value-card:hover::before,.service-card:hover::before{opacity:1;}
 .value-card h4,.service-card h4{font-size:16px;font-weight:800;margin-bottom:10px;color:var(--gold);display:flex;align-items:center;gap:10px;}
 .service-card .snum{
   font-family:var(--ff-mono);font-size:13px;color:var(--muted);
@@ -456,40 +425,31 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .value-card p,.service-card p{color:var(--muted);font-size:14px;line-height:1.85;}
 
-/* Industries as floating tags */
 .tag-cloud{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
 .tag-cloud span{
   background:var(--glass-bg);border:1px solid var(--glass-border);
   color:var(--text);padding:10px 20px;border-radius:100px;font-size:13.5px;
-  backdrop-filter:blur(10px);transition:all .3s;
-}
-.tag-cloud span:hover{
-  border-color:var(--gold);color:var(--gold);
-  box-shadow:0 0 20px var(--gold-glow);transform:translateY(-2px);
+  backdrop-filter:blur(10px);
 }
 .tag-cloud.muted-cloud span{color:var(--muted);font-size:12.5px;}
 .tag-cloud.muted-cloud .logo-chip-img{
   background:var(--glass-bg);border:1px solid var(--glass-border);
   border-radius:14px;padding:12px 22px;display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(10px);transition:all .3s;
+  backdrop-filter:blur(10px);
 }
-.tag-cloud.muted-cloud .logo-chip-img:hover{border-color:var(--gold);transform:translateY(-2px);}
 .tag-cloud.muted-cloud .logo-chip-img img{height:28px;max-width:120px;object-fit:contain;filter:grayscale(1) brightness(1.5);opacity:.85;}
 
-/* Stats as glass stat blocks */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;}
 .stat-block{
   text-align:center;background:var(--panel);border:1px solid var(--glass-border);
   border-radius:var(--r-lg);padding:32px 20px;backdrop-filter:blur(12px);
-  transition:all .35s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
+  position:relative;overflow:hidden;
 }
 .stat-block::before{
   content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg, transparent, var(--gold), transparent);
   opacity:0;transition:opacity .3s;
 }
-.stat-block:hover{transform:translateY(-5px);border-color:rgba(232,200,122,0.2);}
-.stat-block:hover::before{opacity:1;}
 .stat-block b{
   display:block;font-family:var(--ff-mono);font-size:36px;
   background:linear-gradient(135deg, var(--gold), var(--gold-dim));
@@ -498,36 +458,26 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .stat-block span{font-size:13px;color:var(--muted);line-height:1.6;display:block;margin-top:8px;}
 
-/* People grid */
 .people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;}
-.person-card{text-align:center;padding:24px 16px;background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);backdrop-filter:blur(12px);transition:all .35s;}
-.person-card:hover{transform:translateY(-5px);border-color:rgba(232,200,122,0.15);}
+.person-card{text-align:center;padding:24px 16px;background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);backdrop-filter:blur(12px);}
 .person-photo{
   width:96px;height:96px;border-radius:50%;margin:0 auto 16px;
   background:linear-gradient(135deg, var(--panel-2), rgba(255,255,255,0.03));
   border:2px solid var(--glass-border);display:flex;align-items:center;justify-content:center;
   overflow:hidden;font-family:var(--ff-display);font-size:30px;color:var(--gold);
   box-shadow:0 4px 20px rgba(0,0,0,0.2);
-  transition:all .4s;
-}
-.person-card:hover .person-photo{
-  border-color:var(--gold);box-shadow:0 0 30px var(--gold-glow);transform:scale(1.05);
 }
 .person-photo img{width:100%;height:100%;object-fit:cover;}
 .person-card h4{font-size:15px;font-weight:800;}
 .person-card .ptitle{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5;}
 .person-card .pbio{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7;}
 
-/* Contact */
 .contact-block{text-align:center;}
 .contact-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
 .contact-row a{
   color:var(--gold);text-decoration:none;border:1px solid var(--glass-border);
   padding:14px 28px;border-radius:100px;font-size:14px;background:var(--glass-bg);
-  backdrop-filter:blur(10px);transition:all .3s;
-}
-.contact-row a:hover{
-  border-color:var(--gold);box-shadow:0 0 30px var(--gold-glow);transform:translateY(-2px);
+  backdrop-filter:blur(10px);
 }
 
 /* ========== MODAL - GLASS DIALOG ========== */
@@ -535,17 +485,11 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   position:fixed;inset:0;background:rgba(2,3,8,.88);backdrop-filter:blur(12px);
   z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
 }
-.modal-overlay.active{display:flex;}
 .modal-box{
   background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);
   max-width:600px;width:100%;max-height:86vh;overflow-y:auto;
   padding:40px;position:relative;backdrop-filter:blur(24px);
   box-shadow:0 32px 80px rgba(0,0,0,0.5), 0 0 60px rgba(232,200,122,0.08);
-  animation:modal-enter .4s cubic-bezier(.16,1,.3,1);
-}
-@keyframes modal-enter{
-  0%{opacity:0;transform:scale(.92) translateY(20px);}
-  100%{opacity:1;transform:scale(1) translateY(0);}
 }
 .modal-close{
   position:absolute;top:20px;left:20px;background:transparent;border:none;
@@ -562,7 +506,15 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   font-family:var(--ff-display);font-size:28px;color:var(--modal-accent,var(--gold));
   border:1px solid var(--glass-border);box-shadow:0 4px 20px rgba(0,0,0,0.2);
 }
-.modal-logo img{width:100%;height:100%;object-fit:cover;}
+
+/* FIX: Ensure modal logo image also uses contain to avoid being cropped */
+.modal-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding: 8px;
+}
+
 .modal-top h3{font-size:22px;font-weight:800;}
 .modal-top .tag{color:var(--muted);font-size:14px;margin-top:4px;}
 .modal-desc{color:#cfced9;font-size:15.5px;line-height:2;margin:22px 0;}
@@ -577,15 +529,12 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .modal-actions{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap;}
 .modal-actions a, .modal-actions span{
   font-size:14px;padding:13px 26px;border-radius:100px;text-decoration:none;
-  transition:all .3s;
 }
 .btn-primary{
   background:linear-gradient(135deg, var(--modal-accent,var(--gold)), var(--gold-dim));
   color:#111;font-weight:800;box-shadow:0 4px 20px rgba(212,175,106,.3);
 }
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(212,175,106,.5);}
 .btn-ghost{border:1px solid var(--glass-border);color:var(--muted);background:var(--glass-bg);}
-.btn-ghost:hover{border-color:var(--modal-accent,var(--gold));color:var(--modal-accent,var(--gold));}
 
 /* ========== FOOTER ========== */
 .site-footer{
@@ -594,15 +543,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .site-footer a{color:var(--muted);text-decoration:none;opacity:.6;transition:.25s;}
 .site-footer a:hover{opacity:1;color:var(--gold);}
-
-/* ========== LOADING ========== */
-.loading{color:var(--muted);font-size:14px;padding:60px 20px;text-align:center;}
-.loading-spinner{
-  width:40px;height:40px;border:2px solid var(--glass-border);
-  border-top-color:var(--gold);border-radius:50%;
-  animation:spin 1s linear infinite;margin:0 auto 16px;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width:640px){
@@ -632,20 +572,26 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   pointer-events:none;z-index:1;transform:translate(-50%,-50%);
   transition:opacity .3s;opacity:0;
 }
-@media (pointer:fine){
-  .cursor-glow{opacity:1;}
-}
+@media (pointer:fine){ .cursor-glow{opacity:1;} }
 </style>
 <base target="_blank">
 </head>
 <body>
+
+<!-- INITIAL LOADER (GSAP will fade this out) -->
+<div id="init-loader">
+  <div class="hero-orb" style="transform: scale(0.6);">
+    <div class="home-logo">IX</div>
+  </div>
+  <div class="loader-text">Initializing Universe...</div>
+</div>
 
 <canvas id="particleCanvas"></canvas>
 <div class="noise-overlay"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="topbar">
-  <a href="#" class="brand-mini" id="brandMini" onclick="goHome();return false;">
+  <a href="#" class="brand-mini" id="brandMini" onclick="switchView('view-home');return false;">
     <span class="dot"></span>
     <span data-i18n="brand_name">إنترسكت</span>
   </a>
@@ -661,13 +607,13 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <p class="home-tagline" id="homeTagline">حيث تتقاطع الأفكار وتُبنى المشاريع</p>
   <p class="home-about" id="homeAbout">جارٍ التحميل…</p>
   <div class="home-stats" id="homeStats"></div>
-  <button class="cta-btn" onclick="showGalaxy()">
+  <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
     <span data-i18n="explore_cta">استكشف الكون ←</span>
   </button>
-  <a class="consulting-link" href="#" onclick="showAbout();return false;" style="margin-top:2px;">
+  <a class="consulting-link gs-hover" href="#" onclick="switchView('view-about');return false;" style="margin-top:2px;">
     <span data-i18n="about_link">📖 عن إنترسكت بالتفصيل ←</span>
   </a>
-  <div class="scroll-hint" onclick="showGalaxy()">
+  <div class="scroll-hint" onclick="switchView('view-galaxy')">
     <span data-i18n="scroll_hint">استكشف</span>
     <div class="arrow"></div>
   </div>
@@ -681,14 +627,14 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   </div>
   <div class="orbit-wrap" id="orbitWrap"></div>
   <div class="galaxy-legend" id="galaxyLegend"></div>
-  <a class="consulting-link" href="#" onclick="showConsulting();return false;">
+  <a class="consulting-link gs-hover" href="#" onclick="switchView('view-consulting');return false;">
     <span data-i18n="partnerships_link">🤝 شراكات واستشارات ←</span>
   </a>
 </section>
 
 <!-- SECTOR -->
 <section class="view" id="view-sector">
-  <a class="back-link" href="#" onclick="showGalaxy();return false;">
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;">
     <span data-i18n="back_to_sectors">→ رجوع للقطاعات</span>
   </a>
   <div class="sector-header">
@@ -701,7 +647,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 
 <!-- CONSULTING -->
 <section class="view" id="view-consulting">
-  <a class="back-link" href="#" onclick="showGalaxy();return false;">
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;">
     <span data-i18n="back_to_sectors">→ رجوع للقطاعات</span>
   </a>
   <div class="sector-header">
@@ -714,7 +660,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 
 <!-- ABOUT -->
 <section class="view" id="view-about">
-  <a class="back-link" href="#" onclick="goHome();return false;">
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-home');return false;">
     <span data-i18n="back_home">→ رجوع للرئيسية</span>
   </a>
   <div class="about-hero">
@@ -725,11 +671,11 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <div class="about-block">
     <div class="section-divider"></div>
     <div class="vm-grid">
-      <div class="vm-card">
+      <div class="vm-card gs-card">
         <h3><span class="vm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8-10-8-10-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span data-i18n="vision_title">رؤيتنا</span></h3>
         <p id="visionText"></p>
       </div>
-      <div class="vm-card">
+      <div class="vm-card gs-card">
         <h3><span class="vm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span data-i18n="mission_title">رسالتنا</span></h3>
         <p id="missionText"></p>
       </div>
@@ -794,9 +740,20 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 /* ============ CONFIG ============ */
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let DATA = { settings:{}, sectors:[], companies:[], consulting:[] };
+
+/* ============ URL HELPER FIX ============ */
+// هذه الدالة تتأكد من أن الرابط يحتوي دائماً على https:// لكي لا يظهر خطأ 404
+function makeValidUrl(url) {
+  if (!url) return '#';
+  url = url.trim();
+  if (!/^https?:\/\//i.test(url)) {
+    return 'https://' + url;
+  }
+  return url;
+}
 
 /* ============ PARTICLE SYSTEM ============ */
 const pCanvas = document.getElementById('particleCanvas');
@@ -823,7 +780,6 @@ function drawParticles(){
   pCtx.fillStyle = '#020308';
   pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
 
-  // Draw connections
   for(let i=0; i<particles.length; i++){
     for(let j=i+1; j<particles.length; j++){
       const dx = particles[i].x - particles[j].x;
@@ -841,50 +797,29 @@ function drawParticles(){
   }
 
   particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.pulse += 0.02;
-
-    // Mouse repulsion
-    const mdx = p.x - mouseX;
-    const mdy = p.y - mouseY;
+    p.x += p.vx; p.y += p.vy; p.pulse += 0.02;
+    const mdx = p.x - mouseX; const mdy = p.y - mouseY;
     const mDist = Math.sqrt(mdx*mdx + mdy*mdy);
     if(mDist < 150){
       const force = (150 - mDist) / 150 * 0.5;
-      p.vx += (mdx / mDist) * force;
-      p.vy += (mdy / mDist) * force;
+      p.vx += (mdx / mDist) * force; p.vy += (mdy / mDist) * force;
     }
-
-    // Damping
-    p.vx *= 0.99;
-    p.vy *= 0.99;
-
-    // Wrap
-    if(p.x < 0) p.x = pCanvas.width;
-    if(p.x > pCanvas.width) p.x = 0;
-    if(p.y < 0) p.y = pCanvas.height;
-    if(p.y > pCanvas.height) p.y = 0;
+    p.vx *= 0.99; p.vy *= 0.99;
+    if(p.x < 0) p.x = pCanvas.width; if(p.x > pCanvas.width) p.x = 0;
+    if(p.y < 0) p.y = pCanvas.height; if(p.y > pCanvas.height) p.y = 0;
 
     const op = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse));
-    pCtx.beginPath();
-    pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    pCtx.fillStyle = `rgba(241,240,234,${op})`;
-    pCtx.fill();
+    pCtx.beginPath(); pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    pCtx.fillStyle = `rgba(241,240,234,${op})`; pCtx.fill();
   });
   requestAnimationFrame(drawParticles);
 }
-resizePCanvas();
-window.addEventListener('resize', resizePCanvas);
-drawParticles();
+resizePCanvas(); window.addEventListener('resize', resizePCanvas); drawParticles();
 
 document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+  mouseX = e.clientX; mouseY = e.clientY;
   const glow = document.getElementById('cursorGlow');
-  if(glow){
-    glow.style.left = e.clientX + 'px';
-    glow.style.top = e.clientY + 'px';
-  }
+  if(glow){ glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; }
 });
 
 /* ============ 12-LANGUAGE SYSTEM ============ */
@@ -895,51 +830,30 @@ const LANGS = [
   {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
 ];
 const I18N = {
-  ar:{brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف شركات إنترسيكت ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',industries_title:'القطاعات التي نخدمها',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',kind_client:'عميل',kind_partner:'شريك استراتيجي',scroll_hint:'استكشف'},
-  en:{brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe — Intersect Portfolio →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',industries_title:'Industries We Serve',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',portfolio_caption:'🌌 Intersect Interactive Portfolio',kind_client:'Client',kind_partner:'Strategic Partner',scroll_hint:'Explore'},
-  fr:{brand_name:'Intersect, Société Holding',tagline_default:"Là où les idées se croisent et les projets se construisent",explore_cta:"Explorer l'univers — Intersect Portfolio →",sectors_title:'Secteurs',sectors_sub:'Choisissez une planète pour explorer ses projets',partnerships_link:'🤝 Partenariats et conseil →',back_to_sectors:'← Retour aux secteurs',partnerships_title:'Partenariats et conseil',partnerships_sub:'Projets clients et partenariats stratégiques hors de notre portefeuille',no_ventures:'Aucune entreprise dans ce secteur pour le moment.',no_partnerships:'Aucun partenariat ajouté pour le moment.',visit_website:'Visiter le site ↗',stat_ventures:'Projets',stat_sectors:'Secteurs',stat_partnerships:'Partenariats',footer_rights:'© 2026 Intersect. Tous droits réservés.',footer_admin:'Administration',rel_owned:'Propriété exclusive',rel_jv:'Coentreprise',rel_collaboration:'Collaboration',rel_subsidiary:'Filiale',rel_initiative:'Initiative',loading:'Chargement…',about_link:"📖 À propos d'Intersect →",about_title:"À propos d'Intersect",back_home:"← Retour à l'accueil",vision_title:'Notre vision',mission_title:'Notre mission',values_title:'Nos valeurs fondamentales',services_title:'Nos services',industries_title:'Secteurs desservis',team_title:'Notre équipe',advisors_title:'Nos conseillers',contact_title:'Nous contacter',portfolio_caption:'🌌 Portfolio interactif Intersect',kind_client:'Client',kind_partner:'Partenaire stratégique',scroll_hint:'Explorer'},
-  es:{brand_name:'Intersect, Sociedad Holding',tagline_default:'Donde las ideas se cruzan y los proyectos se construyen',explore_cta:'Explorar el universo — Portafolio Intersect →',sectors_title:'Sectores',sectors_sub:'Elige un planeta para explorar sus proyectos',partnerships_link:'🤝 Alianzas y consultoría →',back_to_sectors:'← Volver a los sectores',partnerships_title:'Alianzas y consultoría',partnerships_sub:'Proyectos de clientes y alianzas estratégicas fuera de nuestro portafolio',no_ventures:'Aún no hay empresas en este sector.',no_partnerships:'Aún no se han añadido alianzas.',visit_website:'Visitar sitio web ↗',stat_ventures:'Proyectos',stat_sectors:'Sectores',stat_partnerships:'Alianzas',footer_rights:'© 2026 Intersect. Todos los derechos reservados.',footer_admin:'Administración',rel_owned:'Propiedad total',rel_jv:'Empresa conjunta',rel_collaboration:'Colaboración',rel_subsidiary:'Filial',rel_initiative:'Iniciativa',loading:'Cargando…',about_link:'📖 Sobre Intersect →',about_title:'Sobre Intersect',back_home:'← Volver al inicio',vision_title:'Nuestra visión',mission_title:'Nuestra misión',values_title:'Nuestros valores',services_title:'Nuestros servicios',industries_title:'Sectores a los que servimos',team_title:'Nuestro equipo',advisors_title:'Nuestros asesores',contact_title:'Contáctanos',portfolio_caption:'🌌 Portafolio interactivo de Intersect',kind_client:'Cliente',kind_partner:'Socio estratégico',scroll_hint:'Explorar'},
-  de:{brand_name:'Intersect Holdinggesellschaft',tagline_default:'Wo Ideen sich kreuzen und Unternehmen entstehen',explore_cta:'Universum erkunden — Intersect Portfolio →',sectors_title:'Sektoren',sectors_sub:'Wählen Sie einen Planeten, um seine Projekte zu erkunden',partnerships_link:'🤝 Partnerschaften & Beratung →',back_to_sectors:'← Zurück zu den Sektoren',partnerships_title:'Partnerschaften & Beratung',partnerships_sub:'Kundenprojekte und strategische Partnerschaften außerhalb unseres Portfolios',no_ventures:'Noch keine Unternehmen in diesem Sektor.',no_partnerships:'Noch keine Partnerschaften hinzugefügt.',visit_website:'Website besuchen ↗',stat_ventures:'Projekte',stat_sectors:'Sektoren',stat_partnerships:'Partnerschaften',footer_rights:'© 2026 Intersect. Alle Rechte vorbehalten.',footer_admin:'Verwaltung',rel_owned:'Im Eigentum',rel_jv:'Joint Venture',rel_collaboration:'Zusammenarbeit',rel_subsidiary:'Tochtergesellschaft',rel_initiative:'Initiative',loading:'Wird geladen…',about_link:'📖 Über Intersect →',about_title:'Über Intersect',back_home:'← Zurück zur Startseite',vision_title:'Unsere Vision',mission_title:'Unsere Mission',values_title:'Unsere Grundwerte',services_title:'Unsere Dienstleistungen',industries_title:'Branchen, die wir bedienen',team_title:'Unser Team',advisors_title:'Unsere Berater',contact_title:'Kontakt',portfolio_caption:'🌌 Interaktives Intersect-Portfolio',kind_client:'Kunde',kind_partner:'Strategischer Partner',scroll_hint:'Erkunden'},
-  it:{brand_name:'Intersect, Società Holding',tagline_default:"Dove le idee si incontrano e i progetti prendono vita",explore_cta:"Esplora l'universo — Portfolio Intersect →",sectors_title:'Settori',sectors_sub:'Scegli un pianeta per esplorare i suoi progetti',partnerships_link:'🤝 Partnership e consulenza →',back_to_sectors:'← Torna ai settori',partnerships_title:'Partnership e consulenza',partnerships_sub:'Progetti clienti e partnership strategiche al di fuori del nostro portafoglio',no_ventures:'Nessuna azienda in questo settore ancora.',no_partnerships:'Nessuna partnership aggiunta ancora.',visit_website:'Visita il sito ↗',stat_ventures:'Progetti',stat_sectors:'Settori',stat_partnerships:'Partnership',footer_rights:'© 2026 Intersect. Tutti i diritti riservati.',footer_admin:'Amministrazione',rel_owned:'Proprietà esclusiva',rel_jv:'Joint Venture',rel_collaboration:'Collaborazione',rel_subsidiary:'Controllata',rel_initiative:'Iniziativa',loading:'Caricamento…',about_link:'📖 Chi è Intersect →',about_title:'Chi è Intersect',back_home:'← Torna alla home',vision_title:'La nostra visione',mission_title:'La nostra missione',values_title:'I nostri valori',services_title:'I nostri servizi',industries_title:'Settori serviti',team_title:'Il nostro team',advisors_title:'I nostri consulenti',contact_title:'Contattaci',portfolio_caption:'🌌 Portfolio interattivo Intersect',kind_client:'Cliente',kind_partner:'Partner strategico',scroll_hint:'Esplora'},
-  pt:{brand_name:'Intersect, Sociedade Holding',tagline_default:'Onde as ideias se cruzam e os projetos são construídos',explore_cta:'Explorar o universo — Portfólio Intersect →',sectors_title:'Setores',sectors_sub:'Escolha um planeta para explorar seus projetos',partnerships_link:'🤝 Parcerias e consultoria →',back_to_sectors:'← Voltar aos setores',partnerships_title:'Parcerias e consultoria',partnerships_sub:'Projetos de clientes e parcerias estratégicas fora do nosso portfólio',no_ventures:'Ainda não há empresas neste setor.',no_partnerships:'Ainda não há parcerias adicionadas.',visit_website:'Visitar site ↗',stat_ventures:'Projetos',stat_sectors:'Setores',stat_partnerships:'Parcerias',footer_rights:'© 2026 Intersect. Todos os direitos reservados.',footer_admin:'Administração',rel_owned:'Propriedade total',rel_jv:'Joint Venture',rel_collaboration:'Colaboração',rel_subsidiary:'Subsidiária',rel_initiative:'Iniciativa',loading:'Carregando…',about_link:'📖 Sobre a Intersect →',about_title:'Sobre a Intersect',back_home:'← Voltar ao início',vision_title:'Nossa visão',mission_title:'Nossa missão',values_title:'Nossos valores',services_title:'Nossos serviços',industries_title:'Setores que atendemos',team_title:'Nossa equipe',advisors_title:'Nossos conselheiros',contact_title:'Fale conosco',portfolio_caption:'🌌 Portfólio interativo da Intersect',kind_client:'Cliente',kind_partner:'Parceiro estratégico',scroll_hint:'Explorar'},
-  ru:{brand_name:'Intersect, Холдинговая компания',tagline_default:'Там, где идеи пересекаются и рождаются проекты',explore_cta:'Исследовать вселенную — Портфолио Intersect →',sectors_title:'Секторы',sectors_sub:'Выберите планету, чтобы изучить её проекты',partnerships_link:'🤝 Партнёрства и консалтинг →',back_to_sectors:'← Назад к секторам',partnerships_title:'Партнёрства и консалтинг',partnerships_sub:'Клиентские проекты и стратегические партнёрства вне нашего портфеля',no_ventures:'В этом секторе пока нет компаний.',no_partnerships:'Партнёрства ещё не добавлены.',visit_website:'Перейти на сайт ↗',stat_ventures:'Проекты',stat_sectors:'Секторы',stat_partnerships:'Партнёрства',footer_rights:'© 2026 Intersect. Все права защищены.',footer_admin:'Админ-панель',rel_owned:'В собственности',rel_jv:'Совместное предприятие',rel_collaboration:'Сотрудничество',rel_subsidiary:'Дочерняя компания',rel_initiative:'Инициатива',loading:'Загрузка…',about_link:'📖 Об Intersect →',about_title:'Об Intersect',back_home:'← Назад на главную',vision_title:'Наше видение',mission_title:'Наша миссия',values_title:'Наши ценности',services_title:'Наши услуги',industries_title:'Отрасли, которые мы обслуживаем',team_title:'Наша команда',advisors_title:'Наши советники',contact_title:'Связаться с нами',portfolio_caption:'🌌 Интерактивное портфолио Intersect',kind_client:'Клиент',kind_partner:'Стратегический партнёр',scroll_hint:'Исследовать'},
-  tr:{brand_name:'Intersect Holding Şirketi',tagline_default:'Fikirlerin kesiştiği, girişimlerin inşa edildiği yer',explore_cta:'Evreni keşfet — Intersect Portföyü →',sectors_title:'Sektörler',sectors_sub:'Projelerini keşfetmek için bir gezegen seçin',partnerships_link:'🤝 Ortaklıklar ve danışmanlık →',back_to_sectors:'← Sektörlere dön',partnerships_title:'Ortaklıklar ve danışmanlık',partnerships_sub:'Portföyümüz dışındaki müşteri projeleri ve stratejik ortaklıklar',no_ventures:'Bu sektörde henüz şirket yok.',no_partnerships:'Henüz ortaklık eklenmedi.',visit_website:'Web sitesini ziyaret et ↗',stat_ventures:'Girişim',stat_sectors:'Sektör',stat_partnerships:'Ortaklık',footer_rights:'© 2026 Intersect. Tüm hakları saklıdır.',footer_admin:'Yönetim',rel_owned:'Tam sahiplik',rel_jv:'Ortak girişim',rel_collaboration:'İşbirliği',rel_subsidiary:'Bağlı şirket',rel_initiative:'Girişim',loading:'Yükleniyor…',about_link:'📖 Intersect Hakkında →',about_title:'Intersect Hakkında',back_home:'← Ana sayfaya dön',vision_title:'Vizyonumuz',mission_title:'Misyonumuz',values_title:'Temel Değerlerimiz',services_title:'Hizmetlerimiz',industries_title:'Hizmet Verdiğimiz Sektörler',team_title:'Ekibimiz',advisors_title:'Danışmanlarımız',contact_title:'Bize Ulaşın',portfolio_caption:'🌌 Intersect İnteraktif Portföyü',kind_client:'Müşteri',kind_partner:'Stratejik Ortak',scroll_hint:'Keşfet'},
-  zh:{brand_name:'Intersect 控股公司',tagline_default:'思想交汇、事业成形之地',explore_cta:'探索宇宙 — Intersect 作品集 →',sectors_title:'行业板块',sectors_sub:'选择一个星球以探索其项目',partnerships_link:'🤝 合作与咨询 →',back_to_sectors:'← 返回板块',partnerships_title:'合作与咨询',partnerships_sub:'我们自有业务组合之外的客户项目与战略合作',no_ventures:'该板块暂无企业。',no_partnerships:'暂无合作项目。',visit_website:'访问网站 ↗',stat_ventures:'企业',stat_sectors:'板块',stat_partnerships:'合作',footer_rights:'© 2026 Intersect. 保留所有权利。',footer_admin:'管理后台',rel_owned:'全资拥有',rel_jv:'合资企业',rel_collaboration:'合作',rel_subsidiary:'子公司',rel_initiative:'公益项目',loading:'加载中…',about_link:'📖 关于 Intersect →',about_title:'关于 Intersect',back_home:'← 返回首页',vision_title:'我们的愿景',mission_title:'我们的使命',values_title:'我们的核心价值观',services_title:'我们的服务',industries_title:'我们服务的行业',team_title:'我们的团队',advisors_title:'我们的顾问',contact_title:'联系我们',portfolio_caption:'🌌 Intersect 互动作品集',kind_client:'客户',kind_partner:'战略合作伙伴',scroll_hint:'探索'},
-  ja:{brand_name:'Intersect ホールディングス',tagline_default:'アイデアが交わり、事業が生まれる場所',explore_cta:'宇宙を探索する — Intersectポートフォリオ →',sectors_title:'セクター',sectors_sub:'惑星を選んでプロジェクトを探索',partnerships_link:'🤝 パートナーシップ・コンサルティング →',back_to_sectors:'← セクター一覧へ戻る',partnerships_title:'パートナーシップ・コンサルティング',partnerships_sub:'自社ポートフォリオ外のクライアント案件と戦略的パートナーシップ',no_ventures:'このセクターにはまだ企業がありません。',no_partnerships:'まだパートナーシップが追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'事業',stat_sectors:'セクター',stat_partnerships:'パートナー',footer_rights:'© 2026 Intersect. 無断複製を禁じます。',footer_admin:'管理画面',rel_owned:'完全所有',rel_jv:'合弁事業',rel_collaboration:'協業',rel_subsidiary:'子会社',rel_initiative:'非営利イニシアチブ',loading:'読み込み中…',about_link:'📖 Intersectについて →',about_title:'Intersectについて',back_home:'← ホームに戻る',vision_title:'私たちのビジョン',mission_title:'私たちのミッション',values_title:'私たちの価値観',services_title:'私たちのサービス',industries_title:'対応業界',team_title:'私たちのチーム',advisors_title:'アドバイザー',contact_title:'お問い合わせ',portfolio_caption:'🌌 Intersect インタラクティブポートフォリオ',kind_client:'クライアント',kind_partner:'戦略的パートナー',scroll_hint:'探索'},
-  ko:{brand_name:'Intersect 홀딩스',tagline_default:'아이디어가 교차하고 사업이 만들어지는 곳',explore_cta:'우주 탐험하기 — Intersect 포트폴리오 →',sectors_title:'섹터',sectors_sub:'행성을 선택해 프로젝트를 탐험하세요',partnerships_link:'🤝 파트너십 및 컨설팅 →',back_to_sectors:'← 섹터로 돌아가기',partnerships_title:'파트너십 및 컨설팅',partnerships_sub:'자사 포트폴리오 외부의 클라이언트 프로젝트 및 전략적 파트너십',no_ventures:'아직 이 섹터에 등록된 기업이 없습니다.',no_partnerships:'아직 추가된 파트너십이 없습니다.',visit_website:'웹사이트 방문 ↗',stat_ventures:'프로젝트',stat_sectors:'섹터',stat_partnerships:'파트너십',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'관리자',rel_owned:'단독 소유',rel_jv:'합작 투자',rel_collaboration:'협업',rel_subsidiary:'자회사',rel_initiative:'이니셔티브',loading:'로딩 중…',about_link:'📖 Intersect 소개 →',about_title:'Intersect 소개',back_home:'← 홈으로 돌아가기',vision_title:'우리의 비전',mission_title:'우리의 미션',values_title:'핵심 가치',services_title:'서비스',industries_title:'서비스 산업 분야',team_title:'팀 소개',advisors_title:'자문단',contact_title:'문의하기',portfolio_caption:'🌌 Intersect 인터랙티브 포트폴리오',kind_client:'클라이언트',kind_partner:'전략적 파트너',scroll_hint:'탐험'}
+  ar:{brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',industries_title:'القطاعات التي نخدمها',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',kind_client:'عميل',kind_partner:'شريك استراتيجي',scroll_hint:'استكشف'},
+  en:{brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',industries_title:'Industries We Serve',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',portfolio_caption:'🌌 Intersect Interactive Portfolio',kind_client:'Client',kind_partner:'Strategic Partner',scroll_hint:'Explore'}
 };
-let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'ar';
 
-function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || key; }
-function applyI18N(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = i18n(el.dataset.i18n); });
-}
+function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
+function applyI18N(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = i18n(el.dataset.i18n); }); }
 function setLang(code){
   LANG = code;
   try{ sessionStorage.setItem('ix_lang', code); }catch(e){}
-  document.documentElement.lang = code;
-  document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = code; document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
   document.body.classList.toggle('lang-ltr', code!=='ar');
   document.body.classList.toggle('lang-en', code==='en');
-  document.body.classList.toggle('lang-ja', code==='ja');
-  document.body.classList.toggle('lang-ko', code==='ko');
-  document.body.classList.toggle('lang-zh', code==='zh');
   document.getElementById('langSelect').value = code;
-  applyI18N();
-  renderAll();
+  
+  gsap.to('.view.active', {opacity: 0, duration: 0.2, onComplete: () => {
+    applyI18N(); renderAll();
+    gsap.to('.view.active', {opacity: 1, duration: 0.3});
+  }});
 }
 function initLangSelect(){
   const sel = document.getElementById('langSelect');
   sel.innerHTML = LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
-  sel.value = LANG;
-  document.documentElement.lang = LANG;
-  document.documentElement.dir = LANG==='ar' ? 'rtl' : 'ltr';
-  document.body.classList.toggle('lang-ltr', LANG!=='ar');
-  document.body.classList.toggle('lang-en', LANG==='en');
-  document.body.classList.toggle('lang-ja', LANG==='ja');
-  document.body.classList.toggle('lang-ko', LANG==='ko');
-  document.body.classList.toggle('lang-zh', LANG==='zh');
-  applyI18N();
+  sel.value = LANG; setLang(LANG);
 }
 initLangSelect();
 
@@ -951,26 +865,18 @@ function tf(obj, field, lang){
   if(tr && tr[field]) return tr[field];
   return obj[field+'_en'] || obj[field+'_ar'] || '';
 }
-function hasManualTranslation(obj, field, lang){
-  return !!(obj && obj.translations && obj.translations[lang] && obj.translations[lang][field]);
-}
 
 /* ============ AUTO-TRANSLATE ENGINE ============ */
 let TRANS_CACHE = {};
-try{ TRANS_CACHE = JSON.parse(sessionStorage.getItem('ix_trans_cache')||'{}'); }catch(e){ TRANS_CACHE = {}; }
+try{ TRANS_CACHE = JSON.parse(sessionStorage.getItem('ix_trans_cache')||'{}'); }catch(e){}
 function saveTransCache(){ try{ sessionStorage.setItem('ix_trans_cache', JSON.stringify(TRANS_CACHE)); }catch(e){} }
 async function mtTranslate(text, targetLang){
-  if(!text) return text;
-  const key = targetLang+'::'+text;
-  if(TRANS_CACHE[key]) return TRANS_CACHE[key];
+  if(!text) return text; const key = targetLang+'::'+text; if(TRANS_CACHE[key]) return TRANS_CACHE[key];
   try{
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const res = await fetch(url); const data = await res.json();
     const translated = data[0].map(chunk=>chunk[0]).join('');
-    TRANS_CACHE[key] = translated;
-    saveTransCache();
-    return translated;
+    TRANS_CACHE[key] = translated; saveTransCache(); return translated;
   }catch(e){ return text; }
 }
 async function autoTranslateInto(el, sourceText){
@@ -981,13 +887,11 @@ async function autoTranslateInto(el, sourceText){
 }
 function autoTranslateField(el, obj, field){
   if(!el || LANG==='ar') return;
-  if(hasManualTranslation(obj, field, LANG)) return;
-  if(LANG==='en' && obj[field+'_en']) return;
   const source = obj[field+'_en'] || obj[field+'_ar'];
   autoTranslateInto(el, source);
 }
 
-/* ============ DATA LOAD ============ */
+/* ============ DATA LOAD & INITIAL GSAP SEQUENCE ============ */
 async function loadData(){
   try{
     const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}] = await Promise.all([
@@ -997,439 +901,313 @@ async function loadData(){
       sb.from('intersect_consulting').select('*').eq('is_active',true).order('sort_order')
     ]);
     (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
-    DATA.sectors = sectors || [];
-    DATA.companies = companies || [];
-    DATA.consulting = consulting || [];
-  }catch(e){
-    console.error('Supabase load error', e);
-  }
+    DATA.sectors = sectors || []; DATA.companies = companies || []; DATA.consulting = consulting || [];
+  }catch(e){ console.error('Supabase load error', e); }
   renderAll();
+  
+  const tl = gsap.timeline();
+  tl.to('#init-loader', {opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: ()=> document.getElementById('init-loader').style.display = 'none'})
+    .fromTo('.topbar', {y: -20, opacity: 0}, {y: 0, opacity: 1, duration: 0.8}, "-=0.2")
+    .fromTo('.hero-orb', {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 1, ease: "back.out(1.5)"}, "-=0.6")
+    .fromTo('.home-wordmark', {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: 0.8, ease: "power3.out"}, "-=0.6")
+    .fromTo('.home-tagline', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, ease: "power3.out"}, "-=0.6")
+    .fromTo('.home-about', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, ease: "power3.out"}, "-=0.4")
+    .fromTo('.home-stat', {y: 20, opacity: 0, scale:0.95}, {y: 0, opacity: 1, scale:1, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)"}, "-=0.4")
+    .fromTo('.cta-btn, .consulting-link', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out"}, "-=0.4")
+    .fromTo('.scroll-hint', {opacity: 0}, {opacity: 1, duration: 1}, "-=0.2");
 }
 
-/* ============ RENDER: HOME ============ */
+/* ============ VIEW ROUTER ============ */
+let isAnimatingView = false;
+function switchView(id){
+  if(isAnimatingView) return;
+  const current = document.querySelector('.view.active');
+  const next = document.getElementById(id);
+  if(current === next) return;
+  
+  isAnimatingView = true;
+  document.getElementById('brandMini').classList.toggle('show', id!=='view-home');
+  if(id==='view-galaxy' || id==='view-home') clearAmbient();
+
+  const tl = gsap.timeline({ onComplete: () => { isAnimatingView = false; }});
+  
+  if(current){
+    tl.to(current.children, {y: -20, opacity: 0, duration: 0.3, stagger: 0.02, ease: "power2.in"})
+      .call(() => {
+        current.classList.remove('active');
+        gsap.set(current.children, {clearProps: "all"});
+      });
+  }
+  
+  tl.call(() => {
+    next.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    
+    if(id === 'view-galaxy'){
+      gsap.fromTo('.galaxy-head > *', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1});
+      gsap.fromTo('.orbit-path', {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 1, stagger: 0.1, ease: "back.out(1.2)"}, "-=0.4");
+      gsap.fromTo('.planet-node', {scale: 0, opacity: 0}, {scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(2)"}, "-=0.6");
+      gsap.fromTo('.legend-pill', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "back.out(1.5)"}, "-=0.4");
+      gsap.fromTo('#view-galaxy .consulting-link', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.5}, "-=0.2");
+    }
+    else if(id === 'view-sector' || id === 'view-consulting'){
+      if(id === 'view-sector' && currentSector) showSector(currentSector.slug, true);
+      gsap.fromTo('.back-link', {x: -20, opacity: 0}, {x: 0, opacity: 1, duration: 0.5});
+      gsap.fromTo('.sector-header > *', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1}, "-=0.3");
+      gsap.fromTo('.company-card', {y: 40, opacity: 0, scale: 0.95}, {y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"}, "-=0.4");
+    }
+    else if(id === 'view-about'){
+      renderAbout();
+      gsap.fromTo('.back-link', {x: -20, opacity: 0}, {x: 0, opacity: 1, duration: 0.5});
+      gsap.fromTo('.about-hero > *', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1}, "-=0.3");
+      gsap.fromTo('.about-block', {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power2.out"}, "-=0.4");
+    }
+    else if(id === 'view-home'){
+      gsap.fromTo('.hero-orb', {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 1, ease: "back.out(1.5)"});
+      gsap.fromTo('.home-wordmark, .home-tagline, .home-about, .home-stat, .cta-btn, .consulting-link', {y: 20, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: "power2.out"}, "-=0.6");
+    }
+  });
+}
+
+function attachGSAPInteractions() {
+  document.querySelectorAll('.company-card, .gs-card, .legend-pill, .stat-block, .person-card, .value-card, .service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => gsap.to(el, { y: -6, scale: 1.02, duration: 0.4, ease: "power2.out", overwrite: "auto" }));
+    el.addEventListener('mouseleave', () => gsap.to(el, { y: 0, scale: 1, duration: 0.4, ease: "power2.out", overwrite: "auto" }));
+    el.addEventListener('mousedown', () => gsap.to(el, { scale: 0.96, duration: 0.2, ease: "power1.inOut", overwrite: "auto" }));
+    el.addEventListener('mouseup', () => gsap.to(el, { scale: 1.02, duration: 0.4, ease: "back.out(2)", overwrite: "auto" }));
+  });
+  
+  document.querySelectorAll('.gs-hover').forEach(el => {
+    el.addEventListener('mousedown', () => gsap.to(el, { scale: 0.95, duration: 0.1 }));
+    el.addEventListener('mouseup', () => gsap.to(el, { scale: 1, duration: 0.3, ease: "back.out(2)" }));
+  });
+}
+
+/* ============ RENDER LOGIC ============ */
 function renderHome(){
   const brand = DATA.settings.brand || {};
-  const taglineEl = document.getElementById('homeTagline');
-  const aboutEl = document.getElementById('homeAbout');
-  taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default');
-  aboutEl.textContent = tf(brand,'about') || '';
+  const taglineEl = document.getElementById('homeTagline'); const aboutEl = document.getElementById('homeAbout');
+  taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default'); aboutEl.textContent = tf(brand,'about') || '';
   if(brand.tagline_ar || brand.tagline_en) autoTranslateField(taglineEl, brand, 'tagline');
   if(brand.about_ar || brand.about_en) autoTranslateField(aboutEl, brand, 'about');
-  const logoEl = document.getElementById('homeLogo');
-  const wordmarkEl = document.getElementById('homeWordmark');
+  const logoEl = document.getElementById('homeLogo'); const wordmarkEl = document.getElementById('homeWordmark');
   if(brand.logo_url){
-    logoEl.classList.add('has-image');
-    logoEl.innerHTML = `<img src="${brand.logo_url}" alt="Intersect">`;
-    wordmarkEl.style.display = 'none';
+    logoEl.classList.add('has-image'); logoEl.innerHTML = `<img src="${brand.logo_url}" alt="Intersect">`; wordmarkEl.style.display = 'none';
   } else {
-    logoEl.classList.remove('has-image');
-    logoEl.textContent = 'IX';
-    wordmarkEl.style.display = '';
+    logoEl.classList.remove('has-image'); logoEl.textContent = 'IX'; wordmarkEl.style.display = '';
   }
-  const sectorsCount = DATA.sectors.length;
-  const companiesCount = DATA.companies.length;
   document.getElementById('homeStats').innerHTML = `
-    <div class="home-stat"><b>${companiesCount}</b><span>${i18n('stat_ventures')}</span></div>
-    <div class="home-stat"><b>${sectorsCount}</b><span>${i18n('stat_sectors')}</span></div>
+    <div class="home-stat"><b>${DATA.companies.length}</b><span>${i18n('stat_ventures')}</span></div>
+    <div class="home-stat"><b>${DATA.sectors.length}</b><span>${i18n('stat_sectors')}</span></div>
     <div class="home-stat"><b>${DATA.consulting.length}</b><span>${i18n('stat_partnerships')}</span></div>
   `;
 }
 
-/* ============ RENDER: GALAXY ============ */
-const orbitOffsets = [
-  {ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},
-  {ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}
-];
+const orbitOffsets = [{ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},{ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}];
 function renderGalaxy(){
-  const wrap = document.getElementById('orbitWrap');
-  const legend = document.getElementById('galaxyLegend');
-  if(!wrap) return;
-  const cx=400, cy=400;
-  let svg = `<svg viewBox="0 0 800 800">`;
-  svg += `<circle class="sun" cx="${cx}" cy="${cy}" r="24" fill="#e8c87a"/>`;
-  svg += `<text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="16" fill="#1a1306" font-weight="700">IX</text>`;
+  const wrap = document.getElementById('orbitWrap'); const legend = document.getElementById('galaxyLegend');
+  if(!wrap) return; const cx=400, cy=400;
+  let svg = `<svg viewBox="0 0 800 800"><circle class="sun" cx="${cx}" cy="${cy}" r="24" fill="#e8c87a"/><text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="16" fill="#1a1306" font-weight="700">IX</text>`;
   DATA.sectors.forEach((sector,i)=>{
-    const off = orbitOffsets[i % orbitOffsets.length];
-    const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
-    const dur = 40 + i*9;
-    const color = sector.color_primary || '#8b6cf0';
+    const off = orbitOffsets[i % orbitOffsets.length]; const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
+    const dur = 40 + i*9; const color = sector.color_primary || '#8b6cf0';
     svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-opacity="0.28"/>`;
     const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
-    svg += `<g class="planet-node" onclick="showSector('${sector.slug}')">
-      <circle class="planet-dot" r="16" fill="${color}" style="color:${color}">
-        <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
-      </circle>
-    </g>`;
+    svg += `<g class="planet-node gs-hover" onclick="showSector('${sector.slug}')"><circle class="planet-dot" r="16" fill="${color}" style="color:${color}"><animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/></circle></g>`;
   });
-  svg += `</svg>`;
-  wrap.innerHTML = svg;
-
+  svg += `</svg>`; wrap.innerHTML = svg;
   if(legend){
-    legend.innerHTML = DATA.sectors.map(sector=>`
-      <button class="legend-pill" onclick="showSector('${sector.slug}')">
-        ${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}
-        <span id="leg-${sector.id}">${tf(sector,'name')}</span>
-      </button>
-    `).join('');
+    legend.innerHTML = DATA.sectors.map(sector=>`<button class="legend-pill" onclick="showSector('${sector.slug}')">${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}<span id="leg-${sector.id}">${tf(sector,'name')}</span></button>`).join('');
     DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
   }
 }
 
-/* ============ RENDER: SECTOR ============ */
 let currentSector = null;
-function showSector(slug){
+function showSector(slug, bypassViewSwitch = false){
   currentSector = DATA.sectors.find(s=>s.slug===slug);
   if(!currentSector) return;
-  switchView('view-sector');
+  if(!bypassViewSwitch) switchView('view-sector');
+  
   document.getElementById('sectorIcon').innerHTML = miniIcon(pickIconKeys(currentSector)[0], currentSector.color_primary, 64);
-  const nameEl = document.getElementById('sectorName');
-  const descEl = document.getElementById('sectorDesc');
-  nameEl.textContent = tf(currentSector,'name');
-  descEl.textContent = tf(currentSector,'description');
-  autoTranslateField(nameEl, currentSector, 'name');
-  autoTranslateField(descEl, currentSector, 'description');
+  const nameEl = document.getElementById('sectorName'); const descEl = document.getElementById('sectorDesc');
+  nameEl.textContent = tf(currentSector,'name'); descEl.textContent = tf(currentSector,'description');
+  autoTranslateField(nameEl, currentSector, 'name'); autoTranslateField(descEl, currentSector, 'description');
   document.documentElement.style.setProperty('--sector-active', currentSector.color_primary);
   applyAmbient(currentSector.color_primary, currentSector.color_secondary, pickIconKeys(currentSector));
 
   const list = DATA.companies.filter(c=>c.sector_id===currentSector.id);
   const grid = document.getElementById('companyGrid');
-  if(list.length===0){
-    grid.innerHTML = `<div class="empty-state">${i18n('no_ventures')}</div>`;
-    return;
-  }
+  if(list.length===0){ grid.innerHTML = `<div class="empty-state">${i18n('no_ventures')}</div>`; return; }
+  
   grid.innerHTML = list.map(c=>`
     <div class="company-card" style="--card-accent:${currentSector.color_primary}" onclick="openCompany('${c.id}')">
-      <div class="company-logo" style="--card-accent:${currentSector.color_primary}">
-        ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
-      </div>
+      <div class="company-logo" style="--card-accent:${currentSector.color_primary}">${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}</div>
       <h3 id="cn-${c.id}">${tf(c,'name')}</h3>
       <div class="tag" id="ct-${c.id}">${tf(c,'tagline')||''}</div>
       ${relationshipLabel(c) ? `<span class="badge" id="rl-${c.id}" style="--card-accent:${currentSector.color_primary}">${relationshipLabel(c)}</span>` : ''}
     </div>
   `).join('');
+  
   list.forEach(c=>{
     autoTranslateField(document.getElementById('cn-'+c.id), c, 'name');
     if(c.tagline_en || c.tagline_ar) autoTranslateField(document.getElementById('ct-'+c.id), c, 'tagline');
-    autoTranslateRelationshipLabel(c, document.getElementById('rl-'+c.id));
   });
+  setTimeout(attachGSAPInteractions, 50);
 }
-function autoTranslateRelationshipLabel(c, el){
-  if(!el || !c.relationship_label_ar || LANG==='ar') return;
-  const manual = c.translations && c.translations[LANG] && c.translations[LANG].relationship_label;
-  if(manual) return;
-  mtTranslate(c.relationship_label_ar, LANG).then(t=>{ if(el.isConnected) el.textContent = t; });
-}
+
 function relationshipLabel(c){
   if(!c.relationship_type) return '';
-  const manual = c.translations && c.translations[LANG] && c.translations[LANG].relationship_label;
-  if(manual) return manual;
-  if(c.relationship_label_ar && LANG==='ar') return c.relationship_label_ar;
   const map = {owned:'rel_owned', jv:'rel_jv', collaboration:'rel_collaboration', subsidiary:'rel_subsidiary', initiative:'rel_initiative'};
   return i18n(map[c.relationship_type] || 'rel_owned');
 }
 
-/* ============ NEON ICON LIBRARY ============ */
+/* ============ MODAL (GSAP ENABLED) ============ */
+function openCompany(id){
+  const c = DATA.companies.find(x=>x.id===id); if(!c) return;
+  const accent = currentSector ? currentSector.color_primary : '#e8c87a';
+  const overlay = document.getElementById('modalOverlay');
+  const box = document.getElementById('modalBox');
+  
+  box.style.setProperty('--modal-accent', accent);
+  box.innerHTML = `
+    <button class="modal-close gs-hover" onclick="closeModal()">×</button>
+    <div class="modal-top">
+      <div class="modal-logo" style="--modal-accent:${accent}">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
+      <div><h3 id="modalName">${tf(c,'name')}</h3><div class="tag" id="modalTag">${tf(c,'tagline')||''}</div></div>
+    </div>
+    ${relationshipLabel(c) ? `<span class="badge" style="--card-accent:${accent}">${relationshipLabel(c)}</span>` : ''}
+    <p class="modal-desc" id="modalDesc">${tf(c,'description')||''}</p>
+    ${c.reference_text ? `<div class="modal-ref">${c.reference_text}${c.reference_author?`<cite>— ${c.reference_author}</cite>`:''}</div>` : ''}
+    ${(c.gallery&&c.gallery.length) ? `<div class="modal-gallery">${c.gallery.map(g=>`<img src="${g}">`).join('')}</div>` : ''}
+    <div class="modal-actions">
+      ${c.website_url?`<a class="btn-primary gs-hover" style="--modal-accent:${accent}" href="${makeValidUrl(c.website_url)}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
+    </div>
+  `;
+  
+  overlay.style.display = 'flex';
+  gsap.fromTo(overlay, {opacity: 0}, {opacity: 1, duration: 0.3});
+  gsap.fromTo(box, {scale: 0.9, y: 30, opacity: 0}, {scale: 1, y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.5)"});
+  
+  autoTranslateField(document.getElementById('modalName'), c, 'name');
+  autoTranslateField(document.getElementById('modalTag'), c, 'tagline');
+  autoTranslateField(document.getElementById('modalDesc'), c, 'description');
+}
+
+/* للشركات الاستشارية / الشراكات */
+function openConsulting(id){
+  const c = DATA.consulting.find(x=>x.id===id);
+  if(!c) return;
+  const overlay = document.getElementById('modalOverlay');
+  const box = document.getElementById('modalBox');
+
+  box.style.setProperty('--modal-accent', '#9ba3b8');
+  box.innerHTML = `
+    <button class="modal-close gs-hover" onclick="closeModal()">×</button>
+    <div class="modal-top">
+      <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
+      <div><h3 id="modalConName">${tf(c,'name')}</h3><div class="tag" id="modalConType">${tf(c,'type')||''}</div></div>
+    </div>
+    <p class="modal-desc" id="modalConDesc">${tf(c,'description')||''}</p>
+    <div class="modal-actions">
+      ${c.website_url?`<a class="btn-primary gs-hover" style="--modal-accent:#9ba3b8" href="${makeValidUrl(c.website_url)}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
+    </div>
+  `;
+  
+  overlay.style.display = 'flex';
+  gsap.fromTo(overlay, {opacity: 0}, {opacity: 1, duration: 0.3});
+  gsap.fromTo(box, {scale: 0.9, y: 30, opacity: 0}, {scale: 1, y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.5)"});
+
+  autoTranslateField(document.getElementById('modalConName'), c, 'name');
+  autoTranslateField(document.getElementById('modalConDesc'), c, 'description');
+  autoTranslateField(document.getElementById('modalConType'), c, 'type');
+}
+
+
+function closeModal(){
+  gsap.to('#modalBox', {scale: 0.95, y: -20, opacity: 0, duration: 0.3});
+  gsap.to('#modalOverlay', {opacity: 0, duration: 0.3, onComplete: () => {
+    document.getElementById('modalOverlay').style.display = 'none';
+  }});
+}
+
+/* ============ ICONS & UTILS ============ */
 const NEON_ICONS = {
   ai: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="13" r="5"/><circle cx="13" cy="47" r="5"/><circle cx="51" cy="47" r="5"/><path d="M32 18 L17 43 M32 18 L47 43 M18 47 H46"/><circle cx="32" cy="33" r="2.2" fill="currentColor" stroke="none"/></svg>`,
   health: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 34 H19 L25 19 L34 47 L40 34 H59"/><path d="M32 8 V18 M27 13 H37" stroke-width="3.2"/></svg>`,
   tourism: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="32" cy="32" r="24"/><path d="M32 10 V17 M32 47 V54 M10 32 H17 M47 32 H54"/><path d="M41 23 L27 29 L23 43 L37 37 Z" stroke-linejoin="round"/></svg>`,
   mobility: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 20 H32 M5 32 H40 M5 44 H24"/><path d="M44 32 H58 M50 24 L58 32 L50 40" stroke-linejoin="round"/></svg>`,
-  intelligence: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="32" r="5.5"/><circle cx="32" cy="32" r="16" stroke-dasharray="3 6"/><circle cx="32" cy="32" r="26" stroke-dasharray="1.5 7"/><circle cx="32" cy="6" r="2.4" fill="currentColor" stroke="none"/><circle cx="55" cy="45" r="2.4" fill="currentColor" stroke="none"/></svg>`,
-  culture: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M39 11 A20 20 0 1 0 39 53 A16 16 0 1 1 39 11 Z"/><path d="M50 13 L52 18 L57 20 L52 22 L50 27 L48 22 L43 20 L48 18 Z" fill="currentColor" stroke="none"/></svg>`,
-  partnerships: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="24" cy="32" r="16"/><circle cx="40" cy="32" r="16"/></svg>`,
-  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`,
-  satellite: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="26" y="26" width="12" height="12" rx="2"/><rect x="4" y="22" width="14" height="20" rx="1.5"/><rect x="46" y="22" width="14" height="20" rx="1.5"/><path d="M18 32 H26 M38 32 H46 M38 26 L48 16"/><circle cx="50" cy="14" r="2.4" fill="currentColor" stroke="none"/></svg>`,
-  rocket: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6 C40 16 42 28 42 38 L22 38 C22 28 24 16 32 6 Z"/><circle cx="32" cy="26" r="4"/><path d="M22 34 L12 44 M42 34 L52 44"/><path d="M27 40 L24 52 M37 40 L40 52 M32 40 L32 54"/></svg>`,
-  car: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 38 L12 26 L22 20 H42 L52 26 L56 38"/><path d="M8 38 H56 V44 H8 Z"/><circle cx="18" cy="44" r="5"/><circle cx="46" cy="44" r="5"/><path d="M20 26 H40"/></svg>`,
-  train: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="10" width="36" height="34" rx="8"/><path d="M14 26 H50"/><circle cx="24" cy="18" r="3"/><circle cx="40" cy="18" r="3"/><path d="M20 50 V56 M44 50 V56 M10 44 H54"/></svg>`,
-  tower: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="48"/><path d="M26 16 H30 M34 16 H38 M26 24 H30 M34 24 H38 M26 32 H30 M34 32 H38 M26 40 H30 M34 40 H38"/><path d="M12 56 H52"/></svg>`,
-  plane: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 32 L58 12 L36 34 L58 52 Z"/><path d="M36 34 L26 44"/></svg>`,
-  coffee: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 26 H42 V40 C42 48 36 52 28 52 C20 52 14 48 14 40 Z"/><path d="M42 30 H48 C52 30 52 38 48 38 H42"/><path d="M22 10 C22 14 26 14 26 18 M32 10 C32 14 36 14 36 18"/></svg>`,
-  arabic_letter: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M46 20 C46 12 36 10 28 14 C18 18 14 28 20 34 C26 40 38 38 40 30 C42 24 34 22 32 28 C30 34 38 36 40 30"/></svg>`,
-  japanese_kanji: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="10" width="28" height="44" rx="2"/><path d="M18 32 H46"/></svg>`,
-  mosaic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="14" y="14" width="36" height="36"/><rect x="14" y="14" width="36" height="36" transform="rotate(45 32 32)"/></svg>`,
-  lightning: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M36 6 L16 36 H30 L26 58 L50 26 H36 Z"/></svg>`,
-  chart: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 54 H54"/><rect x="14" y="38" width="8" height="16"/><rect x="28" y="28" width="8" height="26"/><rect x="42" y="16" width="8" height="38"/><path d="M14 24 L26 14 L36 20 L52 6 M44 6 H52 V14"/></svg>`,
-  guide: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="26" cy="14" r="7"/><path d="M26 21 V42 M18 30 H26 M26 26 L44 20 V32 L26 30" stroke-linejoin="round"/><path d="M18 42 L14 56 M26 42 L30 56"/></svg>`
+  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`
 };
-function miniIcon(key, color, size){
-  const svg = NEON_ICONS[key] || NEON_ICONS.generic;
-  const sizeStyle = size ? `width:${size}px;height:${size}px;` : '';
-  return `<span class="mini-icon" style="color:${color||'#e8c87a'};${sizeStyle}">${svg}</span>`;
-}
-function pickIconKeys(sector){
-  if(!sector) return ['generic'];
-  if(sector.forceKeys) return sector.forceKeys;
-  if(Array.isArray(sector.icon_keys) && sector.icon_keys.length){
-    const valid = sector.icon_keys.filter(k=>NEON_ICONS[k]);
-    if(valid.length) return valid;
-  }
-  return [autoDetectIconKey(sector)];
-}
-function autoDetectIconKey(sector){
-  const s = ((sector.slug||'')+' '+(sector.name_en||'')+' '+(sector.name_ar||'')).toLowerCase();
-  if(/ai\b|artificial|game|gaming|robot|ذكاء|ألعاب|العاب/.test(s)) return 'ai';
-  if(/health|medic|pharma|clinic|hospital|صح|طب|صيدل/.test(s)) return 'health';
-  if(/tour|travel|guide|trip|سياح|سفر/.test(s)) return 'tourism';
-  if(/mobil|transport|ride|car|logistic|نقل|تنقل|مواصلات/.test(s)) return 'mobility';
-  if(/intel|data|market|analytic|استخبار|بيانات|سوق/.test(s)) return 'intelligence';
-  if(/cultur|herit|impact|communit|nonprofit|ثقاف|تراث|مجتمع|أثر/.test(s)) return 'culture';
-  return 'generic';
-}
+function miniIcon(key, color, size){ return `<span class="mini-icon" style="color:${color||'#e8c87a'};width:${size}px;height:${size}px;">${NEON_ICONS[key] || NEON_ICONS.generic}</span>`; }
+function pickIconKeys(s){ return (s.icon_keys&&s.icon_keys.length) ? s.icon_keys : ['generic']; }
 
 function applyAmbient(c1,c2,iconKeys){
-  const keys = Array.isArray(iconKeys) ? iconKeys : [iconKeys || 'generic'];
   let amb = document.getElementById('sectorAmbient');
-  if(!amb){
-    amb = document.createElement('div');
-    amb.className='sector-ambient';
-    amb.id='sectorAmbient';
-    document.body.appendChild(amb);
-  }
+  if(!amb){ amb = document.createElement('div'); amb.className='sector-ambient'; amb.id='sectorAmbient'; document.body.appendChild(amb); }
   amb.style.background = `radial-gradient(circle at 50% 20%, ${c1}22, transparent 55%), radial-gradient(circle at 80% 80%, ${c2}18, transparent 50%)`;
-
   let field = '<div class="icon-field" id="iconField">';
-  const COUNT = 14;
-  for(let i=0;i<COUNT;i++){
-    const svg = NEON_ICONS[keys[Math.floor(Math.random()*keys.length)]] || NEON_ICONS.generic;
-    const x = Math.random()*100, y = Math.random()*100;
-    const sz = 26 + Math.random()*44;
-    const op = 0.22 + Math.random()*0.28;
-    const dur = 14 + Math.random()*16;
-    const delay = -(Math.random()*dur);
-    const dx = (Math.random()*60-30).toFixed(0);
-    const dy = (Math.random()*60-30).toFixed(0);
-    const rot = (Math.random()*24-12).toFixed(0);
-    const color = i%2===0 ? c1 : c2;
-    field += `<span class="floating-icon" style="--x:${x}%;--y:${y}%;--sz:${sz}px;--op:${op};--dur:${dur}s;--delay:${delay}s;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;color:${color}">${svg}</span>`;
+  for(let i=0;i<14;i++){
+    const svg = NEON_ICONS[iconKeys[Math.floor(Math.random()*iconKeys.length)]] || NEON_ICONS.generic;
+    field += `<span class="floating-icon" style="--x:${Math.random()*100}%;--y:${Math.random()*100}%;--sz:${26+Math.random()*44}px;--op:${0.22+Math.random()*0.28};--dur:${14+Math.random()*16}s;--delay:-${Math.random()*14}s;--dx:${(Math.random()*60-30).toFixed(0)}px;--dy:${(Math.random()*60-30).toFixed(0)}px;--rot:${(Math.random()*24-12).toFixed(0)}deg;color:${i%2===0?c1:c2}">${svg}</span>`;
   }
-  field += '</div>';
-  amb.innerHTML = field;
+  amb.innerHTML = field + '</div>';
   requestAnimationFrame(()=>amb.classList.add('active'));
 }
+function clearAmbient(){ const amb = document.getElementById('sectorAmbient'); if(amb) amb.classList.remove('active'); }
+
 let parallaxRAF = null;
 document.addEventListener('mousemove', e=>{
   if(parallaxRAF) return;
   parallaxRAF = requestAnimationFrame(()=>{
     const field = document.getElementById('iconField');
-    if(field){
-      const px = (e.clientX/window.innerWidth - 0.5) * 26;
-      const py = (e.clientY/window.innerHeight - 0.5) * 26;
-      field.style.transform = `translate(${px}px, ${py}px)`;
-    }
+    if(field) field.style.transform = `translate(${(e.clientX/window.innerWidth-0.5)*26}px, ${(e.clientY/window.innerHeight-0.5)*26}px)`;
     parallaxRAF = null;
   });
 });
-function clearAmbient(){
-  const amb = document.getElementById('sectorAmbient');
-  if(amb) amb.classList.remove('active');
-}
 
-/* ============ RENDER: CONSULTING ============ */
-function showConsulting(){
-  switchView('view-consulting');
-  applyAmbient('#9ba3b8','#5c6272',['partnerships']);
-  const grid = document.getElementById('consultingGrid');
-  if(DATA.consulting.length===0){
-    grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`;
-    return;
-  }
-  grid.innerHTML = DATA.consulting.map(c=>`
-    <div class="company-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
-      <div class="company-logo" style="--card-accent:#9ba3b8">
-        ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
-      </div>
-      <h3 id="con-${c.id}">${tf(c,'name')}</h3>
-      <div class="tag" id="cot-${c.id}">${tf(c,'type')||''}</div>
-      <span class="badge" style="--card-accent:#9ba3b8">${consultingRelLabel(c)}</span>
-    </div>
-  `).join('');
-  DATA.consulting.forEach(c=>{
-    autoTranslateField(document.getElementById('con-'+c.id), c, 'name');
-    autoTranslateField(document.getElementById('cot-'+c.id), c, 'type');
-  });
-}
-function consultingRelLabel(c){
-  return i18n(c.relationship_kind==='partner' ? 'kind_partner' : 'kind_client');
-}
-
-/* ============ MODALS ============ */
-function openCompany(id){
-  const c = DATA.companies.find(x=>x.id===id);
-  if(!c) return;
-  const accent = currentSector ? currentSector.color_primary : '#e8c87a';
-  document.getElementById('modalBox').style.setProperty('--modal-accent', accent);
-  document.getElementById('modalBox').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="modal-top">
-      <div class="modal-logo" style="--modal-accent:${accent}">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
-      <div>
-        <h3 id="modalName">${tf(c,'name')}</h3>
-        <div class="tag" id="modalTag">${tf(c,'tagline')||''}</div>
-      </div>
-    </div>
-    ${relationshipLabel(c) ? `<span class="badge" id="modalRelBadge" style="--card-accent:${accent}">${relationshipLabel(c)}</span>` : ''}
-    <p class="modal-desc" id="modalDesc">${tf(c,'description')||''}</p>
-    ${c.reference_text ? `<div class="modal-ref" id="modalRef">${c.reference_text}${c.reference_author?`<cite>— ${c.reference_author}</cite>`:''}</div>` : ''}
-    ${(c.gallery&&c.gallery.length) ? `<div class="modal-gallery">${c.gallery.map(g=>`<img src="${g}">`).join('')}</div>` : ''}
-    <div class="modal-actions">
-      ${c.website_url?`<a class="btn-primary" style="--modal-accent:${accent}" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
-      <span class="btn-ghost" id="modalSectorTag">${currentSector?tf(currentSector,'name'):''}</span>
-    </div>
-  `;
-  document.getElementById('modalOverlay').classList.add('active');
-  autoTranslateField(document.getElementById('modalName'), c, 'name');
-  if(c.tagline_en || c.tagline_ar) autoTranslateField(document.getElementById('modalTag'), c, 'tagline');
-  autoTranslateField(document.getElementById('modalDesc'), c, 'description');
-  if(currentSector) autoTranslateField(document.getElementById('modalSectorTag'), currentSector, 'name');
-  autoTranslateRelationshipLabel(c, document.getElementById('modalRelBadge'));
-  if(c.reference_text && LANG!=='ar'){
-    const refEl = document.getElementById('modalRef');
-    const manualRef = c.translations && c.translations[LANG] && c.translations[LANG].reference_text;
-    if(refEl && manualRef){
-      refEl.childNodes[0].textContent = manualRef;
-    } else if(refEl){
-      mtTranslate(c.reference_text, LANG).then(t=>{ if(refEl.isConnected) refEl.childNodes[0].textContent = t; });
-    }
-  }
-}
-function openConsulting(id){
-  const c = DATA.consulting.find(x=>x.id===id);
-  if(!c) return;
-  document.getElementById('modalBox').style.setProperty('--modal-accent', '#9ba3b8');
-  document.getElementById('modalBox').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="modal-top">
-      <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
-      <div><h3 id="modalConName">${tf(c,'name')}</h3><div class="tag" id="modalConType">${tf(c,'type')||''}</div></div>
-    </div>
-    <span class="badge" style="--card-accent:#9ba3b8">${consultingRelLabel(c)}</span>
-    <p class="modal-desc" id="modalConDesc">${tf(c,'description')||''}</p>
-    <div class="modal-actions">
-      ${c.website_url?`<a class="btn-primary" style="--modal-accent:#9ba3b8" href="${c.website_url}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
-    </div>
-  `;
-  document.getElementById('modalOverlay').classList.add('active');
-  autoTranslateField(document.getElementById('modalConName'), c, 'name');
-  autoTranslateField(document.getElementById('modalConDesc'), c, 'description');
-  autoTranslateField(document.getElementById('modalConType'), c, 'type');
-}
-function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-
-/* ============ VIEW ROUTER ============ */
-function switchView(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('brandMini').classList.toggle('show', id!=='view-home');
-  if(id==='view-galaxy' || id==='view-home') clearAmbient();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function goHome(){ switchView('view-home'); clearAmbient(); }
-function showGalaxy(){ switchView('view-galaxy'); clearAmbient(); }
-function showAbout(){ switchView('view-about'); clearAmbient(); renderAbout(); }
-
-/* ============ RENDER: ABOUT ============ */
-function bl(obj, baseKey, lang){
-  lang = lang || LANG;
-  if(lang==='ar') return obj[baseKey+'_ar'] || obj[baseKey+'_en'] || '';
-  return obj[baseKey+'_en'] || obj[baseKey+'_ar'] || '';
-}
-function autoTranslateBl(el, obj, baseKey){
-  if(!el || LANG==='ar') return;
-  if(LANG==='en' && obj[baseKey+'_en']) return;
-  const source = obj[baseKey+'_en'] || obj[baseKey+'_ar'];
-  autoTranslateInto(el, source);
-}
+/* ============ OTHER VIEWS (CONSULTING & ABOUT) ============ */
+function bl(obj, baseKey){ return obj[baseKey+'_en'] || obj[baseKey+'_ar'] || ''; }
 function renderAbout(){
   const brand = DATA.settings.brand || {};
   document.getElementById('aboutLead').textContent = tf(brand,'about') || '';
-
   const vm = DATA.settings.vision_mission || {};
-  const visionEl = document.getElementById('visionText');
-  const missionEl = document.getElementById('missionText');
-  visionEl.textContent = bl(vm,'vision');
-  missionEl.textContent = bl(vm,'mission');
-  autoTranslateBl(visionEl, vm, 'vision');
-  autoTranslateBl(missionEl, vm, 'mission');
+  document.getElementById('visionText').textContent = bl(vm,'vision');
+  document.getElementById('missionText').textContent = bl(vm,'mission');
 
-  const values = DATA.settings.core_values || [];
-  document.getElementById('valuesGrid').innerHTML = values.map((v,i)=>`
-    <div class="value-card"><h4>◆ <span id="val-t-${i}">${bl(v,'title')}</span></h4><p id="val-d-${i}">${bl(v,'desc')}</p></div>
+  document.getElementById('valuesGrid').innerHTML = (DATA.settings.core_values||[]).map((v,i)=>`
+    <div class="value-card"><h4>◆ <span>${bl(v,'title')}</span></h4><p>${bl(v,'desc')}</p></div>
   `).join('');
-  values.forEach((v,i)=>{
-    autoTranslateBl(document.getElementById('val-t-'+i), v, 'title');
-    autoTranslateBl(document.getElementById('val-d-'+i), v, 'desc');
-  });
 
-  const services = DATA.settings.services || [];
-  document.getElementById('servicesGrid').innerHTML = services.map((s,i)=>`
-    <div class="service-card"><h4><span class="snum">0${i+1}</span> <span id="svc-t-${i}">${bl(s,'title')}</span></h4><p id="svc-d-${i}">${bl(s,'desc')}</p></div>
+  document.getElementById('servicesGrid').innerHTML = (DATA.settings.services||[]).map((s,i)=>`
+    <div class="service-card"><h4><span class="snum">0${i+1}</span> <span>${bl(s,'title')}</span></h4><p>${bl(s,'desc')}</p></div>
   `).join('');
-  services.forEach((s,i)=>{
-    autoTranslateBl(document.getElementById('svc-t-'+i), s, 'title');
-    autoTranslateBl(document.getElementById('svc-d-'+i), s, 'desc');
-  });
 
-  const industries = DATA.settings.industries || [];
-  document.getElementById('industriesCloud').innerHTML = industries.map((name,i)=>`<span id="ind-${i}">${name}</span>`).join('');
-  if(LANG!=='en'){
-    industries.forEach((name,i)=>{ const el=document.getElementById('ind-'+i); if(el) autoTranslateInto(el, name); });
-  }
-
-  const stats = DATA.settings.stats || [];
-  document.getElementById('statsGrid').innerHTML = stats.map((s,i)=>`
-    <div class="stat-block"><b>${s.value}</b><span id="stat-${i}">${bl(s,'label')}</span></div>
+  document.getElementById('industriesCloud').innerHTML = (DATA.settings.industries||[]).map(name=>`<span>${name}</span>`).join('');
+  document.getElementById('statsGrid').innerHTML = (DATA.settings.stats||[]).map(s=>`
+    <div class="stat-block"><b>${s.value}</b><span>${bl(s,'label')}</span></div>
   `).join('');
-  stats.forEach((s,i)=>autoTranslateBl(document.getElementById('stat-'+i), s, 'label'));
 
-  const team = DATA.settings.team || [];
-  document.getElementById('teamGrid').innerHTML = team.map((p,i)=>`
-    <div class="person-card">
-      <div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div>
-      <h4>${p.name||''}</h4>
-      <div class="ptitle" id="team-t-${i}">${bl(p,'title')}</div>
-    </div>
+  document.getElementById('teamGrid').innerHTML = (DATA.settings.team||[]).map(p=>`
+    <div class="person-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div></div>
   `).join('');
-  team.forEach((p,i)=>autoTranslateBl(document.getElementById('team-t-'+i), p, 'title'));
 
-  const advisors = DATA.settings.advisors || [];
-  document.getElementById('advisorsGrid').innerHTML = advisors.map((p,i)=>`
-    <div class="person-card">
-      <div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div>
-      <h4>${p.name||''}</h4>
-      <div class="ptitle" id="adv-t-${i}">${bl(p,'title')}</div>
-      <div class="pbio" id="adv-b-${i}">${bl(p,'bio')}</div>
-    </div>
-  `).join('');
-  advisors.forEach((p,i)=>{
-    autoTranslateBl(document.getElementById('adv-t-'+i), p, 'title');
-    autoTranslateBl(document.getElementById('adv-b-'+i), p, 'bio');
-  });
-
-  const logos = DATA.settings.client_logos || [];
-  document.getElementById('logosCloud').innerHTML = logos.map(l=>{
-    const name = typeof l === 'string' ? l : (l.name||'');
-    const logoUrl = typeof l === 'string' ? null : l.logo_url;
-    return logoUrl ? `<span class="logo-chip-img"><img src="${logoUrl}" alt="${name}"></span>` : `<span>${name}</span>`;
-  }).join('');
-
-  const contact = DATA.settings.contact_info || {};
   document.getElementById('contactRow').innerHTML = `
-    ${contact.website?`<a href="${contact.website}" target="_blank" rel="noopener">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`:''}
-    ${contact.email?`<a href="mailto:${contact.email}">✉️ ${contact.email}</a>`:''}
-    ${contact.phone?`<a href="tel:${contact.phone.replace(/\s/g,'')}">📞 ${contact.phone}</a>`:''}
+    ${DATA.settings.contact_info?.website?`<a class="gs-hover" href="${makeValidUrl(DATA.settings.contact_info.website)}" target="_blank" rel="noopener">🌐 ${DATA.settings.contact_info.website.replace(/^https?:\/\//,'')}</a>`:''}
+    ${DATA.settings.contact_info?.email?`<a class="gs-hover" href="mailto:${DATA.settings.contact_info.email}">✉️ ${DATA.settings.contact_info.email}</a>`:''}
   `;
+  setTimeout(attachGSAPInteractions, 50);
 }
 
 function renderAll(){
-  renderHome();
-  renderGalaxy();
-  if(currentSector) showSector(currentSector.slug);
+  renderHome(); renderGalaxy();
+  if(currentSector) showSector(currentSector.slug, true);
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
+// Start
 loadData();
 </script>
 </body>
 </html>
+
+

@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
 <title>Intersect — إنترسكت | حيث تتقاطع الأفكار</title>
 <meta name="description" content="بروفايل تفاعلي لمحفظة مشاريع إنترسكت الرقمية في السوق السعودي">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,7 +76,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:50;
   display:flex;align-items:center;justify-content:space-between;
-  padding:20px 32px;
+  padding: max(20px, env(safe-area-inset-top)) 32px 20px;
   pointer-events:none;
   background:linear-gradient(180deg, rgba(2,3,8,0.9) 0%, transparent 100%);
 }
@@ -301,7 +301,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 /* ========== FOOTER ========== */
 .site-footer{
   position:relative;z-index:2;text-align:center;padding:40px 20px 50px;color:var(--muted);font-size:12px;
-  border-top:1px solid var(--glass-border);margin-top:40px;
+  border-top:1px solid var(--glass-border);margin-bottom: max(20px, env(safe-area-inset-bottom));
 }
 .site-footer a{color:var(--muted);text-decoration:none;opacity:.6;transition:.25s;}
 .site-footer a:hover{opacity:1;color:var(--gold);}
@@ -352,7 +352,7 @@ body.lang-ltr .chat-msg.bot { border-bottom-right-radius: 16px; border-bottom-le
 .chat-msg.user { background: rgba(232,200,122,0.15); align-self: flex-end; border-bottom-left-radius: 4px; color: var(--gold); border: 1px solid rgba(232,200,122,0.3); }
 body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; }
 
-/* Quick Replies (Buttons inside chat) */
+/* Quick Replies */
 .quick-replies-container { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; max-width:90%; align-self: flex-start;}
 .qr-btn {
   background: var(--glass-bg); border: 1px solid rgba(232,200,122,0.4);
@@ -386,23 +386,38 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
 .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-/* ========== RESPONSIVE ========== */
-@media (max-width:640px){
-  .topbar{padding:14px 18px;}
-  .company-grid{grid-template-columns:1fr;}
-  .vm-grid,.values-grid,.services-grid{grid-template-columns:1fr;}
-  .people-grid{grid-template-columns:repeat(2,1fr);}
-  .chat-window { bottom: 0; right: 0; left: 0; width: 100%; height: 100vh; max-width: 100%; border-radius: 0; }
-  .chat-fab { bottom: 20px; right: 20px; }
-  body.lang-ltr .chat-fab { left: 20px; }
+/* ========== RESPONSIVE (MOBILE & TABLET FIXES) ========== */
+@media (max-width: 768px) {
+  .topbar { padding: max(14px, env(safe-area-inset-top)) 18px 14px; }
+  .company-grid { grid-template-columns: 1fr; }
+  .vm-grid, .values-grid, .services-grid { grid-template-columns: 1fr; }
+  .people-grid { grid-template-columns: repeat(2, 1fr); }
+  
+  /* Mobile App-like Chat Window */
+  .chat-window { 
+    bottom: 0; right: 0; left: 0; top: 0; 
+    width: 100%; height: 100dvh; /* Dynamic Viewport Height fixes URL bar issues */
+    max-width: 100%; border-radius: 0; 
+    transform-origin: bottom center; 
+    z-index: 99999;
+  }
+  body.lang-ltr .chat-window { transform-origin: bottom center; }
+  
+  .chat-header { padding-top: max(16px, env(safe-area-inset-top)); }
+  .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  
+  /* Floating Action Button (FAB) Positioning */
+  .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
+  body.lang-ltr .chat-fab { left: 20px; right: auto; }
 }
-body.lang-ltr{direction:ltr;}
+
 select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:28px;}
 .section-divider{width:60px;height:2px;background:linear-gradient(90deg, var(--gold), var(--gold-dim), transparent);margin:0 auto 40px;border-radius:2px;}
 </style>
 <base target="_blank">
 </head>
-<body>
+<!-- DEFAULT LANGUAGE IS NOW ENGLISH (lang-en / ltr) -->
+<body class="lang-en lang-ltr">
 
 <!-- INITIAL LOADER -->
 <div id="init-loader">
@@ -419,7 +434,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 <div class="topbar">
   <a href="#" class="brand-mini" id="brandMini" onclick="switchView('view-home');return false;">
     <span class="dot"></span>
-    <span data-i18n="brand_name">إنترسكت</span>
+    <span data-i18n="brand_name">Intersect</span>
   </a>
   <select class="lang-toggle" id="langSelect" onchange="setLang(this.value)"></select>
 </div>
@@ -427,54 +442,54 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 <!-- HOME -->
 <section class="view active" id="view-home">
   <div class="hero-orb"><div class="home-logo" id="homeLogo">IX</div></div>
-  <h1 class="home-wordmark" id="homeWordmark" data-i18n="brand_name">إنترسكت</h1>
-  <p class="home-tagline" id="homeTagline">حيث تتقاطع الأفكار وتُبنى المشاريع</p>
-  <p class="home-about" id="homeAbout">جارٍ التحميل…</p>
+  <h1 class="home-wordmark" id="homeWordmark" data-i18n="brand_name">Intersect</h1>
+  <p class="home-tagline" id="homeTagline">Where ideas intersect and ventures are built</p>
+  <p class="home-about" id="homeAbout">Loading…</p>
   <div class="home-stats" id="homeStats"></div>
   <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
-    <span data-i18n="explore_cta">استكشف الكون ←</span>
+    <span data-i18n="explore_cta">Explore the Universe →</span>
   </button>
   <a class="consulting-link gs-hover" href="#" onclick="switchView('view-about');return false;" style="margin-top:2px;">
-    <span data-i18n="about_link">📖 عن إنترسكت بالتفصيل ←</span>
+    <span data-i18n="about_link">📖 About Intersect in detail →</span>
   </a>
 </section>
 
 <!-- GALAXY -->
 <section class="view" id="view-galaxy">
   <div class="galaxy-head">
-    <h2 data-i18n="sectors_title">القطاعات</h2>
-    <p data-i18n="sectors_sub">اختر كوكبًا لاستكشاف مشاريعه</p>
+    <h2 data-i18n="sectors_title">Sectors</h2>
+    <p data-i18n="sectors_sub">Choose a planet to explore its ventures</p>
   </div>
   <div class="orbit-wrap" id="orbitWrap"></div>
   <div class="galaxy-legend" id="galaxyLegend"></div>
   <a class="consulting-link gs-hover" href="#" onclick="switchView('view-consulting');return false;">
-    <span data-i18n="partnerships_link">🤝 شراكات واستشارات ←</span>
+    <span data-i18n="partnerships_link">🤝 Partnerships & Consulting →</span>
   </a>
 </section>
 
 <!-- SECTOR -->
 <section class="view" id="view-sector">
-  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">→ رجوع للقطاعات</span></a>
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">← Back to sectors</span></a>
   <div class="sector-header"><span class="sector-icon" id="sectorIcon"></span><h2 id="sectorName">—</h2><p id="sectorDesc"></p></div>
   <div class="company-grid" id="companyGrid"></div>
 </section>
 
 <!-- CONSULTING -->
 <section class="view" id="view-consulting">
-  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">→ رجوع للقطاعات</span></a>
-  <div class="sector-header"><span class="sector-icon"><span class="mini-icon" style="color:#9ba3b8;width:64px;height:64px;"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="24" cy="32" r="16"/><circle cx="40" cy="32" r="16"/></svg></span></span><h2 data-i18n="partnerships_title">شراكات واستشارات</h2></div>
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">← Back to sectors</span></a>
+  <div class="sector-header"><span class="sector-icon"><span class="mini-icon" style="color:#9ba3b8;width:64px;height:64px;"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="24" cy="32" r="16"/><circle cx="40" cy="32" r="16"/></svg></span></span><h2 data-i18n="partnerships_title">Partnerships & Consulting</h2></div>
   <div class="company-grid" id="consultingGrid"></div>
 </section>
 
 <!-- ABOUT -->
 <section class="view" id="view-about">
-  <a class="back-link gs-hover" href="#" onclick="switchView('view-home');return false;"><span data-i18n="back_home">→ رجوع للرئيسية</span></a>
-  <div class="about-hero"><h2 id="aboutTitle" data-i18n="about_title">عن إنترسكت</h2><p class="about-lead" id="aboutLead"></p></div>
-  <div class="about-block"><div class="section-divider"></div><div class="vm-grid"><div class="vm-card gs-card"><h3><span data-i18n="vision_title">رؤيتنا</span></h3><p id="visionText"></p></div><div class="vm-card gs-card"><h3><span data-i18n="mission_title">رسالتنا</span></h3><p id="missionText"></p></div></div></div>
-  <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="values_title">قيمنا الأساسية</h3><div class="values-grid" id="valuesGrid"></div></div>
-  <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="services_title">خدماتنا</h3><div class="services-grid" id="servicesGrid"></div></div>
+  <a class="back-link gs-hover" href="#" onclick="switchView('view-home');return false;"><span data-i18n="back_home">← Back to home</span></a>
+  <div class="about-hero"><h2 id="aboutTitle" data-i18n="about_title">About Intersect</h2><p class="about-lead" id="aboutLead"></p></div>
+  <div class="about-block"><div class="section-divider"></div><div class="vm-grid"><div class="vm-card gs-card"><h3><span data-i18n="vision_title">Our Vision</span></h3><p id="visionText"></p></div><div class="vm-card gs-card"><h3><span data-i18n="mission_title">Our Mission</span></h3><p id="missionText"></p></div></div></div>
+  <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="values_title">Our Core Values</h3><div class="values-grid" id="valuesGrid"></div></div>
+  <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="services_title">Our Services</h3><div class="services-grid" id="servicesGrid"></div></div>
   <div class="about-block"><div class="stats-grid" id="statsGrid"></div></div>
-  <div class="about-block contact-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="contact_title">تواصل معنا</h3><div class="contact-row" id="contactRow"></div><div class="social-row" id="socialRow"></div></div>
+  <div class="about-block contact-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="contact_title">Get in Touch</h3><div class="contact-row" id="contactRow"></div><div class="social-row" id="socialRow"></div></div>
 </section>
 
 <!-- AI CHAT BOT UI -->
@@ -486,7 +501,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <div class="chat-header">
     <div class="chat-header-title">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
-      <span id="chatTitle">المساعد الذكي (IX Bot)</span>
+      <span id="chatTitle">IX AI Assistant</span>
     </div>
     <button class="chat-close" onclick="toggleChat()">×</button>
   </div>
@@ -496,7 +511,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
     </div>
   </div>
   <div class="chat-input-area">
-    <input type="text" class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key==='Enter') handleChatSubmit()">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message here..." onkeydown="if(event.key==='Enter') handleChatSubmit()">
     <button class="chat-send" onclick="handleChatSubmit()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
     </button>
@@ -504,7 +519,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </div>
 
 <footer class="site-footer">
-  <span data-i18n="footer_rights">© 2026 إنترسكت. جميع الحقوق محفوظة.</span> &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
+  <span data-i18n="footer_rights">© 2026 Intersect. All rights reserved.</span> &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">Admin</a>
 </footer>
 
 <script>
@@ -662,7 +677,10 @@ const I18N = {
     bot_skip_country: 'A global company, wonderful! We work with many international entities.'
   }
 };
-let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'ar';
+
+// DEFAULT LANGUAGE SET TO ENGLISH ('en')
+let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+
 function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
 function applyI18N(){ 
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = i18n(el.dataset.i18n); }); 
@@ -672,12 +690,19 @@ function applyI18N(){
 function setLang(code){
   LANG = code;
   try{ sessionStorage.setItem('ix_lang', code); }catch(e){}
-  document.documentElement.lang = code; document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
-  document.body.classList.toggle('lang-ltr', code!=='ar'); document.body.classList.toggle('lang-en', code==='en');
-  document.body.classList.toggle('lang-ja', code==='ja' || code==='ko' || code==='zh');
+  document.documentElement.lang = code; 
+  document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
+  
+  // Toggle classes for font families and directions
+  document.body.classList.remove('lang-ltr', 'lang-en', 'lang-ja');
+  if(code !== 'ar') document.body.classList.add('lang-ltr');
+  if(code === 'en') document.body.classList.add('lang-en');
+  if(code === 'ja' || code === 'ko' || code === 'zh') document.body.classList.add('lang-ja');
+  
   document.getElementById('langSelect').value = code;
   applyI18N(); renderAll();
 }
+
 function initLangSelect(){
   const sel = document.getElementById('langSelect');
   sel.innerHTML = LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
@@ -984,7 +1009,7 @@ function renderAll(){
 }
 
 /* ============ AI ASSISTANT (GEMINI & LEAD GEN) ============ */
-let chatState = 'INIT'; // INIT -> REGION -> COUNTRY -> CONTACT -> SECTOR -> CHAT
+let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
 
@@ -1002,7 +1027,6 @@ function toggleChat() {
   }
 }
 
-// دالة مساعدة لطباعة رسالة البوت ومعها أزرار خيارات سريعة
 function addBotMsgWithOptions(text, options, callback) {
   addBotMsg(text);
   const body = document.getElementById('chatBody');
@@ -1017,7 +1041,7 @@ function addBotMsgWithOptions(text, options, callback) {
     btn.textContent = opt.text;
     btn.onclick = () => {
       addUserMsg(opt.text);
-      optionsDiv.remove(); // إزالة الأزرار بعد الاختيار
+      optionsDiv.remove(); 
       setTyping(true);
       setTimeout(() => callback(opt.val), 500);
     };
@@ -1061,14 +1085,14 @@ function setTyping(isTyping) {
   if(isTyping) body.scrollTop = body.scrollHeight;
 }
 
-// ----------------- Onboarding Flow ----------------- //
+/* --- Onboarding Flow --- */
 
 function askBotLanguage() {
   chatState = 'LANG';
   addBotMsgWithOptions(i18n('bot_ask_lang'), 
     [
-      {text: 'العربية 🇸🇦', val: 'ar'}, 
       {text: 'English 🇬🇧', val: 'en'},
+      {text: 'العربية 🇸🇦', val: 'ar'}, 
       {text: '日本語 🇯🇵', val: 'ja'},
       {text: 'Français 🇫🇷', val: 'fr'}
     ], 
@@ -1113,7 +1137,6 @@ function askSector() {
   chatState = 'SECTOR';
   setTyping(false);
   
-  // توليد أزرار القطاعات ديناميكياً من قاعدة البيانات
   const opts = DATA.sectors.map(s => ({ text: tf(s, 'name'), val: tf(s, 'name') }));
   opts.push({ text: (LANG === 'ar' ? 'جميع القطاعات / أخرى' : 'All Sectors / Other'), val: 'All' });
   
@@ -1129,7 +1152,7 @@ function finishOnboarding() {
   addBotMsg(i18n('bot_ready'));
 }
 
-// -------------------------------------------------- //
+/* --- Submit Logic --- */
 
 function handleChatSubmit() {
   const input = document.getElementById('chatInput');
@@ -1142,7 +1165,6 @@ function handleChatSubmit() {
 
   if (chatState === 'COUNTRY') {
     leadData.country = text;
-    // تفاعل بشري ديناميكي حسب الدولة
     const flair_ar = [
       `يا لها من صدفة! فريق إنترسكت زار ${text} مؤخراً، مكان رائع جداً.`,
       `${text} بلد جميل ومميز بالفرص الاستثمارية الواعدة.`,
@@ -1215,9 +1237,8 @@ async function askGemini(question) {
     });
 
     const data = await response.json();
-    let answerText = "عذراً، أواجه ضغطاً حالياً، يرجى المحاولة بعد قليل.";
+    let answerText = LANG === 'ar' ? "عذراً، أواجه ضغطاً حالياً، يرجى المحاولة بعد قليل." : "Sorry, I am currently experiencing high load. Please try again shortly.";
     
-    // إصلاح مشكلة قراءة البيانات من API Gemini وتجنب الـ Error في الصورة
     if (data && data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
       answerText = data.candidates[0].content.parts[0].text;
     }
@@ -1225,7 +1246,6 @@ async function askGemini(question) {
     setTyping(false);
     addBotMsg(answerText);
     
-    // إرسال البيانات المكتملة إلى Supabase بصمت
     sb.from('intersect_chat_logs').insert({
       ip_location: USER_IP_DATA || {}, 
       lead_data: leadData, 

@@ -16,39 +16,110 @@
 body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:100vh;}
 .hidden{display:none!important;}
 
-/* Gate */
+/* GATE */
 #gate{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px;}
-#gate input{ background:var(--panel);border:1px solid var(--line);color:var(--text); padding:14px 16px;border-radius:10px;width:280px;text-align:center;letter-spacing:2px; }
-#gate button{ background:var(--gold);color:#1a1306;border:none;padding:13px 30px;border-radius:10px; font-weight:700;cursor:pointer; }
-#gateError{color:var(--danger);font-size:12.5px;}
+#gate h1{font-size:20px;margin-bottom:6px;}
+#gate p{color:var(--muted);font-size:13px;text-align:center;max-width:320px;}
+#gate input{
+  background:var(--panel);border:1px solid var(--line);color:var(--text);
+  padding:14px 16px;border-radius:10px;width:280px;font-family:var(--ffm);font-size:15px;text-align:center;letter-spacing:2px;
+}
+#gate button{
+  background:var(--gold);color:#1a1306;border:none;padding:13px 30px;border-radius:10px;
+  font-weight:700;cursor:pointer;font-family:var(--ff);
+}
+#gateError{color:var(--danger);font-size:12.5px;min-height:16px;}
 
-/* Shell & Layout */
+/* SHELL */
 #shell{max-width:1080px;margin:0 auto;padding:26px 20px 80px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
+.topbar h1{font-size:19px;}
 .topbar a{color:var(--muted);text-decoration:none;font-size:13px;border:1px solid var(--line);padding:8px 16px;border-radius:100px;}
 .tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
-.tab{ background:var(--panel);border:1px solid var(--line);color:var(--muted); padding:10px 20px;border-radius:100px;cursor:pointer;font-size:13.5px; }
+.tab{
+  background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  padding:10px 20px;border-radius:100px;cursor:pointer;font-size:13.5px;font-family:var(--ff);
+}
 .tab.active{background:var(--gold);color:#1a1306;border-color:var(--gold);font-weight:700;}
-.panel{display:none;} .panel.active{display:block;}
+.panel{display:none;}
+.panel.active{display:block;}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px;}
+.card h3{font-size:15px;margin-bottom:14px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
-.field input, .field textarea, .field select{ width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text); padding:11px 13px;border-radius:8px;font-family:var(--ff);font-size:14px; }
+.field input, .field textarea, .field select{
+  width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+  padding:11px 13px;border-radius:8px;font-family:var(--ff);font-size:14px;
+}
+.field textarea{min-height:80px;resize:vertical;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.btn{ background:var(--gold);color:#1a1306;border:none;padding:11px 24px;border-radius:8px; font-weight:700;cursor:pointer;font-size:13.5px; }
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:560px){.row2, .row3{grid-template-columns:1fr;}}
+.btn{
+  background:var(--gold);color:#1a1306;border:none;padding:11px 24px;border-radius:8px;
+  font-weight:700;cursor:pointer;font-size:13.5px;font-family:var(--ff);
+}
 .btn-outline{background:transparent;border:1px solid var(--line);color:var(--muted);}
 .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);}
-.toast{ position:fixed;bottom:24px;left:50%;transform:translateX(-50%); background:var(--panel-2);border:1px solid var(--ok);color:var(--ok); padding:12px 24px;border-radius:100px;font-size:13px;z-index:200;opacity:0;transition:.3s;pointer-events:none; }
+.btn-sm{padding:7px 14px;font-size:12px;}
+.item-row{
+  display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;
+}
+.item-row img, .item-row .thumb-fallback{
+  width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--panel-2);
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);flex-shrink:0;
+}
+.item-row .meta{flex:1;min-width:0;}
+.item-row .meta b{font-size:14px;display:block;}
+.item-row .meta span{font-size:12px;color:var(--muted);}
+.item-actions{display:flex;gap:6px;flex-shrink:0;}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--panel-2);border:1px solid var(--ok);color:var(--ok);
+  padding:12px 24px;border-radius:100px;font-size:13px;z-index:200;opacity:0;transition:.3s;pointer-events:none;
+}
 .toast.show{opacity:1;}
-.lead-badge { display:inline-block; background:rgba(212,175,106,0.1); border:1px solid rgba(212,175,106,0.3); color:var(--gold); padding:4px 8px; border-radius:4px; font-size:11px; margin-left:6px; }
+.upload-row{display:flex;align-items:center;gap:10px;}
+.upload-row img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--panel-2);}
+
+/* Icons Grid */
+.icon-picker-grid{ display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px; }
+.icon-chip{ display:flex;flex-direction:column;align-items:center;gap:5px; background:var(--panel-2);border:1.5px solid var(--line);border-radius:10px; padding:10px 6px;cursor:pointer;transition:.2s; }
+.icon-chip:hover{border-color:var(--gold);}
+.icon-chip.selected{border-color:var(--gold);background:rgba(212,175,106,.12);}
+.icon-chip svg{width:26px;height:26px;color:var(--text);}
+.icon-chip.selected svg{color:var(--gold);}
+.icon-chip span{font-size:10px;color:var(--muted);text-align:center;line-height:1.3;}
+.icon-chip.selected span{color:var(--text);}
+
+/* CHAT LOGS STYLES */
+.chat-log-card{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+  padding:16px; margin-bottom:12px; display:flex; flex-direction:column; gap:10px;
+}
+.chat-log-head{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  border-bottom:1px solid var(--line); padding-bottom:10px;
+}
+.lead-info span{
+  display:inline-block; background:rgba(255,255,255,0.05); padding:4px 10px;
+  border-radius:6px; font-size:12px; margin-left:6px; margin-bottom:6px;
+  color:var(--gold); border:1px solid var(--line);
+}
+.chat-qa{font-size:13.5px; line-height:1.6;}
+.chat-q{color:var(--text); font-weight:600; margin-bottom:4px;}
+.chat-q::before{content:'س: '; color:var(--muted);}
+.chat-a{color:var(--muted); white-space:pre-wrap;}
+.chat-a::before{content:'ج: '; color:var(--ok);}
 </style>
 </head>
 <body>
 
 <div id="gate">
-  <h1>🔒 لوحة تحكم إنترسكت</h1>
+  <h1 id="gateTitle">🔒 لوحة تحكم إنترسكت</h1>
+  <p id="gateSub">أدخل كلمة المرور للمتابعة</p>
   <input type="password" id="gatePassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitGate()">
-  <button onclick="submitGate()">دخول</button>
+  <button onclick="submitGate()" id="gateBtn">دخول</button>
   <div id="gateError"></div>
 </div>
 
@@ -59,60 +130,273 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('brand')">الهوية والتواصل</button>
-    <button class="tab" onclick="switchTab('knowledge')">قاعدة المعرفة</button>
-    <button class="tab" onclick="switchTab('chatlogs')">💬 سجل الزوار والتأهيل</button>
+    <button class="tab active" data-tab="brand" onclick="switchTab('brand')">الهوية والتواصل</button>
+    <button class="tab" data-tab="sectors" onclick="switchTab('sectors')">القطاعات</button>
+    <button class="tab" data-tab="companies" onclick="switchTab('companies')">الشركات</button>
+    <button class="tab" data-tab="consulting" onclick="switchTab('consulting')">شراكات واستشارات</button>
+    <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت</button>
+    <button class="tab" style="background:var(--panel-2);border-color:var(--gold);color:var(--gold)" data-tab="ai" onclick="switchTab('ai')">🤖 الذكاء الاصطناعي</button>
   </div>
 
   <!-- BRAND & CONTACT -->
   <div class="panel active" id="panel-brand">
     <div class="card">
+      <h3>معلومات إنترسكت الأساسية</h3>
+      <div class="field"><label>الشعار (رفع صورة)</label>
+        <div class="upload-row">
+          <img id="brandLogoPreview" src="" style="display:none">
+          <input type="file" id="brandLogoFile" accept="image/*" onchange="handleBrandLogo(event)">
+        </div>
+      </div>
+      <div class="field"><label>الشعار النصي (Tagline)</label><input id="brandTaglineAr" placeholder="حيث تتقاطع الأفكار وتُبنى المشاريع"></div>
+      <div class="field"><label>Tagline (English)</label><input id="brandTaglineEn" placeholder="Where ideas intersect"></div>
+      <div class="field"><label>نبذة عن إنترسكت</label><textarea id="brandAboutAr"></textarea></div>
+      <div class="field"><label>About (English)</label><textarea id="brandAboutEn"></textarea></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" onclick="saveBrand()">حفظ التغييرات</button>
+        <button class="btn-outline" onclick="openTr('brand','brand')">🌐 ترجمات لباقي اللغات</button>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>بيانات التواصل والسوشيال ميديا</h3>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">أدخل أرقام الجوال والإيميلات مفصولة بفاصلة ( , ) إذا كان لديك أكثر من واحد.</p>
-      
       <div class="row2">
-        <div class="field"><label>الإيميلات (افصل بينها بفاصلة)</label><input id="contactEmails" placeholder="info@intersect.com.sa, sales@..."></div>
-        <div class="field"><label>أرقام التواصل (افصل بينها بفاصلة)</label><input id="contactPhones" placeholder="+966 50 000 0000, +966 11..."></div>
+        <div class="field"><label>الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://"></div>
+        <div class="field"><label>الإيميل</label><input id="contactEmail"></div>
       </div>
+      <div class="field"><label>الجوال</label><input id="contactPhone"></div>
       
-      <div class="row2">
-        <div class="field"><label>رابط الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://www.intersect.com.sa"></div>
-        <div class="field"><label>رابط صفحة LinkedIn</label><input id="contactLinkedin" placeholder="https://linkedin.com/company/..."></div>
+      <h4 style="margin:16px 0 10px; font-size:14px; color:var(--muted);">منصات التواصل الاجتماعي</h4>
+      <div class="row3">
+        <div class="field"><label>LinkedIn</label><input id="contactLinkedIn" placeholder="https://linkedin.com/company/..."></div>
+        <div class="field"><label>Twitter (X)</label><input id="contactTwitter" placeholder="https://twitter.com/..."></div>
+        <div class="field"><label>Instagram</label><input id="contactInstagram" placeholder="https://instagram.com/..."></div>
       </div>
-      
-      <div class="row2">
-        <div class="field"><label>رابط تويتر (X)</label><input id="contactTwitter" placeholder="https://x.com/..."></div>
-        <div class="field"><label>رابط إنستقرام</label><input id="contactInstagram" placeholder="https://instagram.com/..."></div>
-      </div>
-      
       <button class="btn" onclick="saveContactInfo()">حفظ بيانات التواصل</button>
     </div>
   </div>
 
-  <!-- KNOWLEDGE BASE -->
-  <div class="panel" id="panel-knowledge">
-    <div class="card">
-      <h3 id="kbFormTitle">إضافة مقال للمدونة السرية (لتغذية الذكاء الاصطناعي)</h3>
-      <div class="row2">
-        <div class="field"><label>العنوان (عربي)</label><input id="kbTitleAr"></div>
-        <div class="field"><label>Title (English)</label><input id="kbTitleEn"></div>
+  <!-- AI & CHAT LOGS -->
+  <div class="panel" id="panel-ai">
+    <div class="card" style="border-color:var(--gold);">
+      <h3>🧠 قاعدة المعرفة السرية (Knowledge Base)</h3>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">
+        أضف معلومات استراتيجية، أسئلة وأجوبة، أو تفاصيل سرية هنا. هذه المعلومات لن تظهر كصفحات في الموقع، ولكن سيعتمد عليها المساعد الذكي (Bot) للإجابة على أسئلة الزوار.
+      </p>
+      <div class="field">
+        <label>إضافة معلومة جديدة</label>
+        <textarea id="aiKnowledgeInput" placeholder="مثال: نخطط لافتتاح مقر جديد في الرياض في الربع الثالث من 2026. الميزانية المبدئية 50 مليون..."></textarea>
       </div>
-      <div class="field"><label>المحتوى (عربي)</label><textarea id="kbContentAr" style="min-height: 80px;"></textarea></div>
-      <div class="field"><label>Content (English)</label><textarea id="kbContentEn" style="min-height: 80px;"></textarea></div>
-      <button class="btn" onclick="saveKB()">حفظ المعلومة</button>
+      <button class="btn" onclick="saveKnowledge()">إضافة للقاعدة ➕</button>
+      
+      <div style="margin-top:24px;">
+        <h4 style="margin-bottom:12px; font-size:14px;">المعلومات المحفوظة:</h4>
+        <div id="knowledgeList"></div>
+      </div>
     </div>
-    <div class="card"><h3>قاعدة المعرفة الحالية</h3><div id="kbList"></div></div>
-  </div>
 
-  <!-- CHAT LOGS & LEADS -->
-  <div class="panel" id="panel-chatlogs">
     <div class="card">
-      <h3>سجل الزوار وبيانات التأهيل (Leads)</h3>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">هنا تظهر أسئلة الزوار مع بياناتهم إذا قاموا بإدخالها في المحادثة الترحيبية.</p>
-      <div id="chatLogsList" style="display:flex;flex-direction:column;gap:12px;"></div>
+      <h3>💬 مراقبة المحادثات (Lead Generation)</h3>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">
+        يعرض هذا الجدول أحدث 50 محادثة تمت مع البوت، متضمنة بيانات التأهيل والموقع الجغرافي.
+      </p>
+      <button class="btn-outline btn-sm" onclick="loadChatLogs()" style="margin-bottom:16px;">🔄 تحديث السجل</button>
+      <div id="chatLogsContainer"></div>
     </div>
   </div>
 
+  <!-- SECTORS -->
+  <div class="panel" id="panel-sectors">
+    <div class="card">
+      <h3 id="secFormTitle">إضافة قطاع جديد</h3>
+      <div class="row2">
+        <div class="field"><label>الاسم (عربي)</label><input id="secNameAr"></div>
+        <div class="field"><label>Name (English)</label><input id="secNameEn"></div>
+      </div>
+      <div class="field"><label>slug (حروف انجليزية بدون مسافات)</label><input id="secSlug" placeholder="ai-gaming"></div>
+      <div class="row2">
+        <div class="field"><label>اللون الأساسي</label><input type="color" id="secColor1" value="#7b5cff"></div>
+        <div class="field"><label>اللون الثانوي</label><input type="color" id="secColor2" value="#4fd8e0"></div>
+      </div>
+      <div class="field"><label>الوصف (عربي)</label><textarea id="secDescAr"></textarea></div>
+      <div class="field">
+        <label>أيقونات النيون المتحركة بالخلفية — اختر وحدة أو أكثر (فاضي = تلقائي)</label>
+        <div id="iconPickerGrid" class="icon-picker-grid"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" id="secSaveBtn" onclick="saveSector()">إضافة القطاع</button>
+        <button class="btn-outline hidden" id="secCancelBtn" onclick="cancelSectorEdit()">إلغاء التعديل</button>
+      </div>
+    </div>
+    <div class="card"><h3>القطاعات الحالية</h3><div id="sectorsList"></div></div>
+  </div>
+
+  <!-- COMPANIES -->
+  <div class="panel" id="panel-companies">
+    <div class="card">
+      <h3 id="compFormTitle">إضافة شركة جديدة</h3>
+      <div class="field"><label>القطاع</label><select id="compSector"></select></div>
+      <div class="row2">
+        <div class="field"><label>الاسم (عربي)</label><input id="compNameAr"></div>
+        <div class="field"><label>Name (English)</label><input id="compNameEn"></div>
+      </div>
+      <div class="field"><label>slug (فريد، حروف انجليزية)</label><input id="compSlug" placeholder="urb"></div>
+      <div class="field"><label>الشعار (رفع صورة)</label>
+        <div class="upload-row">
+          <img id="compLogoPreview" src="" style="display:none">
+          <input type="file" id="compLogoFile" accept="image/*" onchange="handleCompLogo(event)">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>وصف قصير (عربي)</label><input id="compTaglineAr"></div>
+        <div class="field"><label>Tagline (English)</label><input id="compTaglineEn"></div>
+      </div>
+      <div class="field"><label>الوصف الكامل (عربي)</label><textarea id="compDescAr"></textarea></div>
+      <div class="field"><label>Description (English)</label><textarea id="compDescEn"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>نوع العلاقة مع إنترسكت</label>
+          <select id="compRelType">
+            <option value="">بدون تصنيف (ما يظهر شي)</option>
+            <option value="owned">مملوكة بالكامل</option>
+            <option value="jv">شراكة استثمارية (JV)</option>
+            <option value="collaboration">تعاون</option>
+            <option value="subsidiary">تابعة</option>
+            <option value="initiative">مبادرة غير ربحية</option>
+          </select>
+        </div>
+        <div class="field"><label>وصف العلاقة (اختياري)</label><input id="compRelLabel" placeholder="مثال: شراكة 40%"></div>
+      </div>
+      <div class="field"><label>الموقع الإلكتروني</label><input id="compWebsite" placeholder="https://"></div>
+      <div class="row2">
+        <div class="field"><label>اقتباس / شهادة (اختياري)</label><input id="compRefText"></div>
+        <div class="field"><label>اسم صاحب الشهادة</label><input id="compRefAuthor"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" id="compSaveBtn" onclick="saveCompany()">إضافة الشركة</button>
+        <button class="btn-outline hidden" id="compCancelBtn" onclick="cancelCompanyEdit()">إلغاء التعديل</button>
+      </div>
+    </div>
+    <div class="card"><h3>الشركات الحالية</h3><div id="companiesList"></div></div>
+  </div>
+
+  <!-- CONSULTING -->
+  <div class="panel" id="panel-consulting">
+    <div class="card">
+      <h3 id="conFormTitle">إضافة شراكة / مشروع استشاري</h3>
+      <div class="row2">
+        <div class="field"><label>الاسم (عربي)</label><input id="conNameAr"></div>
+        <div class="field"><label>Name (English)</label><input id="conNameEn"></div>
+      </div>
+      <div class="field"><label>الشعار (رفع صورة)</label>
+        <div class="upload-row">
+          <img id="conLogoPreview" src="" style="display:none">
+          <input type="file" id="conLogoFile" accept="image/*" onchange="handleConLogo(event)">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>نوع العلاقة</label>
+          <select id="conRelKind">
+            <option value="client">عميل</option>
+            <option value="partner">شريك استراتيجي</option>
+          </select>
+        </div>
+        <div class="field"><label>فئة المشروع (وصف قصير، اختياري)</label><input id="conType" placeholder="مثال: تطوير أنظمة تنفيذية"></div>
+      </div>
+      <div class="field"><label>الوصف</label><textarea id="conDescAr"></textarea></div>
+      <div class="field"><label>الموقع الإلكتروني (اختياري)</label><input id="conWebsite" placeholder="https://"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" id="conSaveBtn" onclick="saveConsulting()">إضافة</button>
+        <button class="btn-outline hidden" id="conCancelBtn" onclick="cancelConsultingEdit()">إلغاء التعديل</button>
+      </div>
+    </div>
+    <div class="card"><h3>الشراكات الحالية</h3><div id="consultingList"></div></div>
+  </div>
+
+  <!-- ABOUT INTERSECT -->
+  <div class="panel" id="panel-about">
+    <div class="card">
+      <h3>الرؤية والرسالة</h3>
+      <div class="field"><label>Vision (English)</label><textarea id="visionEn"></textarea></div>
+      <div class="field"><label>Mission (English)</label><textarea id="missionEn"></textarea></div>
+      <button class="btn" onclick="saveVisionMission()">حفظ</button>
+    </div>
+
+    <div class="card">
+      <h3>القيم الأساسية</h3>
+      <div id="valuesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('core_values',{title_en:'',desc_en:''})">+ إضافة قيمة</button>
+        <button class="btn btn-sm" onclick="saveListSection('core_values')">حفظ القيم</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>الخدمات</h3>
+      <div id="servicesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('services',{title_en:'',desc_en:''})">+ إضافة خدمة</button>
+        <button class="btn btn-sm" onclick="saveListSection('services')">حفظ الخدمات</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>القطاعات التي نخدمها</h3>
+      <div id="industriesList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addSimpleListRow('industries')">+ إضافة</button>
+        <button class="btn btn-sm" onclick="saveSimpleListSection('industries')">حفظ</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>شريط الإحصائيات</h3>
+      <div id="statsList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('stats',{value:'',label_en:''})">+ إضافة رقم</button>
+        <button class="btn btn-sm" onclick="saveListSection('stats')">حفظ الإحصائيات</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>الفريق</h3>
+      <div id="teamList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('team',{name:'',title_en:'',photo_url:null})">+ إضافة عضو</button>
+        <button class="btn btn-sm" onclick="saveListSection('team')">حفظ الفريق</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>المستشارون</h3>
+      <div id="advisorsList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('advisors',{name:'',title_en:'',bio_en:'',photo_url:null})">+ إضافة مستشار</button>
+        <button class="btn btn-sm" onclick="saveListSection('advisors')">حفظ المستشارين</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>شعارات عملاء/شركاء (نص فقط)</h3>
+      <div id="logosList"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-outline btn-sm" onclick="addListRow('client_logos',{name:'',logo_url:null})">+ إضافة</button>
+        <button class="btn btn-sm" onclick="saveListSection('client_logos')">حفظ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSLATION MODAL OVERLAY -->
+<div class="modal-overlay-tr hidden" id="trOverlay" style="position:fixed;inset:0;background:rgba(3,4,10,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="card" style="max-width:440px;width:100%;">
+    <h3 id="trTitle">إضافة ترجمة</h3>
+    <div class="field"><label>اللغة</label><select id="trLang" onchange="loadTrValues()"></select></div>
+    <div id="trFieldsContainer"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn" onclick="saveTranslation()">حفظ الترجمة</button>
+      <button class="btn-outline" onclick="closeTr()">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -122,7 +406,40 @@ const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let SETTINGS = {}, KNOWLEDGE = [], CHAT_LOGS = [];
+let SECTORS = [], COMPANIES = [], CONSULTING = [];
+let KNOWLEDGE = [], CHAT_LOGS = [];
+let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null;
+let selectedIconKeys = new Set();
+
+/* ============ NEON ICON LIBRARY ============ */
+const ICON_LIBRARY = {
+  ai: {label:'شبكة عصبية', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="13" r="5"/><circle cx="13" cy="47" r="5"/><circle cx="51" cy="47" r="5"/><path d="M32 18 L17 43 M32 18 L47 43 M18 47 H46"/><circle cx="32" cy="33" r="2.2" fill="currentColor" stroke="none"/></svg>`},
+  health: {label:'نبضة طبية', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 34 H19 L25 19 L34 47 L40 34 H59"/><path d="M32 8 V18 M27 13 H37" stroke-width="3.2"/></svg>`},
+  tourism: {label:'بوصلة', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="32" cy="32" r="24"/><path d="M32 10 V17 M32 47 V54 M10 32 H17 M47 32 H54"/><path d="M41 23 L27 29 L23 43 L37 37 Z" stroke-linejoin="round"/></svg>`},
+  mobility: {label:'خطوط سرعة', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 20 H32 M5 32 H40 M5 44 H24"/><path d="M44 32 H58 M50 24 L58 32 L50 40" stroke-linejoin="round"/></svg>`},
+  intelligence: {label:'مدارات رادار', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="32" r="5.5"/><circle cx="32" cy="32" r="16" stroke-dasharray="3 6"/><circle cx="32" cy="32" r="26" stroke-dasharray="1.5 7"/><circle cx="32" cy="6" r="2.4" fill="currentColor" stroke="none"/><circle cx="55" cy="45" r="2.4" fill="currentColor" stroke="none"/></svg>`},
+  generic: {label:'شكل هندسي عام', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`}
+};
+function renderIconPicker(){
+  const grid = document.getElementById('iconPickerGrid');
+  grid.innerHTML = Object.keys(ICON_LIBRARY).map(key=>{
+    const it = ICON_LIBRARY[key];
+    return `<div class="icon-chip" id="chip-${key}" onclick="toggleIconChip('${key}')">${it.svg}<span>${it.label}</span></div>`;
+  }).join('');
+}
+function toggleIconChip(key){
+  if(selectedIconKeys.has(key)) selectedIconKeys.delete(key);
+  else selectedIconKeys.add(key);
+  document.getElementById('chip-'+key).classList.toggle('selected', selectedIconKeys.has(key));
+}
+function setSelectedIconKeys(arr){
+  selectedIconKeys = new Set(Array.isArray(arr)?arr:[]);
+  Object.keys(ICON_LIBRARY).forEach(key=>{
+    const chip = document.getElementById('chip-'+key);
+    if(chip) chip.classList.toggle('selected', selectedIconKeys.has(key));
+  });
+}
+renderIconPicker();
 
 async function sha256(str){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -130,108 +447,472 @@ async function sha256(str){
 }
 
 async function submitGate(){
-  const pw = document.getElementById('gatePassword').value; if(!pw) return;
+  const pw = document.getElementById('gatePassword').value;
+  if(!pw){ return; }
   const {data} = await sb.from('intersect_site_settings').select('*').eq('key','admin_auth').single();
   const hash = await sha256(pw);
-  if(!data || !data.value){
+  if(!data || !data.value || !data.value.password_hash){
     await sb.from('intersect_site_settings').upsert({key:'admin_auth', value:{password_hash:hash}});
-    document.getElementById('gate').classList.add('hidden'); document.getElementById('shell').classList.remove('hidden'); loadAll(); return;
+    unlockShell();
+    return;
   }
-  if(data.value.password_hash === hash){
-    document.getElementById('gate').classList.add('hidden'); document.getElementById('shell').classList.remove('hidden'); loadAll();
-  } else { document.getElementById('gateError').textContent = 'كلمة المرور غير صحيحة'; }
+  if(data.value.password_hash === hash){ unlockShell(); } else { document.getElementById('gateError').textContent = 'كلمة المرور غير صحيحة'; }
+}
+function unlockShell(){
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('shell').classList.remove('hidden');
+  loadAll();
 }
 
 function switchTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.textContent.includes(name==='brand'?'الهوية':name==='knowledge'?'قاعدة':'سجل')));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+name));
+  if(name === 'ai') loadChatLogs();
 }
 
-function showToast(msg){ const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 2200); }
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+async function uploadImage(file){
+  const ext = file.name.split('.').pop();
+  const path = `uploads/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const {error} = await sb.storage.from('intersect-media').upload(path, file);
+  if(error){ showToast('فشل رفع الصورة: '+error.message); return null; }
+  const {data} = sb.storage.from('intersect-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function handleBrandLogo(e){ handleGenericLogo(e, url=>{ pendingBrandLogo=url; document.getElementById('brandLogoPreview').src=url; document.getElementById('brandLogoPreview').style.display='block'; }); }
+function handleCompLogo(e){ handleGenericLogo(e, url=>{ pendingCompLogo=url; document.getElementById('compLogoPreview').src=url; document.getElementById('compLogoPreview').style.display='block'; }); }
+function handleConLogo(e){ handleGenericLogo(e, url=>{ pendingConLogo=url; document.getElementById('conLogoPreview').src=url; document.getElementById('conLogoPreview').style.display='block'; }); }
+async function handleGenericLogo(e, cb){
+  const file = e.target.files[0]; if(!file) return;
+  showToast('جارٍ رفع الصورة…');
+  const url = await uploadImage(file);
+  if(url) cb(url);
+}
+
+/* ============ LOAD ============ */
+let BRAND_DATA = {};
+let ABOUT = { vision_mission:{}, core_values:[], services:[], industries:[], stats:[], team:[], advisors:[], client_logos:[], contact_info:{} };
 
 async function loadAll(){
-  const [{data:sets}, {data:kb}, {data:logs}] = await Promise.all([
+  const [{data:settings},{data:sectors},{data:companies},{data:consulting},{data:knowledge}] = await Promise.all([
     sb.from('intersect_site_settings').select('*'),
-    sb.from('intersect_knowledge_base').select('*').order('created_at', {ascending: false}),
-    sb.from('intersect_chat_logs').select('*').order('created_at', {ascending: false}).limit(100)
+    sb.from('intersect_sectors').select('*').order('sort_order'),
+    sb.from('intersect_companies').select('*').order('sort_order'),
+    sb.from('intersect_consulting').select('*').order('sort_order'),
+    sb.from('intersect_knowledge_base').select('*').order('created_at', {ascending: false})
   ]);
   
-  (sets||[]).forEach(r => SETTINGS[r.key] = r.value);
-  const cInfo = SETTINGS.contact_info || {};
-  
-  document.getElementById('contactWebsite').value = cInfo.website || '';
-  document.getElementById('contactLinkedin').value = cInfo.linkedin_url || '';
-  document.getElementById('contactTwitter').value = cInfo.twitter_url || '';
-  document.getElementById('contactInstagram').value = cInfo.instagram_url || '';
-  
-  document.getElementById('contactEmails').value = Array.isArray(cInfo.emails) ? cInfo.emails.join(', ') : (cInfo.email || '');
-  document.getElementById('contactPhones').value = Array.isArray(cInfo.phones) ? cInfo.phones.join(', ') : (cInfo.phone || '');
+  const settingsMap = {};
+  (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
+  const brand = settingsMap.brand || {};
+  BRAND_DATA = brand;
+  document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
+  document.getElementById('brandTaglineEn').value = brand.tagline_en||'';
+  document.getElementById('brandAboutAr').value = brand.about_ar||'';
+  document.getElementById('brandAboutEn').value = brand.about_en||'';
+  if(brand.logo_url){ pendingBrandLogo=brand.logo_url; const im=document.getElementById('brandLogoPreview'); im.src=brand.logo_url; im.style.display='block'; }
 
-  KNOWLEDGE = kb||[]; CHAT_LOGS = logs||[];
-  renderKB(); renderChatLogs();
+  ABOUT.vision_mission = settingsMap.vision_mission || {};
+  ABOUT.core_values = settingsMap.core_values || [];
+  ABOUT.services = settingsMap.services || [];
+  ABOUT.industries = settingsMap.industries || [];
+  ABOUT.stats = settingsMap.stats || [];
+  ABOUT.team = settingsMap.team || [];
+  ABOUT.advisors = settingsMap.advisors || [];
+  ABOUT.client_logos = settingsMap.client_logos || [];
+  ABOUT.contact_info = settingsMap.contact_info || {};
+  
+  document.getElementById('visionEn').value = ABOUT.vision_mission.vision_en || '';
+  document.getElementById('missionEn').value = ABOUT.vision_mission.mission_en || '';
+  
+  document.getElementById('contactWebsite').value = ABOUT.contact_info.website || '';
+  document.getElementById('contactEmail').value = ABOUT.contact_info.email || '';
+  document.getElementById('contactPhone').value = ABOUT.contact_info.phone || '';
+  document.getElementById('contactLinkedIn').value = ABOUT.contact_info.linkedin || '';
+  document.getElementById('contactTwitter').value = ABOUT.contact_info.twitter || '';
+  document.getElementById('contactInstagram').value = ABOUT.contact_info.instagram || '';
+
+  renderListSection('core_values'); renderListSection('services'); renderListSection('stats');
+  renderListSection('team'); renderListSection('advisors');
+  renderSimpleListSection('industries'); renderListSection('client_logos');
+
+  SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
+  renderSectors(); renderCompanies(); renderConsulting();
+  const sel = document.getElementById('compSector');
+  sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
+
+  KNOWLEDGE = knowledge || [];
+  renderKnowledge();
 }
 
-async function saveContactInfo(){
-  const emailsStr = document.getElementById('contactEmails').value;
-  const phonesStr = document.getElementById('contactPhones').value;
-  
-  const value = {
-    website: document.getElementById('contactWebsite').value.trim(),
-    linkedin_url: document.getElementById('contactLinkedin').value.trim(),
-    twitter_url: document.getElementById('contactTwitter').value.trim(),
-    instagram_url: document.getElementById('contactInstagram').value.trim(),
-    emails: emailsStr.split(',').map(s=>s.trim()).filter(s=>s),
-    phones: phonesStr.split(',').map(s=>s.trim()).filter(s=>s)
-  };
-  
-  const {error} = await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
-  if(error) showToast('خطأ: '+error.message); else showToast('تم الحفظ ✓');
-}
-
-function renderKB(){
-  document.getElementById('kbList').innerHTML = KNOWLEDGE.map(k=>`
-    <div style="background:var(--panel-2);padding:12px;margin-bottom:8px;border-radius:8px;">
-      <b>${k.title_ar}</b>
-      <button class="btn-danger" style="float:left;padding:4px 8px;font-size:11px" onclick="deleteKB('${k.id}')">حذف</button>
+/* ============ AI KNOWLEDGE BASE ============ */
+function renderKnowledge() {
+  const container = document.getElementById('knowledgeList');
+  if(!KNOWLEDGE || KNOWLEDGE.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:13px">لا توجد معلومات في القاعدة حالياً.</p>'; return;
+  }
+  container.innerHTML = KNOWLEDGE.map(k => `
+    <div class="item-row" style="align-items:flex-start;">
+      <div class="meta" style="white-space:pre-wrap; font-size:13.5px; line-height:1.6;">${k.content}</div>
+      <div class="item-actions"><button class="btn-danger btn-sm" onclick="deleteKnowledge('${k.id}')">حذف</button></div>
     </div>
   `).join('');
 }
-
-async function saveKB(){
-  const row = {
-    title_ar: document.getElementById('kbTitleAr').value, title_en: document.getElementById('kbTitleEn').value,
-    content_ar: document.getElementById('kbContentAr').value, content_en: document.getElementById('kbContentEn').value
-  };
-  await sb.from('intersect_knowledge_base').insert(row);
-  showToast('تمت الإضافة'); loadAll();
+async function saveKnowledge() {
+  const input = document.getElementById('aiKnowledgeInput'); const content = input.value.trim();
+  if(!content) return;
+  const { data, error } = await sb.from('intersect_knowledge_base').insert({ content }).select();
+  if(error) { showToast('خطأ: ' + error.message); return; }
+  input.value = ''; if(data && data.length) KNOWLEDGE.unshift(data[0]);
+  renderKnowledge(); showToast('تمت إضافة المعلومة بنجاح ✓');
 }
-async function deleteKB(id){ await sb.from('intersect_knowledge_base').delete().eq('id',id); loadAll(); }
+async function deleteKnowledge(id) {
+  if(!confirm('متأكد من حذف هذه المعلومة من عقل البوت؟')) return;
+  const { error } = await sb.from('intersect_knowledge_base').delete().eq('id', id);
+  if(error) { showToast('خطأ: ' + error.message); return; }
+  KNOWLEDGE = KNOWLEDGE.filter(k => k.id !== id); renderKnowledge(); showToast('تم الحذف');
+}
 
-function renderChatLogs(){
-  document.getElementById('chatLogsList').innerHTML = CHAT_LOGS.map(log => {
-    const d = new Date(log.created_at).toLocaleString('ar-SA');
-    let leadHtml = '';
-    if(log.lead_region || log.lead_contact || log.lead_sector) {
-      leadHtml = `<div style="margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:8px;">
-        <span style="font-size:12px;color:var(--text)">بيانات العميل: </span>
-        ${log.lead_contact ? `<span class="lead-badge">👤 ${log.lead_contact}</span>` : ''}
-        ${log.lead_region ? `<span class="lead-badge">🌍 ${log.lead_region}</span>` : ''}
-        ${log.lead_sector ? `<span class="lead-badge">🏢 ${log.lead_sector}</span>` : ''}
-      </div>`;
-    }
-
+/* ============ CHAT LOGS ============ */
+async function loadChatLogs() {
+  const container = document.getElementById('chatLogsContainer');
+  container.innerHTML = '<p style="color:var(--muted);font-size:13px">جاري جلب السجلات...</p>';
+  const { data, error } = await sb.from('intersect_chat_logs').select('*').order('created_at', { ascending: false }).limit(50);
+  if(error) { container.innerHTML = `<p style="color:var(--danger);font-size:13px">خطأ في جلب السجلات: ${error.message}</p>`; return; }
+  CHAT_LOGS = data || [];
+  if(CHAT_LOGS.length === 0) { container.innerHTML = '<p style="color:var(--muted);font-size:13px">لا توجد محادثات مسجلة بعد.</p>'; return; }
+  container.innerHTML = CHAT_LOGS.map(log => {
+    const lead = log.lead_data || {};
+    const ipStr = log.ip_location ? `${log.ip_location.city || ''}, ${log.ip_location.country_name || ''}` : 'غير معروف';
+    const date = new Date(log.created_at).toLocaleString('ar-SA', {timeZone: 'Asia/Riyadh'});
     return `
-    <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:16px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:var(--muted);">
-        <span>📍 ${log.country || 'غير معروف'} ${log.city ? '- '+log.city : ''}</span>
-        <span>🕒 ${d}</span>
+      <div class="chat-log-card">
+        <div class="chat-log-head">
+          <div class="lead-info">
+            <span title="المنطقة المستهدفة">📍 ${lead.region || '-'}</span>
+            <span title="القطاع">🏢 ${lead.sector || '-'}</span>
+            <span title="بيانات التواصل">📞 ${lead.contact || '-'}</span>
+          </div>
+          <div style="text-align:left; font-size:11px; color:var(--muted);"><div>${date}</div><div style="margin-top:4px;">🌐 IP: ${ipStr}</div></div>
+        </div>
+        <div class="chat-qa"><div class="chat-q">${log.question}</div><div class="chat-a">${log.answer}</div></div>
       </div>
-      ${leadHtml}
-      <div style="margin-bottom:8px;"><b>الزائر:</b> <span style="color:var(--text)">${log.user_question}</span></div>
-      <div><b style="color:var(--gold);">البوت:</b> <span style="color:#cfced9;font-size:13px;">${log.bot_answer}</span></div>
-    </div>`;
-  }).join('') || '<p style="font-size:13px;color:var(--muted)">لا توجد سجلات بعد.</p>';
+    `;
+  }).join('');
 }
+
+/* ============ LISTS & SAVING ============ */
+const LIST_FIELD_SETS = {
+  core_values: [{key:'title_en',label:'العنوان (English)',kind:'input'},{key:'desc_en',label:'الوصف (English)',kind:'textarea'}],
+  services: [{key:'title_en',label:'العنوان (English)',kind:'input'},{key:'desc_en',label:'الوصف (English)',kind:'textarea'}],
+  stats: [{key:'value',label:'الرقم (مثال: 15+)',kind:'input'},{key:'label_en',label:'الوصف (English)',kind:'input'}],
+  team: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'}],
+  advisors: [{key:'name',label:'الاسم',kind:'input'},{key:'title_en',label:'المنصب (English)',kind:'input'},{key:'bio_en',label:'نبذة (English)',kind:'textarea'}],
+  client_logos: [{key:'name',label:'اسم الشركة/الشريك',kind:'input'}]
+};
+const LIST_TABLES = {core_values:'valuesList', services:'servicesList', stats:'statsList', team:'teamList', advisors:'advisorsList', client_logos:'logosList'};
+const HAS_PHOTO = {team:true, advisors:true, client_logos:true};
+
+function renderListSection(key){
+  const container = document.getElementById(LIST_TABLES[key]);
+  const fields = LIST_FIELD_SETS[key];
+  const arr = ABOUT[key];
+  container.innerHTML = arr.map((item,i)=>`
+    <div class="card" style="background:var(--panel-2);margin-bottom:10px;">
+      ${HAS_PHOTO[key] ? `<div class="upload-row" style="margin-bottom:10px;"><img src="${item.photo_url||''}" style="${item.photo_url?'':'display:none'}" id="photo-${key}-${i}"><input type="file" accept="image/*" onchange="handleListPhoto(event,'${key}',${i})"></div>` : ''}
+      ${fields.map(f=>`<div class="field"><label>${f.label}</label>${f.kind==='textarea' ? `<textarea onblur="updateListField('${key}',${i},'${f.key}',this.value)">${item[f.key]||''}</textarea>` : `<input value="${(item[f.key]||'').toString().replace(/"/g,'&quot;')}" onblur="updateListField('${key}',${i},'${f.key}',this.value)">`}</div>`).join('')}
+      <button class="btn-danger btn-sm" onclick="removeListRow('${key}',${i})">حذف هذا العنصر</button>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد عناصر بعد.</p>';
+}
+function updateListField(key, i, field, value){ ABOUT[key][i][field] = value; }
+function addListRow(key, blank){ ABOUT[key].push(blank); renderListSection(key); }
+function removeListRow(key, i){ ABOUT[key].splice(i,1); renderListSection(key); }
+async function handleListPhoto(e, key, i){
+  const file = e.target.files[0]; if(!file) return; showToast('جارٍ رفع الصورة…');
+  const url = await uploadImage(file); if(url){ ABOUT[key][i].photo_url = url; renderListSection(key); }
+}
+async function saveListSection(key){
+  const {error} = await sb.from('intersect_site_settings').upsert({key, value: ABOUT[key]});
+  if(error){ showToast('خطأ: '+error.message); return; } showToast('تم الحفظ ✓');
+}
+
+function renderSimpleListSection(key){
+  const container = document.getElementById(key==='industries'?'industriesList':'logosList');
+  container.innerHTML = ABOUT[key].map((name,i)=>`
+    <div class="item-row">
+      <input style="flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;" value="${(name||'').replace(/"/g,'&quot;')}" onblur="ABOUT['${key}'][${i}]=this.value">
+      <button class="btn-danger btn-sm" onclick="ABOUT['${key}'].splice(${i},1); renderSimpleListSection('${key}')">حذف</button>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد عناصر بعد.</p>';
+}
+function addSimpleListRow(key){ ABOUT[key].push(''); renderSimpleListSection(key); }
+async function saveSimpleListSection(key){
+  const {error} = await sb.from('intersect_site_settings').upsert({key, value: ABOUT[key]});
+  if(error){ showToast('خطأ: '+error.message); return; } showToast('تم الحفظ ✓');
+}
+
+async function saveVisionMission(){
+  const value = {...ABOUT.vision_mission, vision_en: document.getElementById('visionEn').value, mission_en: document.getElementById('missionEn').value};
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'vision_mission', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  ABOUT.vision_mission = value; showToast('تم الحفظ ✓');
+}
+async function saveContactInfo(){
+  const value = {
+    website: document.getElementById('contactWebsite').value.trim(), 
+    email: document.getElementById('contactEmail').value.trim(), 
+    phone: document.getElementById('contactPhone').value.trim(),
+    linkedin: document.getElementById('contactLinkedIn').value.trim(),
+    twitter: document.getElementById('contactTwitter').value.trim(),
+    instagram: document.getElementById('contactInstagram').value.trim()
+  };
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  ABOUT.contact_info = value; showToast('تم الحفظ ✓');
+}
+
+async function saveBrand(){
+  const value = {
+    ...BRAND_DATA, name_ar:'إنترسكت', name_en:'Intersect',
+    tagline_ar: document.getElementById('brandTaglineAr').value,
+    tagline_en: document.getElementById('brandTaglineEn').value,
+    about_ar: document.getElementById('brandAboutAr').value,
+    about_en: document.getElementById('brandAboutEn').value,
+    logo_url: pendingBrandLogo
+  };
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  BRAND_DATA = value; showToast('تم الحفظ ✓');
+}
+
+/* ============ SECTORS ============ */
+function renderSectors(){
+  document.getElementById('sectorsList').innerHTML = SECTORS.map(s=>`
+    <div class="item-row">
+      <div class="thumb-fallback" style="color:${s.color_primary}">${(s.icon_keys&&s.icon_keys.length&&ICON_LIBRARY[s.icon_keys[0]]) ? `<span style="width:24px;height:24px;display:inline-flex;">${ICON_LIBRARY[s.icon_keys[0]].svg}</span>` : (s.name_ar||'?').charAt(0)}</div>
+      <div class="meta"><b>${s.name_ar}</b><span>${s.slug} · ${COMPANIES.filter(c=>c.sector_id===s.id).length} شركة</span></div>
+      <div class="item-actions"><button class="btn-outline btn-sm" onclick="editSector('${s.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('sectors','${s.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteSector('${s.id}')">حذف</button></div>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد قطاعات بعد.</p>';
+}
+let editingSectorId = null;
+async function saveSector(){
+  const name_ar = document.getElementById('secNameAr').value.trim();
+  const slug = document.getElementById('secSlug').value.trim();
+  if(!name_ar||!slug){ showToast('عبّي الاسم و slug'); return; }
+  const row = {
+    name_ar, name_en: document.getElementById('secNameEn').value.trim(),
+    slug, color_primary: document.getElementById('secColor1').value,
+    color_secondary: document.getElementById('secColor2').value,
+    description_ar: document.getElementById('secDescAr').value.trim(),
+    icon_keys: Array.from(selectedIconKeys)
+  };
+  let error;
+  if(editingSectorId){ ({error} = await sb.from('intersect_sectors').update(row).eq('id', editingSectorId)); } 
+  else { row.sort_order = SECTORS.length+1; ({error} = await sb.from('intersect_sectors').insert(row)); }
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast(editingSectorId ? 'تم حفظ التعديلات ✓' : 'تمت الإضافة ✓');
+  cancelSectorEdit(); loadAll();
+}
+function editSector(id){
+  const s = SECTORS.find(x=>x.id===id); if(!s) return;
+  editingSectorId = id;
+  document.getElementById('secNameAr').value = s.name_ar||''; document.getElementById('secNameEn').value = s.name_en||'';
+  document.getElementById('secSlug').value = s.slug||''; document.getElementById('secColor1').value = s.color_primary||'#7b5cff';
+  document.getElementById('secColor2').value = s.color_secondary||'#4fd8e0'; document.getElementById('secDescAr').value = s.description_ar||'';
+  setSelectedIconKeys(s.icon_keys||[]);
+  document.getElementById('secFormTitle').textContent = 'تعديل القطاع: ' + s.name_ar;
+  document.getElementById('secSaveBtn').textContent = 'حفظ التعديلات';
+  document.getElementById('secCancelBtn').classList.remove('hidden');
+  switchTab('sectors'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelSectorEdit(){
+  editingSectorId = null; ['secNameAr','secNameEn','secSlug','secDescAr'].forEach(id=>document.getElementById(id).value='');
+  setSelectedIconKeys([]); document.getElementById('secFormTitle').textContent = 'إضافة قطاع جديد';
+  document.getElementById('secSaveBtn').textContent = 'إضافة القطاع'; document.getElementById('secCancelBtn').classList.add('hidden');
+}
+async function deleteSector(id){
+  if(!confirm('حذف القطاع سيحذف كل الشركات بداخله. متأكد؟')) return;
+  await sb.from('intersect_sectors').delete().eq('id', id);
+  showToast('تم الحذف'); loadAll();
+}
+
+/* ============ COMPANIES ============ */
+function renderCompanies(){
+  document.getElementById('companiesList').innerHTML = COMPANIES.map(c=>{
+    const sec = SECTORS.find(s=>s.id===c.sector_id);
+    return `<div class="item-row">
+      ${c.logo_url?`<img src="${c.logo_url}">`:`<div class="thumb-fallback">${(c.name_ar||'?').charAt(0)}</div>`}
+      <div class="meta"><b>${c.name_ar}</b><span>${sec?sec.name_ar:'—'} · ${c.relationship_type}</span></div>
+      <div class="item-actions"><button class="btn-outline btn-sm" onclick="editCompany('${c.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('companies','${c.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteCompany('${c.id}')">حذف</button></div>
+    </div>`;
+  }).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شركات بعد.</p>';
+}
+let editingCompanyId = null;
+async function saveCompany(){
+  const name_ar = document.getElementById('compNameAr').value.trim();
+  const slug = document.getElementById('compSlug').value.trim();
+  const sector_id = document.getElementById('compSector').value;
+  if(!name_ar||!slug||!sector_id){ showToast('عبّي الاسم و slug واختر قطاع'); return; }
+  const row = {
+    sector_id, name_ar, name_en: document.getElementById('compNameEn').value.trim(), slug,
+    logo_url: pendingCompLogo, tagline_ar: document.getElementById('compTaglineAr').value.trim(),
+    tagline_en: document.getElementById('compTaglineEn').value.trim(), description_ar: document.getElementById('compDescAr').value.trim(),
+    description_en: document.getElementById('compDescEn').value.trim(), relationship_type: document.getElementById('compRelType').value,
+    relationship_label_ar: document.getElementById('compRelLabel').value.trim(), website_url: document.getElementById('compWebsite').value.trim(),
+    reference_text: document.getElementById('compRefText').value.trim(), reference_author: document.getElementById('compRefAuthor').value.trim()
+  };
+  let error;
+  if(editingCompanyId){ ({error} = await sb.from('intersect_companies').update(row).eq('id', editingCompanyId)); } 
+  else { row.sort_order = COMPANIES.length+1; ({error} = await sb.from('intersect_companies').insert(row)); }
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast(editingCompanyId ? 'تم حفظ التعديلات ✓' : 'تمت الإضافة ✓');
+  cancelCompanyEdit(); loadAll();
+}
+function editCompany(id){
+  const c = COMPANIES.find(x=>x.id===id); if(!c) return;
+  editingCompanyId = id;
+  document.getElementById('compSector').value = c.sector_id||''; document.getElementById('compNameAr').value = c.name_ar||'';
+  document.getElementById('compNameEn').value = c.name_en||''; document.getElementById('compSlug').value = c.slug||'';
+  document.getElementById('compTaglineAr').value = c.tagline_ar||''; document.getElementById('compTaglineEn').value = c.tagline_en||'';
+  document.getElementById('compDescAr').value = c.description_ar||''; document.getElementById('compDescEn').value = c.description_en||'';
+  document.getElementById('compRelType').value = c.relationship_type||''; document.getElementById('compRelLabel').value = c.relationship_label_ar||'';
+  document.getElementById('compWebsite').value = c.website_url||''; document.getElementById('compRefText').value = c.reference_text||'';
+  document.getElementById('compRefAuthor').value = c.reference_author||'';
+  pendingCompLogo = c.logo_url||null; const im = document.getElementById('compLogoPreview');
+  if(c.logo_url){ im.src=c.logo_url; im.style.display='block'; } else { im.style.display='none'; }
+  document.getElementById('compFormTitle').textContent = 'تعديل الشركة: ' + c.name_ar;
+  document.getElementById('compSaveBtn').textContent = 'حفظ التعديلات'; document.getElementById('compCancelBtn').classList.remove('hidden');
+  switchTab('companies'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelCompanyEdit(){
+  editingCompanyId = null;
+  ['compNameAr','compNameEn','compSlug','compTaglineAr','compTaglineEn','compDescAr','compDescEn','compRelLabel','compWebsite','compRefText','compRefAuthor'].forEach(id=>document.getElementById(id).value='');
+  pendingCompLogo = null; document.getElementById('compLogoPreview').style.display='none';
+  document.getElementById('compFormTitle').textContent = 'إضافة شركة جديدة'; document.getElementById('compSaveBtn').textContent = 'إضافة الشركة';
+  document.getElementById('compCancelBtn').classList.add('hidden');
+}
+async function deleteCompany(id){
+  if(!confirm('متأكد من حذف هذه الشركة؟')) return;
+  await sb.from('intersect_companies').delete().eq('id', id); showToast('تم الحذف'); loadAll();
+}
+
+/* ============ CONSULTING ============ */
+function renderConsulting(){
+  document.getElementById('consultingList').innerHTML = CONSULTING.map(c=>`
+    <div class="item-row">
+      ${c.logo_url?`<img src="${c.logo_url}">`:`<div class="thumb-fallback">${(c.name_ar||'?').charAt(0)}</div>`}
+      <div class="meta"><b>${c.name_ar}</b><span>${c.relationship_kind==='partner'?'شريك استراتيجي':'عميل'}${c.type_ar?' · '+c.type_ar:''}</span></div>
+      <div class="item-actions"><button class="btn-outline btn-sm" onclick="editConsulting('${c.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('consulting','${c.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteConsulting('${c.id}')">حذف</button></div>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شراكات بعد.</p>';
+}
+let editingConsultingId = null;
+async function saveConsulting(){
+  const name_ar = document.getElementById('conNameAr').value.trim();
+  if(!name_ar){ showToast('عبّي الاسم'); return; }
+  const row = {
+    name_ar, name_en: document.getElementById('conNameEn').value.trim(), logo_url: pendingConLogo,
+    relationship_kind: document.getElementById('conRelKind').value, type_ar: document.getElementById('conType').value.trim(),
+    description_ar: document.getElementById('conDescAr').value.trim(), website_url: document.getElementById('conWebsite').value.trim()
+  };
+  let error;
+  if(editingConsultingId){ ({error} = await sb.from('intersect_consulting').update(row).eq('id', editingConsultingId)); } 
+  else { row.sort_order = CONSULTING.length+1; ({error} = await sb.from('intersect_consulting').insert(row)); }
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast(editingConsultingId ? 'تم حفظ التعديلات ✓' : 'تمت الإضافة ✓');
+  cancelConsultingEdit(); loadAll();
+}
+function editConsulting(id){
+  const c = CONSULTING.find(x=>x.id===id); if(!c) return;
+  editingConsultingId = id;
+  document.getElementById('conNameAr').value = c.name_ar||''; document.getElementById('conNameEn').value = c.name_en||'';
+  document.getElementById('conRelKind').value = c.relationship_kind||'client'; document.getElementById('conType').value = c.type_ar||'';
+  document.getElementById('conDescAr').value = c.description_ar||''; document.getElementById('conWebsite').value = c.website_url||'';
+  pendingConLogo = c.logo_url||null; const im = document.getElementById('conLogoPreview');
+  if(c.logo_url){ im.src=c.logo_url; im.style.display='block'; } else { im.style.display='none'; }
+  document.getElementById('conFormTitle').textContent = 'تعديل: ' + c.name_ar; document.getElementById('conSaveBtn').textContent = 'حفظ التعديلات';
+  document.getElementById('conCancelBtn').classList.remove('hidden');
+  switchTab('consulting'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelConsultingEdit(){
+  editingConsultingId = null;
+  ['conNameAr','conNameEn','conType','conDescAr','conWebsite'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('conRelKind').value = 'client';
+  pendingConLogo = null; document.getElementById('conLogoPreview').style.display='none';
+  document.getElementById('conFormTitle').textContent = 'إضافة شراكة / مشروع استشاري';
+  document.getElementById('conSaveBtn').textContent = 'إضافة'; document.getElementById('conCancelBtn').classList.add('hidden');
+}
+async function deleteConsulting(id){
+  if(!confirm('متأكد من الحذف؟')) return;
+  await sb.from('intersect_consulting').delete().eq('id', id); showToast('تم الحذف'); loadAll();
+}
+
+/* ============ TRANSLATIONS (10 extra languages beyond AR/EN) ============ */
+const TR_LANGS = [
+  {code:'fr',label:'Français'},{code:'es',label:'Español'},{code:'de',label:'Deutsch'},
+  {code:'it',label:'Italiano'},{code:'pt',label:'Português'},{code:'ru',label:'Русский'},
+  {code:'tr',label:'Türkçe'},{code:'zh',label:'中文'},{code:'ja',label:'日本語'},{code:'ko',label:'한국어'}
+];
+const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies', consulting:'intersect_consulting'};
+const TR_FIELD_SETS = {
+  sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص',kind:'input'}, {key:'reference_text',label:'نص الاقتباس',kind:'textarea'}],
+  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'نوع العلاقة',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  brand: [{key:'tagline',label:'الشعار الفرعي',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
+};
+let trContext = null;
+
+function openTr(type, id){
+  let item;
+  if(type==='brand'){ item = BRAND_DATA; } else { const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING; item = arr.find(x=>x.id===id); }
+  if(!item) return;
+  trContext = {type, id, item};
+  document.getElementById('trTitle').textContent = 'ترجمات: ' + (type==='brand' ? 'إنترسكت' : (item.name_ar||''));
+  const sel = document.getElementById('trLang'); sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  buildTrFields(type); document.getElementById('trOverlay').classList.remove('hidden'); loadTrValues();
+}
+function buildTrFields(type){
+  const fields = TR_FIELD_SETS[type] || TR_FIELD_SETS.companies;
+  document.getElementById('trFieldsContainer').innerHTML = fields.map(f=>`
+    <div class="field"><label>${f.label}</label>${f.kind==='textarea' ? `<textarea id="tr-field-${f.key}"></textarea>` : `<input id="tr-field-${f.key}">`}</div>
+  `).join('');
+}
+function loadTrValues(){
+  const lang = document.getElementById('trLang').value;
+  const tr = (trContext.item.translations && trContext.item.translations[lang]) || {};
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  fields.forEach(f=>{ const el = document.getElementById('tr-field-'+f.key); if(el) el.value = tr[f.key] || ''; });
+}
+function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
+async function saveTranslation(){
+  if(!trContext) return;
+  const lang = document.getElementById('trLang').value; const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  const existing = trContext.item.translations || {}; const values = {};
+  fields.forEach(f=>{ const el = document.getElementById('tr-field-'+f.key); values[f.key] = el ? el.value.trim() : ''; });
+  const updated = {...existing, [lang]: values};
+
+  if(trContext.type==='brand'){
+    const value = {...BRAND_DATA, translations: updated};
+    const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
+    if(error){ showToast('خطأ: '+error.message); return; } BRAND_DATA = value;
+  } else {
+    const table = TR_TABLES[trContext.type];
+    const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
+    if(error){ showToast('خطأ: '+error.message); return; } trContext.item.translations = updated;
+  }
+  showToast('تم حفظ الترجمة ✓'); loadAll();
+}
+
 </script>
 </body>
 </html>
+
+

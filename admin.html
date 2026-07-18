@@ -124,12 +124,19 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
   <div class="panel active" id="panel-brand">
     <div class="card">
       <h3>معلومات إنترسكت الأساسية</h3>
-      <div class="field"><label>الشعار (رفع صورة)</label>
+      <div class="field"><label>الشعار الرئيسي (اللوجو)</label>
         <div class="upload-row">
           <img id="brandLogoPreview" src="" style="display:none">
           <input type="file" id="brandLogoFile" accept="image/*" onchange="handleBrandLogo(event)">
         </div>
       </div>
+      <div class="field"><label>شعار مركز المجرة (يظهر في وسط الكواكب بدل كلمة IX)</label>
+        <div class="upload-row">
+          <img id="galaxyCenterLogoPreview" src="" style="display:none; border-radius: 50%;">
+          <input type="file" id="galaxyCenterLogoFile" accept="image/*" onchange="handleGalaxyCenterLogo(event)">
+        </div>
+      </div>
+
       <div class="field"><label>الشعار النصي (Tagline)</label><input id="brandTaglineAr" placeholder="حيث تتقاطع الأفكار وتُبنى المشاريع"></div>
       <div class="field"><label>Tagline (English)</label><input id="brandTaglineEn" placeholder="Where ideas intersect"></div>
       <div class="field"><label>نبذة عن إنترسكت</label><textarea id="brandAboutAr"></textarea></div>
@@ -231,13 +238,16 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       </div>
       <div class="row2">
         <div class="field"><label>نوع العلاقة</label>
-          <select id="conRelKind">
+          <select id="conRelKind" onchange="handleCustomRelVisibility()">
             <option value="client">عميل</option>
             <option value="partner">شريك استراتيجي</option>
+            <option value="none">بدون تصنيف</option>
+            <option value="custom">تخصيص (أكتبه بنفسي)</option>
           </select>
         </div>
-        <div class="field"><label>فئة المشروع (وصف قصير، اختياري)</label><input id="conType" placeholder="مثال: تطوير أنظمة تنفيذية"></div>
+        <div class="field hidden" id="customRelField"><label>التصنيف المخصص</label><input id="conCustomRel" placeholder="أدخل التصنيف المخصص"></div>
       </div>
+      <div class="field"><label>فئة المشروع (وصف قصير، اختياري)</label><input id="conType" placeholder="مثال: تطوير أنظمة تنفيذية"></div>
       <div class="field"><label>الوصف</label><textarea id="conDescAr"></textarea></div>
       <div class="field"><label>الموقع الإلكتروني (اختياري)</label><input id="conWebsite" placeholder="https://"></div>
       <div style="display:flex;gap:10px;">
@@ -350,7 +360,7 @@ const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let SECTORS = [], COMPANIES = [], CONSULTING = [];
-let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null;
+let pendingBrandLogo = null, pendingGalaxyCenterLogo = null, pendingCompLogo = null, pendingConLogo = null;
 let selectedIconKeys = new Set();
 
 /* ============ NEON ICON LIBRARY (mirrors index.html — 21 hand-drawn icons) ============ */
@@ -409,7 +419,6 @@ async function submitGate(){
   const {data} = await sb.from('intersect_site_settings').select('*').eq('key','admin_auth').single();
   const hash = await sha256(pw);
   if(!data || !data.value || !data.value.password_hash){
-    // first run: set this as the password
     await sb.from('intersect_site_settings').upsert({key:'admin_auth', value:{password_hash:hash}});
     unlockShell();
     return;
@@ -447,6 +456,7 @@ async function uploadImage(file){
 }
 
 function handleBrandLogo(e){ handleGenericLogo(e, url=>{ pendingBrandLogo=url; document.getElementById('brandLogoPreview').src=url; document.getElementById('brandLogoPreview').style.display='block'; }); }
+function handleGalaxyCenterLogo(e){ handleGenericLogo(e, url=>{ pendingGalaxyCenterLogo=url; document.getElementById('galaxyCenterLogoPreview').src=url; document.getElementById('galaxyCenterLogoPreview').style.display='block'; }); }
 function handleCompLogo(e){ handleGenericLogo(e, url=>{ pendingCompLogo=url; document.getElementById('compLogoPreview').src=url; document.getElementById('compLogoPreview').style.display='block'; }); }
 function handleConLogo(e){ handleGenericLogo(e, url=>{ pendingConLogo=url; document.getElementById('conLogoPreview').src=url; document.getElementById('conLogoPreview').style.display='block'; }); }
 async function handleGenericLogo(e, cb){
@@ -476,6 +486,7 @@ async function loadAll(){
   document.getElementById('brandAboutAr').value = brand.about_ar||'';
   document.getElementById('brandAboutEn').value = brand.about_en||'';
   if(brand.logo_url){ pendingBrandLogo=brand.logo_url; const im=document.getElementById('brandLogoPreview'); im.src=brand.logo_url; im.style.display='block'; }
+  if(brand.galaxy_center_logo_url){ pendingGalaxyCenterLogo=brand.galaxy_center_logo_url; const im2=document.getElementById('galaxyCenterLogoPreview'); im2.src=brand.galaxy_center_logo_url; im2.style.display='block'; }
 
   ABOUT.vision_mission = settingsMap.vision_mission || {};
   ABOUT.core_values = settingsMap.core_values || [];
@@ -589,7 +600,8 @@ async function saveBrand(){
     tagline_en: document.getElementById('brandTaglineEn').value,
     about_ar: document.getElementById('brandAboutAr').value,
     about_en: document.getElementById('brandAboutEn').value,
-    logo_url: pendingBrandLogo
+    logo_url: pendingBrandLogo,
+    galaxy_center_logo_url: pendingGalaxyCenterLogo
   };
   const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
   if(error){ showToast('خطأ: '+error.message); return; }
@@ -745,27 +757,50 @@ async function deleteCompany(id){
 }
 
 /* ============ CONSULTING ============ */
-function renderConsulting(){
-  document.getElementById('consultingList').innerHTML = CONSULTING.map(c=>`
-    <div class="item-row">
-      ${c.logo_url?`<img src="${c.logo_url}">`:`<div class="thumb-fallback">${(c.name_ar||'?').charAt(0)}</div>`}
-      <div class="meta"><b>${c.name_ar}</b><span>${c.relationship_kind==='partner'?'شريك استراتيجي':'عميل'}${c.type_ar?' · '+c.type_ar:''}</span></div>
-      <div class="item-actions"><button class="btn-outline btn-sm" onclick="editConsulting('${c.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('consulting','${c.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteConsulting('${c.id}')">حذف</button></div>
-    </div>
-  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شراكات بعد.</p>';
+function handleCustomRelVisibility() {
+    const kind = document.getElementById('conRelKind').value;
+    const customField = document.getElementById('customRelField');
+    if (kind === 'custom') {
+        customField.classList.remove('hidden');
+    } else {
+        customField.classList.add('hidden');
+    }
 }
+
+function renderConsulting(){
+  document.getElementById('consultingList').innerHTML = CONSULTING.map(c=>{
+    let relLabel = '';
+    if(c.relationship_kind === 'partner') relLabel = 'شريك استراتيجي';
+    else if(c.relationship_kind === 'client') relLabel = 'عميل';
+    else if(c.relationship_kind === 'none') relLabel = 'بدون تصنيف';
+    else if(c.relationship_kind === 'custom') relLabel = c.custom_relationship_kind || 'مخصص';
+    
+    return `<div class="item-row">
+      ${c.logo_url?`<img src="${c.logo_url}">`:`<div class="thumb-fallback">${(c.name_ar||'?').charAt(0)}</div>`}
+      <div class="meta"><b>${c.name_ar}</b><span>${relLabel}${c.type_ar?' · '+c.type_ar:''}</span></div>
+      <div class="item-actions"><button class="btn-outline btn-sm" onclick="editConsulting('${c.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('consulting','${c.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteConsulting('${c.id}')">حذف</button></div>
+    </div>`;
+  }).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شراكات بعد.</p>';
+}
+
 let editingConsultingId = null;
 async function saveConsulting(){
   const name_ar = document.getElementById('conNameAr').value.trim();
   if(!name_ar){ showToast('عبّي الاسم'); return; }
+  
+  const relKind = document.getElementById('conRelKind').value;
+  const customRel = document.getElementById('conCustomRel').value.trim();
+
   const row = {
     name_ar, name_en: document.getElementById('conNameEn').value.trim(),
     logo_url: pendingConLogo,
-    relationship_kind: document.getElementById('conRelKind').value,
+    relationship_kind: relKind,
+    custom_relationship_kind: relKind === 'custom' ? customRel : null, 
     type_ar: document.getElementById('conType').value.trim(),
     description_ar: document.getElementById('conDescAr').value.trim(),
     website_url: document.getElementById('conWebsite').value.trim()
   };
+  
   let error;
   if(editingConsultingId){
     ({error} = await sb.from('intersect_consulting').update(row).eq('id', editingConsultingId));
@@ -773,18 +808,24 @@ async function saveConsulting(){
     row.sort_order = CONSULTING.length+1;
     ({error} = await sb.from('intersect_consulting').insert(row));
   }
+  
   if(error){ showToast('خطأ: '+error.message); return; }
   showToast(editingConsultingId ? 'تم حفظ التعديلات ✓' : 'تمت الإضافة ✓');
   cancelConsultingEdit();
   loadAll();
 }
+
 function editConsulting(id){
   const c = CONSULTING.find(x=>x.id===id);
   if(!c) return;
   editingConsultingId = id;
   document.getElementById('conNameAr').value = c.name_ar||'';
   document.getElementById('conNameEn').value = c.name_en||'';
+  
   document.getElementById('conRelKind').value = c.relationship_kind||'client';
+  document.getElementById('conCustomRel').value = c.custom_relationship_kind||'';
+  handleCustomRelVisibility();
+
   document.getElementById('conType').value = c.type_ar||'';
   document.getElementById('conDescAr').value = c.description_ar||'';
   document.getElementById('conWebsite').value = c.website_url||'';
@@ -799,8 +840,10 @@ function editConsulting(id){
 }
 function cancelConsultingEdit(){
   editingConsultingId = null;
-  ['conNameAr','conNameEn','conType','conDescAr','conWebsite'].forEach(id=>document.getElementById(id).value='');
+  ['conNameAr','conNameEn','conType','conDescAr','conWebsite','conCustomRel'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('conRelKind').value = 'client';
+  handleCustomRelVisibility();
+  
   pendingConLogo = null; document.getElementById('conLogoPreview').style.display='none';
   document.getElementById('conFormTitle').textContent = 'إضافة شراكة / مشروع استشاري';
   document.getElementById('conSaveBtn').textContent = 'إضافة';
@@ -812,7 +855,7 @@ async function deleteConsulting(id){
   showToast('تم الحذف'); loadAll();
 }
 
-/* ============ TRANSLATIONS (10 extra languages beyond AR/EN) ============ */
+/* ============ TRANSLATIONS ============ */
 const TR_LANGS = [
   {code:'fr',label:'Français'},{code:'es',label:'Español'},{code:'de',label:'Deutsch'},
   {code:'it',label:'Italiano'},{code:'pt',label:'Português'},{code:'ru',label:'Русский'},

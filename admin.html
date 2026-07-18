@@ -187,14 +187,32 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
 
   <!-- AI & CHAT LOGS -->
   <div class="panel" id="panel-ai">
+    
+    <!-- CONTROLS -->
+    <div class="card" style="border: 1px solid var(--ok); background: rgba(79, 216, 160, 0.05);">
+      <h3 style="color:var(--ok);">⚙️ حالة المساعد الذكي (التحكم العام)</h3>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">
+        يمكنك إخفاء أيقونة الدردشة مؤقتاً من الموقع العام في حال وجود صيانة.
+      </p>
+      <div class="field">
+        <label>إظهار / إخفاء البوت من واجهة الزوار</label>
+        <select id="botStatusSelect" style="border-color:var(--ok);">
+          <option value="enabled">🟢 البوت مفعل ويظهر للزوار</option>
+          <option value="disabled">🔴 البوت معطل (مخفي)</option>
+        </select>
+      </div>
+      <button class="btn" style="background:var(--ok); color:#111;" onclick="saveBotStatus()">تحديث الحالة</button>
+    </div>
+
+    <!-- KNOWLEDGE BASE -->
     <div class="card" style="border-color:var(--gold);">
       <h3>🧠 قاعدة المعرفة السرية (Knowledge Base)</h3>
       <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">
-        أضف معلومات استراتيجية، أسئلة وأجوبة، أو تفاصيل سرية هنا. هذه المعلومات لن تظهر كصفحات في الموقع، ولكن سيعتمد عليها المساعد الذكي (Bot) للإجابة على أسئلة الزوار.
+        أضف معلومات استراتيجية، أسئلة وأجوبة، أو تفاصيل سرية هنا. سيعتمد عليها المساعد الذكي، وحتى في حال تعطل سيرفرات جوجل، سيبحث البوت في هذه القاعدة ويرد على الزائر!
       </p>
       <div class="field">
         <label>إضافة معلومة جديدة</label>
-        <textarea id="aiKnowledgeInput" placeholder="مثال: نخطط لافتتاح مقر جديد في الرياض في الربع الثالث من 2026. الميزانية المبدئية 50 مليون..."></textarea>
+        <textarea id="aiKnowledgeInput" placeholder="مثال: نخطط لافتتاح مقر جديد في الرياض في الربع الثالث من 2026..."></textarea>
       </div>
       <button class="btn" onclick="saveKnowledge()">إضافة للقاعدة ➕</button>
       
@@ -545,7 +563,7 @@ async function loadAll(){
   ABOUT.contact_emails = settingsMap.contact_emails || [];
   ABOUT.contact_phones = settingsMap.contact_phones || [];
   
-  // Backward compatibility for old single email/phone
+  // Backward compatibility
   if(ABOUT.contact_emails.length === 0 && ABOUT.contact_info.email) ABOUT.contact_emails.push(ABOUT.contact_info.email);
   if(ABOUT.contact_phones.length === 0 && ABOUT.contact_info.phone) ABOUT.contact_phones.push(ABOUT.contact_info.phone);
   
@@ -561,9 +579,12 @@ async function loadAll(){
   renderListSection('team'); renderListSection('advisors');
   renderSimpleListSection('industries'); renderSimpleListSection('client_logos');
   
-  // New Multiple Contacts Lists
   renderSimpleListSection('contact_emails');
   renderSimpleListSection('contact_phones');
+
+  // Load Bot Status
+  const botStatus = settingsMap.bot_status || 'enabled';
+  document.getElementById('botStatusSelect').value = botStatus;
 
   SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
   renderSectors(); renderCompanies(); renderConsulting();
@@ -572,6 +593,14 @@ async function loadAll(){
 
   KNOWLEDGE = knowledge || [];
   renderKnowledge();
+}
+
+/* ============ BOT CONTROL ============ */
+async function saveBotStatus() {
+  const val = document.getElementById('botStatusSelect').value;
+  const {error} = await sb.from('intersect_site_settings').upsert({key:'bot_status', value: val});
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast('تم تحديث حالة البوت ✓');
 }
 
 /* ============ AI KNOWLEDGE BASE ============ */

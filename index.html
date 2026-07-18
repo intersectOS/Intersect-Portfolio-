@@ -416,7 +416,6 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </style>
 <base target="_blank">
 </head>
-<!-- DEFAULT LANGUAGE IS NOW ENGLISH (lang-en / ltr) -->
 <body class="lang-en lang-ltr">
 
 <!-- INITIAL LOADER -->
@@ -988,11 +987,27 @@ function renderAbout(){
   document.getElementById('statsGrid').innerHTML = (DATA.settings.stats||[]).map((s,i)=>`<div class="stat-block"><b>${s.value}</b><span id="stlbl-${i}">${tf(s,'label')}</span></div>`).join('');
   (DATA.settings.stats||[]).forEach((s,i) => { autoTranslateField(document.getElementById(`stlbl-${i}`), s, 'label'); });
 
+  // Multiple contacts rendering
   const contact = DATA.settings.contact_info || {};
-  document.getElementById('contactRow').innerHTML = `
-    ${contact.website?`<a href="${makeValidUrl(contact.website)}">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`:''}
-    ${contact.email?`<a href="mailto:${contact.email}">✉️ ${contact.email}</a>`:''}
-  `;
+  const emails = DATA.settings.contact_emails || [];
+  const phones = DATA.settings.contact_phones || [];
+
+  // Compatibility fallback
+  if(emails.length === 0 && contact.email) emails.push(contact.email);
+  if(phones.length === 0 && contact.phone) phones.push(contact.phone);
+
+  let contactHtml = '';
+  if(contact.website) contactHtml += `<a class="gs-hover" href="${makeValidUrl(contact.website)}">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`;
+  
+  phones.forEach(p => {
+    if(p.trim()) contactHtml += `<a class="gs-hover" href="tel:${p.replace(/[\s\-]/g,'')}">📞 <span dir="ltr">${p}</span></a>`;
+  });
+  
+  emails.forEach(e => {
+    if(e.trim()) contactHtml += `<a class="gs-hover" href="mailto:${e}">✉️ ${e}</a>`;
+  });
+  
+  document.getElementById('contactRow').innerHTML = contactHtml;
   
   let socialHtml = '';
   if(contact.linkedin) socialHtml += `<a href="${makeValidUrl(contact.linkedin)}" title="LinkedIn">in</a>`;
@@ -1031,7 +1046,7 @@ function toggleChat() {
 async function botSay(key) {
   setTyping(true);
   let text = I18N[LANG] ? I18N[LANG][key] : I18N['en'][key];
-  if(!I18N[LANG]) text = await mtTranslate(text, LANG); // ترجمة للغات غير الإنجليزية والعربية
+  if(!I18N[LANG]) text = await mtTranslate(text, LANG); 
   setTyping(false);
   addBotMsg(text);
 }
@@ -1042,11 +1057,9 @@ async function botSayWithOptions(key, options, callback) {
   let text = I18N[LANG] ? I18N[LANG][key] : I18N['en'][key];
   if(!I18N[LANG]) text = await mtTranslate(text, LANG);
   
-  // ترجمة أزرار الخيارات أيضاً إن لزم الأمر
   let translatedOptions = [];
   for(let opt of options) {
     let optText = opt.text;
-    // لا نترجم الـ Value لأننا نحتاجه في البرمجة، ولا نترجم كلمة Global لأننا برمجناها مسبقاً
     if(LANG !== 'en' && LANG !== 'ar' && opt.val !== 'Global' && opt.val !== 'All') {
        optText = await mtTranslate(optText, LANG);
     }
@@ -1119,7 +1132,6 @@ function setTyping(isTyping) {
 
 function askBotLanguage() {
   chatState = 'LANG';
-  // نجلب جميع اللغات الـ 12 ونعرضها في البوت
   const langOpts = LANGS.map(l => ({ text: l.label, val: l.code }));
   
   addBotMsgWithOptions(i18n('bot_ask_lang'), langOpts, (langCode) => {
@@ -1157,7 +1169,7 @@ function askContact() {
 
 function askSector() {
   chatState = 'SECTOR';
-  const opts = DATA.sectors.map(s => ({ text: tf(s, 'name', 'en'), val: tf(s, 'name', 'en') })); // Pass english name as value
+  const opts = DATA.sectors.map(s => ({ text: tf(s, 'name', 'en'), val: tf(s, 'name', 'en') })); 
   opts.push({ text: 'All Sectors / Other', val: 'All' });
   
   botSayWithOptions('bot_ask_sector', opts, (val) => {
@@ -1197,7 +1209,6 @@ async function handleChatSubmit() {
     const flairArr = LANG === 'ar' ? flair_ar : flair_en;
     let randomFlair = flairArr[Math.floor(Math.random() * flairArr.length)];
     
-    // ترجمة الرد العفوي إذا كانت اللغة غير العربية أو الإنجليزية
     if(LANG !== 'ar' && LANG !== 'en') {
         randomFlair = await mtTranslate(randomFlair, LANG);
     }
@@ -1233,6 +1244,16 @@ function buildAIContext() {
   DATA.consulting.forEach(c => { ctx += `- ${c.name_ar}: ${c.description_ar}\n`; });
   ctx += "\nقاعدة المعرفة الخاصة (أجب منها إذا سُئلت):\n";
   DATA.knowledge_base.forEach(k => { ctx += `- ${k.content}\n`; });
+
+  // Add Dynamic Contact Info to Bot's Brain
+  const emails = DATA.settings.contact_emails || [];
+  const phones = DATA.settings.contact_phones || [];
+  if (emails.length || phones.length) {
+    ctx += "\nمعلومات التواصل مع الشركة:\n";
+    if (phones.length) ctx += `- أرقام التواصل: ${phones.join(' , ')}\n`;
+    if (emails.length) ctx += `- البريد الإلكتروني: ${emails.join(' , ')}\n`;
+  }
+
   return ctx;
 }
 

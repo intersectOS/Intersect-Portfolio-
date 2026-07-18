@@ -343,7 +343,7 @@ body.lang-ltr .chat-window { right: auto; left: 30px; transform-origin: bottom l
 
 .chat-body {
   flex: 1; overflow-y: auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 16px;
+  display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
 }
 .chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
 .chat-msg a { color: var(--gold); text-decoration: underline; }
@@ -353,7 +353,7 @@ body.lang-ltr .chat-msg.bot { border-bottom-right-radius: 16px; border-bottom-le
 body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; }
 
 /* Quick Replies */
-.quick-replies-container { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; max-width:90%; align-self: flex-start;}
+.quick-replies-container { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; max-width:95%; align-self: flex-start;}
 .qr-btn {
   background: var(--glass-bg); border: 1px solid rgba(232,200,122,0.4);
   color: var(--gold); padding: 8px 14px; border-radius: 100px;
@@ -375,7 +375,7 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
 .chat-send {
   background: var(--gold); border: none; width: 44px; height: 44px;
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #1a1306; transition: 0.3s;
+  cursor: pointer; color: #1a1306; transition: 0.3s; flex-shrink: 0;
 }
 .chat-send:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--gold-glow); }
 .chat-send svg { width: 18px; height: 18px; }
@@ -416,7 +416,6 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </style>
 <base target="_blank">
 </head>
-<!-- DEFAULT LANGUAGE IS NOW ENGLISH (lang-en / ltr) -->
 <body class="lang-en lang-ltr">
 
 <!-- INITIAL LOADER -->
@@ -648,7 +647,7 @@ resizePCanvas(); window.addEventListener('resize', resizePCanvas); drawParticles
 
 /* ============ 12-LANGUAGE SYSTEM & TRANSLATION ENGINE ============ */
 const LANGS = [
-  {code:'ar', label:'العربية'}, {code:'en', label:'English'}, {code:'fr', label:'Français'},
+  {code:'en', label:'English'}, {code:'ar', label:'العربية'}, {code:'fr', label:'Français'},
   {code:'es', label:'Español'}, {code:'de', label:'Deutsch'}, {code:'it', label:'Italiano'},
   {code:'pt', label:'Português'}, {code:'ru', label:'Русский'}, {code:'tr', label:'Türkçe'},
   {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
@@ -678,7 +677,6 @@ const I18N = {
   }
 };
 
-// DEFAULT LANGUAGE SET TO ENGLISH ('en')
 let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
 
 function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
@@ -693,7 +691,6 @@ function setLang(code){
   document.documentElement.lang = code; 
   document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
   
-  // Toggle classes for font families and directions
   document.body.classList.remove('lang-ltr', 'lang-en', 'lang-ja');
   if(code !== 'ar') document.body.classList.add('lang-ltr');
   if(code === 'en') document.body.classList.add('lang-en');
@@ -1008,7 +1005,7 @@ function renderAll(){
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) ============ */
+/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
@@ -1025,6 +1022,36 @@ function toggleChat() {
   } else {
     win.classList.remove('open');
   }
+}
+
+// دالة مساعدة لطباعة رسالة البوت مع الترجمة التلقائية
+async function botSay(key) {
+  setTyping(true);
+  let text = I18N[LANG] ? I18N[LANG][key] : I18N['en'][key];
+  if(!I18N[LANG]) text = await mtTranslate(text, LANG); // ترجمة للغات غير الإنجليزية والعربية
+  setTyping(false);
+  addBotMsg(text);
+}
+
+// دالة للرسائل التي تحتوي خيارات مع الترجمة التلقائية للخيارات
+async function botSayWithOptions(key, options, callback) {
+  setTyping(true);
+  let text = I18N[LANG] ? I18N[LANG][key] : I18N['en'][key];
+  if(!I18N[LANG]) text = await mtTranslate(text, LANG);
+  
+  // ترجمة أزرار الخيارات أيضاً إن لزم الأمر
+  let translatedOptions = [];
+  for(let opt of options) {
+    let optText = opt.text;
+    // لا نترجم الـ Value لأننا نحتاجه في البرمجة، ولا نترجم كلمة Global لأننا برمجناها مسبقاً
+    if(LANG !== 'en' && LANG !== 'ar' && opt.val !== 'Global' && opt.val !== 'All') {
+       optText = await mtTranslate(optText, LANG);
+    }
+    translatedOptions.push({text: optText, val: opt.val});
+  }
+  
+  setTyping(false);
+  addBotMsgWithOptions(text, translatedOptions, callback);
 }
 
 function addBotMsgWithOptions(text, options, callback) {
@@ -1089,18 +1116,13 @@ function setTyping(isTyping) {
 
 function askBotLanguage() {
   chatState = 'LANG';
-  addBotMsgWithOptions(i18n('bot_ask_lang'), 
-    [
-      {text: 'English 🇬🇧', val: 'en'},
-      {text: 'العربية 🇸🇦', val: 'ar'}, 
-      {text: '日本語 🇯🇵', val: 'ja'},
-      {text: 'Français 🇫🇷', val: 'fr'}
-    ], 
-    (langCode) => {
-      setLang(langCode);
-      askRegion();
-    }
-  );
+  // نجلب جميع اللغات הـ 12 ونعرضها في البوت
+  const langOpts = LANGS.map(l => ({ text: l.label, val: l.code }));
+  
+  addBotMsgWithOptions(i18n('bot_ask_lang'), langOpts, (langCode) => {
+    setLang(langCode);
+    setTimeout(askRegion, 500);
+  });
 }
 
 function askRegion() {
@@ -1109,11 +1131,10 @@ function askRegion() {
     ? [{text: 'الشرق الأوسط', val: 'الشرق الأوسط'}, {text: 'آسيا', val: 'آسيا'}, {text: 'أوروبا', val: 'أوروبا'}, {text: 'أمريكا', val: 'أمريكا'}, {text: 'شركة عالمية 🌍', val: 'Global'}]
     : [{text: 'Middle East', val: 'Middle East'}, {text: 'Asia', val: 'Asia'}, {text: 'Europe', val: 'Europe'}, {text: 'Americas', val: 'Americas'}, {text: 'Global Company 🌍', val: 'Global'}];
   
-  addBotMsgWithOptions(i18n('bot_ask_region'), opts, (val) => {
+  botSayWithOptions('bot_ask_region', opts, (val) => {
     leadData.region = val;
     if(val === 'Global') {
-      setTyping(false);
-      addBotMsg(i18n('bot_skip_country'));
+      botSay('bot_skip_country');
       setTimeout(askContact, 1000);
     } else {
       askCountry();
@@ -1123,24 +1144,20 @@ function askRegion() {
 
 function askCountry() {
   chatState = 'COUNTRY';
-  setTyping(false);
-  addBotMsg(i18n('bot_ask_country'));
+  botSay('bot_ask_country');
 }
 
 function askContact() {
   chatState = 'CONTACT';
-  setTyping(false);
-  addBotMsg(i18n('bot_ask_name_contact'));
+  botSay('bot_ask_name_contact');
 }
 
 function askSector() {
   chatState = 'SECTOR';
-  setTyping(false);
+  const opts = DATA.sectors.map(s => ({ text: tf(s, 'name', 'en'), val: tf(s, 'name', 'en') })); // Pass english name as value
+  opts.push({ text: 'All Sectors / Other', val: 'All' });
   
-  const opts = DATA.sectors.map(s => ({ text: tf(s, 'name'), val: tf(s, 'name') }));
-  opts.push({ text: (LANG === 'ar' ? 'جميع القطاعات / أخرى' : 'All Sectors / Other'), val: 'All' });
-  
-  addBotMsgWithOptions(i18n('bot_ask_sector'), opts, (val) => {
+  botSayWithOptions('bot_ask_sector', opts, (val) => {
     leadData.sector = val;
     finishOnboarding();
   });
@@ -1148,13 +1165,12 @@ function askSector() {
 
 function finishOnboarding() {
   chatState = 'CHAT';
-  setTyping(false);
-  addBotMsg(i18n('bot_ready'));
+  botSay('bot_ready');
 }
 
 /* --- Submit Logic --- */
 
-function handleChatSubmit() {
+async function handleChatSubmit() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if(!text) return;
@@ -1176,7 +1192,12 @@ function handleChatSubmit() {
       `We've heard great things about the rapid development in ${text}, thrilled to connect!`
     ];
     const flairArr = LANG === 'ar' ? flair_ar : flair_en;
-    const randomFlair = flairArr[Math.floor(Math.random() * flairArr.length)];
+    let randomFlair = flairArr[Math.floor(Math.random() * flairArr.length)];
+    
+    // ترجمة الرد العفوي إذا كانت اللغة غير العربية أو الإنجليزية
+    if(LANG !== 'ar' && LANG !== 'en') {
+        randomFlair = await mtTranslate(randomFlair, LANG);
+    }
     
     setTimeout(() => {
       setTyping(false);
@@ -1214,13 +1235,18 @@ function buildAIContext() {
 
 async function askGemini(question) {
   const context = buildAIContext();
+  const currentLangObj = LANGS.find(l => l.code === LANG) || {label: 'English'};
+  const langName = currentLangObj.label;
+
   const sysPrompt = `
     You are the official AI assistant for "Intersect Holding Company". Your name is "IX Bot".
     You must answer the user's questions accurately and ONLY based on the provided Knowledge Context below.
     If the answer is NOT in the context, say politely that you don't have that information and advise them to contact support.
     DO NOT invent or hallucinate information.
     Keep your answers concise, professional, and friendly.
-    CRITICAL INSTRUCTION: The user is currently browsing the website in language code "${LANG}". You MUST answer in that language. If LANG is "ja", answer in Japanese. If "en", English. If "ar", Arabic. etc.
+    
+    *** ABSOLUTE CRITICAL RULE: YOU MUST REPLY EXCLUSIVELY IN ${langName} (Language code: ${LANG}). ***
+    Do NOT use English unless the requested language is English. Translate your knowledge into ${langName} before answering.
     
     Knowledge Context:
     ${context}
@@ -1237,7 +1263,8 @@ async function askGemini(question) {
     });
 
     const data = await response.json();
-    let answerText = LANG === 'ar' ? "عذراً، أواجه ضغطاً حالياً، يرجى المحاولة بعد قليل." : "Sorry, I am currently experiencing high load. Please try again shortly.";
+    let answerText = "Sorry, I am currently experiencing high load. Please try again shortly.";
+    if (LANG === 'ar') answerText = "عذراً، أواجه ضغطاً حالياً، يرجى المحاولة بعد قليل.";
     
     if (data && data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
       answerText = data.candidates[0].content.parts[0].text;
@@ -1256,7 +1283,8 @@ async function askGemini(question) {
   } catch (err) {
     console.error("Gemini API Error:", err);
     setTyping(false);
-    addBotMsg(LANG === 'ar' ? "عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً." : "Sorry, I'm having trouble connecting to the server. Please try again later.");
+    let errMsg = LANG === 'ar' ? "عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً." : "Sorry, I'm having trouble connecting to the server. Please try again later.";
+    addBotMsg(errMsg);
   }
 }
 

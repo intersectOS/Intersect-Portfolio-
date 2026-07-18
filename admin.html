@@ -118,6 +118,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
     <button class="tab" data-tab="companies" onclick="switchTab('companies')">الشركات</button>
     <button class="tab" data-tab="consulting" onclick="switchTab('consulting')">شراكات واستشارات</button>
     <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت</button>
+    <button class="tab" data-tab="knowledge" onclick="switchTab('knowledge')">قاعدة المعرفة (للبوت)</button>
   </div>
 
   <!-- BRAND -->
@@ -334,10 +335,30 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       <h3>بيانات التواصل</h3>
       <div class="field"><label>الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://"></div>
       <div class="field"><label>الإيميل</label><input id="contactEmail"></div>
-      <div class="field"><label>الجوال</label><input id="contactPhone"></div>
       <button class="btn" onclick="saveContactInfo()">حفظ</button>
     </div>
   </div>
+
+  <!-- KNOWLEDGE BASE (NEW) -->
+  <div class="panel" id="panel-knowledge">
+    <div class="card">
+      <h3 id="kbFormTitle">إضافة معلومة / مقال جديد (لتغذية الذكاء الاصطناعي)</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">أي معلومات تضعها هنا ستكون مخفية عن الزوار، لكن البوت سيقرأها ويستخدمها للإجابة على أسئلتهم بذكاء أكبر.</p>
+      <div class="row2">
+        <div class="field"><label>عنوان المعلومة (عربي)</label><input id="kbTitleAr" placeholder="مثال: استراتيجية إنترسكت لعام 2026"></div>
+        <div class="field"><label>Title (English)</label><input id="kbTitleEn"></div>
+      </div>
+      <div class="field"><label>الكلمات المفتاحية (للتصنيف)</label><input id="kbKeywords" placeholder="مثال: استراتيجية، رؤية، 2026، مشاريع"></div>
+      <div class="field"><label>المحتوى التفصيلي (عربي)</label><textarea id="kbContentAr" style="min-height: 120px;" placeholder="اكتب كل التفاصيل والمعلومات التي تريد أن يعرفها البوت..."></textarea></div>
+      <div class="field"><label>Content (English)</label><textarea id="kbContentEn" style="min-height: 120px;"></textarea></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" id="kbSaveBtn" onclick="saveKB()">حفظ المعلومة</button>
+        <button class="btn-outline hidden" id="kbCancelBtn" onclick="cancelKBEdit()">إلغاء التعديل</button>
+      </div>
+    </div>
+    <div class="card"><h3>قاعدة المعرفة الحالية</h3><div id="kbList"></div></div>
+  </div>
+
 </div>
 
 <div class="modal-overlay-tr hidden" id="trOverlay" style="position:fixed;inset:0;background:rgba(3,4,10,.82);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -359,8 +380,8 @@ const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let SECTORS = [], COMPANIES = [], CONSULTING = [];
-let pendingBrandLogo = null, pendingGalaxyCenterLogo = null, pendingCompLogo = null, pendingConLogo = null;
+let SECTORS = [], COMPANIES = [], CONSULTING = [], KNOWLEDGE = [];
+let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null;
 let selectedIconKeys = new Set();
 
 /* ============ NEON ICON LIBRARY (mirrors index.html — 21 hand-drawn icons) ============ */
@@ -471,11 +492,12 @@ async function handleGenericLogo(e, cb){
 let BRAND_DATA = {};
 let ABOUT = { vision_mission:{}, core_values:[], services:[], industries:[], stats:[], team:[], advisors:[], client_logos:[], contact_info:{} };
 async function loadAll(){
-  const [{data:settings},{data:sectors},{data:companies},{data:consulting}] = await Promise.all([
+  const [{data:settings},{data:sectors},{data:companies},{data:consulting},{data:knowledge}] = await Promise.all([
     sb.from('intersect_site_settings').select('*'),
     sb.from('intersect_sectors').select('*').order('sort_order'),
     sb.from('intersect_companies').select('*').order('sort_order'),
-    sb.from('intersect_consulting').select('*').order('sort_order')
+    sb.from('intersect_consulting').select('*').order('sort_order'),
+    sb.from('intersect_knowledge_base').select('*').order('created_at', { ascending: false })
   ]);
   const settingsMap = {};
   (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
@@ -506,8 +528,8 @@ async function loadAll(){
   renderListSection('team'); renderListSection('advisors');
   renderSimpleListSection('industries'); renderListSection('client_logos');
 
-  SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
-  renderSectors(); renderCompanies(); renderConsulting();
+  SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[]; KNOWLEDGE = knowledge||[];
+  renderSectors(); renderCompanies(); renderConsulting(); renderKB();
   const sel = document.getElementById('compSector');
   sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
 }
@@ -840,10 +862,8 @@ function editConsulting(id){
 }
 function cancelConsultingEdit(){
   editingConsultingId = null;
-  ['conNameAr','conNameEn','conType','conDescAr','conWebsite','conCustomRel'].forEach(id=>document.getElementById(id).value='');
+  ['conNameAr','conNameEn','conType','conDescAr','conWebsite'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('conRelKind').value = 'client';
-  handleCustomRelVisibility();
-  
   pendingConLogo = null; document.getElementById('conLogoPreview').style.display='none';
   document.getElementById('conFormTitle').textContent = 'إضافة شراكة / مشروع استشاري';
   document.getElementById('conSaveBtn').textContent = 'إضافة';
@@ -855,77 +875,79 @@ async function deleteConsulting(id){
   showToast('تم الحذف'); loadAll();
 }
 
-/* ============ TRANSLATIONS ============ */
-const TR_LANGS = [
-  {code:'fr',label:'Français'},{code:'es',label:'Español'},{code:'de',label:'Deutsch'},
-  {code:'it',label:'Italiano'},{code:'pt',label:'Português'},{code:'ru',label:'Русский'},
-  {code:'tr',label:'Türkçe'},{code:'zh',label:'中文'},{code:'ja',label:'日本語'},{code:'ko',label:'한국어'}
-];
-const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies', consulting:'intersect_consulting'};
-const TR_FIELD_SETS = {
-  sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
-  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص (بدل التصنيف القياسي)',kind:'input'}, {key:'reference_text',label:'نص الاقتباس / الشهادة',kind:'textarea'}],
-  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'نوع العلاقة',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
-  brand: [{key:'tagline',label:'الشعار الفرعي (Tagline)',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
-};
-let trContext = null;
+/* ============ KNOWLEDGE BASE ============ */
+function renderKB(){
+  document.getElementById('kbList').innerHTML = KNOWLEDGE.map(k=>`
+    <div class="item-row">
+      <div class="thumb-fallback" style="color:var(--gold)">🧠</div>
+      <div class="meta"><b>${k.title_ar}</b><span style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${k.content_ar}</span></div>
+      <div class="item-actions">
+        <button class="btn-outline btn-sm" onclick="editKB('${k.id}')">✏️ تعديل</button>
+        <button class="btn-danger btn-sm" onclick="deleteKB('${k.id}')">حذف</button>
+      </div>
+    </div>
+  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد معلومات في القاعدة بعد.</p>';
+}
 
-function openTr(type, id){
-  let item;
-  if(type==='brand'){
-    item = BRAND_DATA;
+let editingKBId = null;
+async function saveKB(){
+  const title_ar = document.getElementById('kbTitleAr').value.trim();
+  const content_ar = document.getElementById('kbContentAr').value.trim();
+  if(!title_ar || !content_ar){ showToast('عبّي العنوان والمحتوى'); return; }
+  
+  const row = {
+    title_ar,
+    title_en: document.getElementById('kbTitleEn').value.trim(),
+    content_ar,
+    content_en: document.getElementById('kbContentEn').value.trim(),
+    keywords: document.getElementById('kbKeywords').value.trim()
+  };
+  
+  let error;
+  if(editingKBId){
+    ({error} = await sb.from('intersect_knowledge_base').update(row).eq('id', editingKBId));
   } else {
-    const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING;
-    item = arr.find(x=>x.id===id);
+    ({error} = await sb.from('intersect_knowledge_base').insert(row));
   }
-  if(!item) return;
-  trContext = {type, id, item};
-  document.getElementById('trTitle').textContent = 'ترجمات: ' + (type==='brand' ? 'إنترسكت' : (item.name_ar||''));
-  const sel = document.getElementById('trLang');
-  sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
-  buildTrFields(type);
-  document.getElementById('trOverlay').classList.remove('hidden');
-  loadTrValues();
+  
+  if(error){ showToast('خطأ: '+error.message); return; }
+  showToast(editingKBId ? 'تم حفظ التعديلات ✓' : 'تمت الإضافة ✓');
+  cancelKBEdit();
+  loadAll();
 }
-function buildTrFields(type){
-  const fields = TR_FIELD_SETS[type] || TR_FIELD_SETS.companies;
-  document.getElementById('trFieldsContainer').innerHTML = fields.map(f=>`
-    <div class="field"><label>${f.label}</label>${f.kind==='textarea' ? `<textarea id="tr-field-${f.key}"></textarea>` : `<input id="tr-field-${f.key}">`}</div>
-  `).join('');
-}
-function loadTrValues(){
-  const lang = document.getElementById('trLang').value;
-  const tr = (trContext.item.translations && trContext.item.translations[lang]) || {};
-  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
-  fields.forEach(f=>{
-    const el = document.getElementById('tr-field-'+f.key);
-    if(el) el.value = tr[f.key] || '';
-  });
-}
-function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
-async function saveTranslation(){
-  if(!trContext) return;
-  const lang = document.getElementById('trLang').value;
-  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
-  const existing = trContext.item.translations || {};
-  const values = {};
-  fields.forEach(f=>{
-    const el = document.getElementById('tr-field-'+f.key);
-    values[f.key] = el ? el.value.trim() : '';
-  });
-  const updated = {...existing, [lang]: values};
 
-  if(trContext.type==='brand'){
-    const value = {...BRAND_DATA, translations: updated};
-    const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
-    if(error){ showToast('خطأ: '+error.message); return; }
-    BRAND_DATA = value;
-  } else {
-    const table = TR_TABLES[trContext.type];
-    const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
-    if(error){ showToast('خطأ: '+error.message); return; }
-    trContext.item.translations = updated;
-  }
+function editKB(id){
+  const k = KNOWLEDGE.find(x=>x.id===id);
+  if(!k) return;
+  editingKBId = id;
+  document.getElementById('kbTitleAr').value = k.title_ar||'';
+  document.getElementById('kbTitleEn').value = k.title_en||'';
+  document.getElementById('kbContentAr').value = k.content_ar||'';
+  document.getElementById('kbContentEn').value = k.content_en||'';
+  document.getElementById('kbKeywords').value = k.keywords||'';
+  
+  document.getElementById('kbFormTitle').textContent = 'تعديل المعلومة: ' + k.title_ar;
+  document.getElementById('kbSaveBtn').textContent = 'حفظ التعديلات';
+  document.getElementById('kbCancelBtn').classList.remove('hidden');
+  switchTab('knowledge');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function cancelKBEdit(){
+  editingKBId = null;
+  ['kbTitleAr','kbTitleEn','kbContentAr','kbContentEn','kbKeywords'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('kbFormTitle').textContent = 'إضافة معلومة / مقال جديد (لتغذية الذكاء الاصطناعي)';
+  document.getElementById('kbSaveBtn').textContent = 'حفظ المعلومة';
+  document.getElementById('kbCancelBtn').classList.add('hidden');
+}
+
+async function deleteKB(id){
+  if(!confirm('متأكد من الحذف؟')) return;
+  await sb.from('intersect_knowledge_base').delete().eq('id', id);
+  showToast('تم الحذف'); loadAll();
+}
+
+/* ============ TRANSLATIONS (10 extra languages beyond AR/EN) ============ */
   showToast('تم حفظ الترجمة ✓');
   loadAll();
 }

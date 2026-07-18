@@ -1,61 +1,244 @@
 <!-- ... existing code ... -->
-  {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
-];
-const I18N = {
-  ar:{brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',industries_title:'القطاعات التي نخدمها',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',kind_client:'عميل',kind_partner:'شريك استراتيجي',scroll_hint:'استكشف', none:'بدون تصنيف'},
-  en:{brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',industries_title:'Industries We Serve',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',portfolio_caption:'🌌 Intersect Interactive Portfolio',kind_client:'Client',kind_partner:'Strategic Partner',scroll_hint:'Explore', none:''}
-};
-let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+.chat-choices button:hover { background: rgba(212,175,106,0.1); border-color: var(--gold-accent); color: var(--gold-accent); }
 
-function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
+.lang-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+.lang-grid button { text-align: center !important; justify-content: center; }
+
+.ai-footer { padding: 16px; border-top: 1px solid var(--panel-border); display: flex; gap: 10px; background: var(--bg-core); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; transition: 0.3s; }
 <!-- ... existing code ... -->
-<div class="ai-window" id="aiChatWindow">
-  <div class="ai-header">
-    <div class="orb"></div>
-    <h3>Intersect AI</h3>
-    <button class="close-btn" onclick="toggleAIChat()">×</button>
-  </div>
-  <div class="ai-body" id="aiChatBody">
-    <div class="chat-bubble bot">Welcome to the Intersect Universe 🌌<br><br>Before we begin our journey answering your questions, let's test your knowledge: <b>Where is the headquarters of Intersect located?</b></div>
-    <div class="chat-choices" id="chatChoicesOptions">
-      <button onclick="handleInitialChoice('The headquarters is in Riyadh, Saudi Arabia 🇸🇦')">Riyadh, Saudi Arabia 🇸🇦</button>
-      <button onclick="handleInitialChoice('The headquarters is in Dubai, UAE 🇦🇪')">Dubai, UAE 🇦🇪</button>
-      <button onclick="handleInitialChoice('The headquarters is in London, UK 🇬🇧')">London, UK 🇬🇧</button>
-    </div>
-  </div>
-  <div class="ai-footer hidden-footer" id="aiChatFooter">
-    <input type="text" id="aiChatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendAIMessage()">
-    <button onclick="sendAIMessage()">
-<!-- ... existing code ... -->
-function buildAIContext() {
-<!-- ... existing code ... -->
+```
+
+الآن، استبدل قسم الترجمات (I18N) في الجافاسكريبت لإضافة قاموس اللغات الـ 12 الخاص بالبوت:
+
+```javascript:Intersect Premium Galaxy:index.html
+// ... existing code ...
+const I18N = {
+  ar:{explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',loading:'جارٍ التحميل…',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',scroll_hint:'استكشف'},
+  en:{explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',loading:'Loading…',portfolio_caption:'🌌 Intersect Interactive Portfolio',scroll_hint:'Explore'}
+};
+
+const CHAT_I18N = {
+  en: { w: "Welcome to Intersect 🌌<br>To serve you better, please answer a few quick questions (Optional, type directly to skip).<br><br><b>Which region are you from?</b>", ro: "Asia & Middle East,Europe,Americas & Africa,Global", c: "Great! Please provide your Name and Contact (Email/Phone):", s: "Thank you. What sector do you operate in?", so: "Tech & AI,Real Estate,Finance,Healthcare,Other", r: "Thank you! What are your inquiries today?" },
+  ar: { w: "مرحباً بك في إنترسكت 🌌<br>لخدمتك بشكل أفضل، نرجو الإجابة على بضعة أسئلة (اختيارية).<br><br><b>من أي منطقة أنتم؟</b>", ro: "آسيا والشرق الأوسط,أوروبا,الأمريكيتين وأفريقيا,شركة عالمية", c: "رائع! يرجى تزويدنا بالاسم ورقم التواصل:", s: "شكراً لك. ما هو القطاع المستهدف؟", so: "التقنية والذكاء الاصطناعي,العقارات,المالية,الصحة,غير ذلك", r: "أشكرك! تفضل، ما هي استفساراتك اليوم؟" },
+  fr: { w: "Bienvenue chez Intersect 🌌<br>Pour mieux vous servir, veuillez répondre à quelques questions (Facultatif).<br><br><b>De quelle région venez-vous ?</b>", ro: "Asie & Moyen-Orient,Europe,Amériques & Afrique,Mondial", c: "Super ! Votre nom et contact :", s: "Merci. Quel est votre secteur ?", so: "Technologie,Immobilier,Finance,Santé,Autre", r: "Merci ! Quelles sont vos questions aujourd'hui ?" },
+  es: { w: "Bienvenido a Intersect 🌌<br>Para servirle mejor, responda algunas preguntas (Opcional).<br><br><b>¿De qué región es?</b>", ro: "Asia y Medio Oriente,Europa,Américas y África,Global", c: "¡Genial! Su nombre y contacto:", s: "Gracias. ¿En qué sector opera?", so: "Tecnología,Bienes Raíces,Finanzas,Salud,Otro", r: "¡Gracias! ¿Cuáles son sus dudas hoy?" },
+  de: { w: "Willkommen bei Intersect 🌌<br>Um Ihnen besser zu helfen, beantworten Sie bitte einige Fragen (Optional).<br><br><b>Aus welcher Region kommen Sie?</b>", ro: "Asien & Naher Osten,Europa,Amerika & Afrika,Global", c: "Großartig! Ihr Name und Kontakt:", s: "Danke. Welche Branche?", so: "Technologie,Immobilien,Finanzen,Gesundheit,Andere", r: "Danke! Was sind Ihre Fragen?" },
+  it: { w: "Benvenuto in Intersect 🌌<br>Per servirti meglio, rispondi a qualche domanda (Opzionale).<br><br><b>Di quale regione sei?</b>", ro: "Asia e Medio Oriente,Europa,Americhe e Africa,Globale", c: "Ottimo! Il tuo nome e contatto:", s: "Grazie. In quale settore operi?", so: "Tecnologia,Immobiliare,Finanza,Sanità,Altro", r: "Grazie! Quali sono le tue domande oggi?" },
+  pt: { w: "Bem-vindo à Intersect 🌌<br>Para melhor atendê-lo, responda a algumas perguntas (Opcional).<br><br><b>De qual região você é?</b>", ro: "Ásia e Oriente Médio,Europa,Américas e África,Global", c: "Ótimo! Seu nome e contato:", s: "Obrigado. Em qual setor você atua?", so: "Tecnologia,Imóveis,Finanças,Saúde,Outros", r: "Obrigado! Quais são suas dúvidas hoje?" },
+  ru: { w: "Добро пожаловать в Intersect 🌌<br>Пожалуйста, ответьте на пару вопросов (Необязательно).<br><br><b>Из какого вы региона?</b>", ro: "Азия и Ближний Восток,Европа,Америка и Африка,Глобально", c: "Отлично! Ваше имя и контакт:", s: "Спасибо. Ваша отрасль?", so: "Технологии,Недвижимость,Финансы,Здравоохранение,Другое", r: "Спасибо! Чем могу помочь?" },
+  tr: { w: "Intersect'e Hoş Geldiniz 🌌<br>Size daha iyi hizmet verebilmek için lütfen birkaç soruyu yanıtlayın (İsteğe bağlı).<br><br><b>Hangi bölgedensiniz?</b>", ro: "Asya ve Orta Doğu,Avrupa,Amerika ve Afrika,Küresel", c: "Harika! Adınız ve İletişim bilginiz:", s: "Teşekkürler. Hangi sektörde faaliyet gösteriyorsunuz?", so: "Teknoloji,Gayrimenkul,Finans,Sağlık,Diğer", r: "Teşekkürler! Sorularınız nelerdir?" },
+  zh: { w: "欢迎来到 Intersect 🌌<br>为了更好地为您服务，请回答几个问题（可选）。<br><br><b>您来自哪个地区？</b>", ro: "亚洲和中东,欧洲,美洲和非洲,全球", c: "太好了！请提供您的姓名和联系方式：", s: "谢谢。您从事什么行业？", so: "技术与人工智能,房地产,金融,医疗保健,其他", r: "谢谢！您今天有什么问题？" },
+  ja: { w: "Intersectへようこそ 🌌<br>より良いサービスを提供するため、いくつかの質問にお答えください（任意）。<br><br><b>どの地域の企業ですか？</b>", ro: "アジア・中東,ヨーロッパ,南北アメリカ・アフリカ,グローバル", c: "素晴らしい！お名前と連絡先をお願いします：", s: "ありがとうございます。どの業界ですか？", so: "テクノロジー・AI,不動産,金融,ヘルスケア,その他", r: "ありがとうございます！本日はどのようなご質問ですか？" },
+  ko: { w: "Intersect에 오신 것을 환영합니다 🌌<br>더 나은 서비스를 위해 몇 가지 질문에 답해 주세요 (선택 사항).<br><br><b>어느 지역에 계십니까?</b>", ro: "아시아 및 중동,유럽,아메리카 및 아프리카,글로벌", c: "좋습니다! 성함과 연락처를 알려주세요:", s: "감사합니다. 어떤 산업에 종사하십니까?", so: "기술 및 AI,부동산,금융,의료,기타", r: "감사합니다! 무엇을 도와드릴까요?" }
+};
+
+let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+// ... existing code ...
+```
+
+وأخيراً، استبدل كامل دوال المساعد الذكي بهذه النسخة المحدثة التي تحتوي على منطق اختيار اللغة وإخفاء الصندوق:
+
+```javascript:Intersect Premium Galaxy:index.html
+// ... existing code ...
+const GEMINI_API_KEY = "AQ.Ab8RN6JGCqU-Ptqu-cQoCaeejGm-iIEtLsenyZ1Cfr-aATh27Q"; 
+let aiChatHistory = [];
+let isChatOpen = false;
+let botState = 'ASK_LANG'; // ASK_LANG, ASK_REGION, ASK_CONTACT, ASK_SECTOR, AI_READY
+let leadInfo = { region: '', contact: '', sector: '' };
+let chatLang = 'en'; // لغة البوت الافتراضية للزائر الحالي
+
+function toggleAIChat() {
+  const windowEl = document.getElementById('aiChatWindow');
+  isChatOpen = !isChatOpen;
+  if (isChatOpen) {
+    windowEl.classList.add('open');
+    if(botState !== 'ASK_LANG' && botState !== 'ASK_REGION' && botState !== 'ASK_SECTOR') {
+       document.getElementById('aiChatInput').focus();
+    }
+  } else {
+    windowEl.classList.remove('open');
+  }
 }
 
-function handleInitialChoice(choiceText) {
-  // إخفاء الخيارات وتفعيل صندوق المحادثة
-  document.getElementById('chatChoicesOptions').style.display = 'none';
-  document.getElementById('aiChatFooter').classList.remove('hidden-footer');
+function appendChat(text, sender, isHTML = true) {
+  const body = document.getElementById('aiChatBody');
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${sender}`;
+  if(isHTML) div.innerHTML = text; else div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTyping() {
+  const body = document.getElementById('aiChatBody');
+  const div = document.createElement('div');
+  div.className = 'typing-indicator bot'; div.id = 'ai-typing';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div); body.scrollTop = body.scrollHeight;
+}
+function hideTyping() { const el = document.getElementById('ai-typing'); if(el) el.remove(); }
+
+const L_OPTS = [
+  {c:'en', l:'English'}, {c:'ar', l:'العربية'}, {c:'fr', l:'Français'},
+  {c:'es', l:'Español'}, {c:'de', l:'Deutsch'}, {c:'it', l:'Italiano'},
+  {c:'pt', l:'Português'}, {c:'ru', l:'Русский'}, {c:'tr', l:'Türkçe'},
+  {c:'zh', l:'中文'}, {c:'ja', l:'日本語'}, {c:'ko', l:'한국어'}
+];
+
+function initBotWelcome() {
+  const body = document.getElementById('aiChatBody');
+  body.innerHTML = ''; aiChatHistory = []; botState = 'ASK_LANG';
+  leadInfo = { region: '', contact: '', sector: '' };
   
-  // إرسال الخيار كرسالة مستخدم
-  appendChatMsg(choiceText, 'user');
+  appendChat('🌍 Please select your preferred language / الرجاء اختيار لغتك المفضلة:', 'bot');
   
-  const typingId = showTypingIndicator();
+  const choicesDiv = document.createElement('div');
+  choicesDiv.className = 'lang-grid'; choicesDiv.id = 'chatChoices';
+  choicesDiv.innerHTML = L_OPTS.map(opt => `<button onclick="handleBotChoice('lang', '${opt.c}')">${opt.l}</button>`).join('');
+  body.appendChild(choicesDiv);
   
-  // الرد المبرمج للترحيب (Hardcoded for speed and precision)
-  setTimeout(() => {
-    removeTypingIndicator(typingId);
-    let botReply = "";
-    if(choiceText.includes("الرياض") || choiceText.includes("Riyadh")) {
-      botReply = LANG === 'ar' 
-        ? "إجابة صحيحة! 👏 مقرنا الرئيسي يقع في قلب الرياض، المملكة العربية السعودية.<br><br>الآن، كيف يمكنني مساعدتك؟ تفضل بسؤالي عن شركاتنا، قطاعاتنا، أو رؤيتنا."
-        : "Correct! 👏 Our headquarters is located in the heart of Riyadh, Saudi Arabia.<br><br>Now, how can I help you today? Feel free to ask about our companies, sectors, or vision.";
-    } else {
-      botReply = LANG === 'ar'
-        ? "محاولة جيدة! لكن مقرنا الرئيسي يقع في العاصمة الرياض، المملكة العربية السعودية 🇸🇦.<br><br>الآن، كيف يمكنني مساعدتك اليوم؟ تفضل بسؤالي أي شيء يخص إنترسكت ومشاريعها."
-        : "Good try! But our headquarters is actually located in Riyadh, Saudi Arabia 🇸🇦.<br><br>Now, how can I help you today? Feel free to ask anything about Intersect and its ventures.";
-    }
+  // إخفاء صندوق الكتابة لإجبار الزائر على اختيار اللغة من الأزرار
+  document.getElementById('aiChatInput').disabled = true;
+  document.getElementById('aiChatInput').placeholder = '...';
+}
+
+function showSectorChoices() {
+  const body = document.getElementById('aiChatBody');
+  const choicesDiv = document.createElement('div');
+  choicesDiv.className = 'chat-choices'; choicesDiv.id = 'chatChoices';
+  const opts = CHAT_I18N[chatLang].so.split(',');
+  choicesDiv.innerHTML = opts.map(opt => `<button onclick="handleBotChoice('sector', '${opt}')">${opt}</button>`).join('');
+  body.appendChild(choicesDiv);
+  body.scrollTop = body.scrollHeight;
+  document.getElementById('aiChatInput').disabled = true;
+}
+
+function handleBotChoice(type, value) {
+  const choicesDiv = document.getElementById('chatChoices');
+  if(choicesDiv) choicesDiv.remove();
+
+  if(type === 'lang') {
+    chatLang = value;
+    const langObj = L_OPTS.find(o=>o.c===value);
+    appendChat(langObj ? langObj.l : value, 'user', false);
+    botState = 'ASK_REGION';
+    showTyping();
+    setTimeout(() => { 
+        hideTyping(); 
+        appendChat(CHAT_I18N[chatLang].w, 'bot');
+        
+        const regChoices = document.createElement('div');
+        regChoices.className = 'chat-choices'; regChoices.id = 'chatChoices';
+        const opts = CHAT_I18N[chatLang].ro.split(',');
+        regChoices.innerHTML = opts.map(opt => `<button onclick="handleBotChoice('region', '${opt}')">${opt}</button>`).join('');
+        document.getElementById('aiChatBody').appendChild(regChoices);
+        document.getElementById('aiChatBody').scrollTop = document.getElementById('aiChatBody').scrollHeight;
+    }, 500);
+  } else if(type === 'region') {
+    leadInfo.region = value;
+    appendChat(value, 'user', false);
+    botState = 'ASK_CONTACT';
+    showTyping();
+    setTimeout(() => { 
+        hideTyping(); 
+        appendChat(CHAT_I18N[chatLang].c, 'bot'); 
+        // نفتح صندوق الكتابة الآن ليدخل بياناته
+        document.getElementById('aiChatInput').disabled = false;
+        document.getElementById('aiChatInput').placeholder = (chatLang==='ar') ? 'اكتب هنا...' : 'Type here...';
+        document.getElementById('aiChatInput').focus(); 
+    }, 600);
+  } else if (type === 'sector') {
+    leadInfo.sector = value;
+    appendChat(value, 'user', false);
+    botState = 'AI_READY';
+    showTyping();
+    setTimeout(() => { 
+        hideTyping(); 
+        appendChat(CHAT_I18N[chatLang].r, 'bot'); 
+        document.getElementById('aiChatInput').disabled = false;
+        document.getElementById('aiChatInput').placeholder = (chatLang==='ar') ? 'اكتب استفسارك...' : 'Ask me anything...';
+        document.getElementById('aiChatInput').focus(); 
+    }, 600);
+  }
+}
+
+async function handleChatInput() {
+  const input = document.getElementById('aiChatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  
+  input.value = '';
+  const choicesDiv = document.getElementById('chatChoices');
+  if(choicesDiv) choicesDiv.remove();
+  
+  appendChat(text, 'user', false);
+
+  if (botState === 'ASK_LANG') {
+     chatLang = 'en'; botState = 'AI_READY'; document.getElementById('aiChatInput').disabled = false; processGeminiRequest(text);
+  } else if (botState === 'ASK_REGION' || botState === 'ASK_SECTOR') {
+     botState = 'AI_READY'; document.getElementById('aiChatInput').disabled = false; processGeminiRequest(text);
+  } else if (botState === 'ASK_CONTACT') {
+     leadInfo.contact = text;
+     botState = 'ASK_SECTOR';
+     showTyping();
+     setTimeout(() => { hideTyping(); appendChat(CHAT_I18N[chatLang].s, 'bot'); showSectorChoices(); }, 500);
+  } else {
+     processGeminiRequest(text);
+  }
+}
+
+function buildAIContext() {
+  const brand = DATA.settings.brand || {}; const about = DATA.settings.vision_mission || {};
+  let str = `Company Name: Intersect Holding Company\nTagline: ${brand.tagline_en || brand.tagline_ar || ''}\nVision: ${about.vision_en || about.vision_ar || ''}\n\nSectors:\n`;
+  DATA.sectors.forEach(s => { str += `- ${s.name_en || s.name_ar}: ${s.description_en || s.description_ar || ''}\n`; });
+  str += `\nPortfolio:\n`;
+  DATA.companies.forEach(c => { str += `- ${c.name_en || c.name_ar}: ${c.description_en || c.description_ar || ''}. Rel: ${c.relationship_type}\n`; });
+  
+  if(DATA.knowledge && DATA.knowledge.length > 0){
+    str += `\nInternal Knowledge Base:\n`;
+    DATA.knowledge.forEach(k => { str += `Title: ${k.title_en || k.title_ar}\nContent: ${k.content_en || k.content_ar}\n\n`; });
+  }
+  return str;
+}
+
+async function processGeminiRequest(userText) {
+  aiChatHistory.push({ role: 'user', parts: [{ text: userText }] });
+  showTyping();
+  
+  const langNames = {en:"English", ar:"Arabic", fr:"French", es:"Spanish", de:"German", it:"Italian", pt:"Portuguese", ru:"Russian", tr:"Turkish", zh:"Chinese", ja:"Japanese", ko:"Korean"};
+  const targetLang = langNames[chatLang] || "English";
+
+  const systemPrompt = `You are 'Intersect AI', the official smart assistant for Intersect Holding Company.
+Your job is to answer visitor questions strictly based on the context provided.
+User Lead Info: [Region: ${leadInfo.region||'N/A'}], [Contact: ${leadInfo.contact||'N/A'}], [Sector: ${leadInfo.sector||'N/A'}]. If you see this info, you can tailor your answer politely if relevant.
+Keep answers concise, professional, and friendly. 
+IMPORTANT CRITERIA: You MUST respond in ${targetLang}.
+Context:\n` + buildAIContext();
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: aiChatHistory,
+        generationConfig: { temperature: 0.2 }
+      })
+    });
     
-    appendChatMsg(botReply, 'bot');
-    aiChatHistory.push({role: 'user', text: choiceText});
-    aiChatHistory.push({role: 'bot', text: botReply});
-<!-- ... existing code ... -->
+    if(!response.ok) throw new Error('API Error');
+    const data = await response.json();
+    const botReply = data.candidates[0].content.parts[0].text;
+    
+    hideTyping();
+    appendChat(botReply.replace(/\n/g, '<br>'), 'bot');
+    aiChatHistory.push({ role: 'model', parts: [{ text: botReply }] });
+    
+    logChatToDB(userText, botReply);
+  } catch(e) {
+    hideTyping();
+    appendChat(chatLang==='ar'?'عذراً، أواجه مشكلة في الاتصال.':'Sorry, I am facing a connection issue.', 'bot');
+  }
+}
+
+async function logChatToDB(userQ, botA) {
+// ... existing code ...

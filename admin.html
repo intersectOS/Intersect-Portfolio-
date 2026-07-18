@@ -335,6 +335,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       <h3>بيانات التواصل</h3>
       <div class="field"><label>الموقع الإلكتروني</label><input id="contactWebsite" placeholder="https://"></div>
       <div class="field"><label>الإيميل</label><input id="contactEmail"></div>
+      <div class="field"><label>الجوال</label><input id="contactPhone"></div>
       <button class="btn" onclick="saveContactInfo()">حفظ</button>
     </div>
   </div>
@@ -381,7 +382,7 @@ const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let SECTORS = [], COMPANIES = [], CONSULTING = [], KNOWLEDGE = [];
-let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null;
+let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null, pendingGalaxyCenterLogo = null;
 let selectedIconKeys = new Set();
 
 /* ============ NEON ICON LIBRARY (mirrors index.html — 21 hand-drawn icons) ============ */
@@ -948,6 +949,76 @@ async function deleteKB(id){
 }
 
 /* ============ TRANSLATIONS (10 extra languages beyond AR/EN) ============ */
+const TR_LANGS = [
+  {code:'fr',label:'Français'},{code:'es',label:'Español'},{code:'de',label:'Deutsch'},
+  {code:'it',label:'Italiano'},{code:'pt',label:'Português'},{code:'ru',label:'Русский'},
+  {code:'tr',label:'Türkçe'},{code:'zh',label:'中文'},{code:'ja',label:'日本語'},{code:'ko',label:'한국어'}
+];
+const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies', consulting:'intersect_consulting'};
+const TR_FIELD_SETS = {
+  sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص (بدل التصنيف القياسي)',kind:'input'}, {key:'reference_text',label:'نص الاقتباس / الشهادة',kind:'textarea'}],
+  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'نوع العلاقة',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  brand: [{key:'tagline',label:'الشعار الفرعي (Tagline)',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
+};
+let trContext = null;
+
+function openTr(type, id){
+  let item;
+  if(type==='brand'){
+    item = BRAND_DATA;
+  } else {
+    const arr = type==='sectors'?SECTORS:type==='companies'?COMPANIES:CONSULTING;
+    item = arr.find(x=>x.id===id);
+  }
+  if(!item) return;
+  trContext = {type, id, item};
+  document.getElementById('trTitle').textContent = 'ترجمات: ' + (type==='brand' ? 'إنترسكت' : (item.name_ar||''));
+  const sel = document.getElementById('trLang');
+  sel.innerHTML = TR_LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  buildTrFields(type);
+  document.getElementById('trOverlay').classList.remove('hidden');
+  loadTrValues();
+}
+function buildTrFields(type){
+  const fields = TR_FIELD_SETS[type] || TR_FIELD_SETS.companies;
+  document.getElementById('trFieldsContainer').innerHTML = fields.map(f=>`
+    <div class="field"><label>${f.label}</label>${f.kind==='textarea' ? `<textarea id="tr-field-${f.key}"></textarea>` : `<input id="tr-field-${f.key}">`}</div>
+  `).join('');
+}
+function loadTrValues(){
+  const lang = document.getElementById('trLang').value;
+  const tr = (trContext.item.translations && trContext.item.translations[lang]) || {};
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    if(el) el.value = tr[f.key] || '';
+  });
+}
+function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
+async function saveTranslation(){
+  if(!trContext) return;
+  const lang = document.getElementById('trLang').value;
+  const fields = TR_FIELD_SETS[trContext.type] || TR_FIELD_SETS.companies;
+  const existing = trContext.item.translations || {};
+  const values = {};
+  fields.forEach(f=>{
+    const el = document.getElementById('tr-field-'+f.key);
+    values[f.key] = el ? el.value.trim() : '';
+  });
+  const updated = {...existing, [lang]: values};
+
+  if(trContext.type==='brand'){
+    const value = {...BRAND_DATA, translations: updated};
+    const {error} = await sb.from('intersect_site_settings').upsert({key:'brand', value});
+    if(error){ showToast('خطأ: '+error.message); return; }
+    BRAND_DATA = value;
+  } else {
+    const table = TR_TABLES[trContext.type];
+    const {error} = await sb.from(table).update({translations: updated}).eq('id', trContext.id);
+    if(error){ showToast('خطأ: '+error.message); return; }
+    trContext.item.translations = updated;
+  }
   showToast('تم حفظ الترجمة ✓');
   loadAll();
 }

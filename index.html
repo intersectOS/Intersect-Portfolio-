@@ -404,7 +404,7 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
   .chat-header { padding-top: max(16px, env(safe-area-inset-top)); }
-  .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
   /* Floating Action Button (FAB) Positioning */
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
@@ -416,6 +416,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </style>
 <base target="_blank">
 </head>
+<!-- DEFAULT LANGUAGE IS NOW ENGLISH (lang-en / ltr) -->
 <body class="lang-en lang-ltr">
 
 <!-- INITIAL LOADER -->
@@ -677,6 +678,7 @@ const I18N = {
   }
 };
 
+// DEFAULT LANGUAGE SET TO ENGLISH ('en')
 let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
 
 function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
@@ -691,6 +693,7 @@ function setLang(code){
   document.documentElement.lang = code; 
   document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
   
+  // Toggle classes for font families and directions
   document.body.classList.remove('lang-ltr', 'lang-en', 'lang-ja');
   if(code !== 'ar') document.body.classList.add('lang-ltr');
   if(code === 'en') document.body.classList.add('lang-en');
@@ -1116,7 +1119,7 @@ function setTyping(isTyping) {
 
 function askBotLanguage() {
   chatState = 'LANG';
-  // نجلب جميع اللغات הـ 12 ونعرضها في البوت
+  // نجلب جميع اللغات الـ 12 ونعرضها في البوت
   const langOpts = LANGS.map(l => ({ text: l.label, val: l.code }));
   
   addBotMsgWithOptions(i18n('bot_ask_lang'), langOpts, (langCode) => {
@@ -1245,7 +1248,7 @@ async function askGemini(question) {
     DO NOT invent or hallucinate information.
     Keep your answers concise, professional, and friendly.
     
-    *** ABSOLUTE CRITICAL RULE: YOU MUST REPLY EXCLUSIVELY IN ${langName} (Language code: ${LANG}). ***
+    *** ABSOLUTE CRITICAL RULE: YOU MUST REPLY EXCLUSIVELY IN THE ${langName.toUpperCase()} LANGUAGE (Language code: ${LANG}). ***
     Do NOT use English unless the requested language is English. Translate your knowledge into ${langName} before answering.
     
     Knowledge Context:
@@ -1253,7 +1256,7 @@ async function askGemini(question) {
   `;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1261,6 +1264,12 @@ async function askGemini(question) {
         contents: [{ parts: [{ text: question }] }]
       })
     });
+
+    if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Gemini API HTTP Error:", response.status, errorData);
+        throw new Error("API returned status " + response.status);
+    }
 
     const data = await response.json();
     let answerText = "Sorry, I am currently experiencing high load. Please try again shortly.";
@@ -1281,7 +1290,7 @@ async function askGemini(question) {
     }).then(() => {});
 
   } catch (err) {
-    console.error("Gemini API Error:", err);
+    console.error("Gemini API Exception:", err);
     setTyping(false);
     let errMsg = LANG === 'ar' ? "عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً." : "Sorry, I'm having trouble connecting to the server. Please try again later.";
     addBotMsg(errMsg);

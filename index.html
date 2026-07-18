@@ -62,7 +62,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 @keyframes pulse-op { from {opacity: 0.5;} to {opacity: 1;} }
 
-/* ========== PARTICLE CANVAS ========== */
+/* ========== PARTICLE CANVAS (Meteors & Stars) ========== */
 #particleCanvas{
   position:fixed;inset:0;z-index:0;pointer-events:none;
 }
@@ -240,7 +240,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 
 /* ========== GALAXY - ORGANIC ORBITS ========== */
-#view-galaxy{padding-top:60px;}
+#view-galaxy{padding-top:100px; width:100%;}
 #view-galaxy::before{
   content:'';position:absolute;top:50%;left:50%;width:800px;height:800px;
   transform:translate(-50%,-50%);
@@ -256,43 +256,34 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .galaxy-head p{color:var(--muted);font-size:15px;margin-top:10px;letter-spacing:.5px;}
 
-.orbit-wrap{position:relative;width:min(900px,100vw);aspect-ratio:1/1;margin:0 auto 20px;}
+.orbit-wrap{position:relative;width:min(1000px,95vw);aspect-ratio:1/1;margin:10px auto 20px;}
 .orbit-wrap svg{width:100%;height:100%;overflow:visible;}
-.orbit-path{fill:none;stroke-width:1;transition:stroke-opacity .3s;}
-.planet-node{cursor:pointer;}
 
-.ix-sun-glow { animation: sunPulse 4s ease-in-out infinite alternate; }
-@keyframes sunPulse { 0% { filter: blur(30px); opacity: 0.6; } 100% { filter: blur(40px); opacity: 1; } }
-
-.sun-image {
-  border-radius: 50%;
-  box-shadow: 0 0 30px var(--gold), 0 0 60px var(--gold-glow);
-  animation: sunPulse 4s ease-in-out infinite alternate;
-}
-
-.planet-dot{
-  filter: drop-shadow(0 0 15px currentColor) drop-shadow(0 0 30px currentColor);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.planet-node:hover .planet-dot {
-  transform: scale(1.3);
-  filter: drop-shadow(0 0 25px currentColor) drop-shadow(0 0 50px currentColor);
-}
+/* Glow Filters SVG */
+.orbit-path{fill:none;stroke-width:1;stroke-dasharray:4 8;transition:stroke-opacity .3s;}
+.planet-node{cursor:pointer; outline:none;}
+.planet-dot{transition:r .3s ease;}
+.planet-node:hover .planet-dot{r: 22;}
 .planet-label{
-  font-family:var(--ff-body);font-size:12px;font-weight:700;fill:rgba(255,255,255,0.7);
-  pointer-events:none; text-anchor:middle; alignment-baseline:middle;
-  transition: opacity 0.3s, transform 0.3s;
-  opacity: 0;
-  transform: translateY(-20px);
+  font-family:var(--ff-mono); font-weight:700; font-size:14px; fill:var(--text);
+  opacity:0; transition:opacity .3s; pointer-events:none;
 }
-.planet-node:hover .planet-label {
-  opacity: 1;
-  transform: translateY(-25px);
+.planet-node:hover .planet-label{opacity:1;}
+.sun{
+  filter:url(#neonGlow);
+}
+.sun-pulse {
+  animation: sun-pulse-anim 4s infinite alternate ease-in-out;
+  transform-origin: 450px 450px;
+}
+@keyframes sun-pulse-anim {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.05); opacity: 1; }
 }
 
 .galaxy-legend{
   display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
-  margin-top:-20px;position:relative;z-index:2;
+  margin-top:24px;position:relative;z-index:2;
 }
 .legend-pill{
   background:var(--glass-bg);border:1px solid var(--glass-border);
@@ -371,7 +362,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   background:linear-gradient(90deg, transparent, var(--card-accent,var(--gold)), transparent);
   opacity:0;transition:opacity .4s;
 }
-
 .company-logo{
   width:72px;height:72px;border-radius:20px;
   background:linear-gradient(135deg, var(--panel-2), rgba(255,255,255,0.02));
@@ -382,12 +372,8 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   transition:transform .4s;
 }
 .company-logo img {
-  width: 100%; 
-  height: 100%; 
-  object-fit: contain; 
-  padding: 8px; 
+  width: 100%; height: 100%; object-fit: contain; padding: 8px;
 }
-
 .company-card h3{font-size:18px;font-weight:800;}
 .company-card .tag{color:var(--muted);font-size:13px;line-height:1.7;}
 .badge{
@@ -533,14 +519,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   font-family:var(--ff-display);font-size:28px;color:var(--modal-accent,var(--gold));
   border:1px solid var(--glass-border);box-shadow:0 4px 20px rgba(0,0,0,0.2);
 }
-
-.modal-logo img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  padding: 8px;
-}
-
+.modal-logo img{ width:100%; height:100%; object-fit:contain; padding: 8px;}
 .modal-top h3{font-size:22px;font-weight:800;}
 .modal-top .tag{color:var(--muted);font-size:14px;margin-top:4px;}
 .modal-desc{color:#cfced9;font-size:15.5px;line-height:2;margin:22px 0;}
@@ -562,6 +541,89 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .btn-ghost{border:1px solid var(--glass-border);color:var(--muted);background:var(--glass-bg);}
 
+/* ========== AI CHATBOT UI ========== */
+.ai-fab {
+  position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  box-shadow: 0 4px 20px rgba(232,200,122,0.4), 0 0 40px var(--gold-glow);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.3s cubic-bezier(.16,1,.3,1);
+  color: #1a1306;
+}
+.ai-fab:hover { transform: scale(1.1) translateY(-5px); box-shadow: 0 8px 25px rgba(232,200,122,0.6), 0 0 60px var(--gold-glow); }
+.ai-fab svg { width: 32px; height: 32px; }
+
+.ai-window {
+  position: fixed; bottom: 100px; right: 30px; z-index: 999;
+  width: 360px; height: 500px; max-height: calc(100vh - 120px);
+  background: var(--panel); border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(232,200,122,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none;
+  transition: all 0.4s cubic-bezier(.16,1,.3,1);
+}
+.ai-window.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+
+.ai-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--glass-border);
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.02);
+}
+.ai-header .orb {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--gold);
+  box-shadow: 0 0 10px var(--gold); animation: pulse-dot 2s infinite;
+}
+.ai-header h3 { font-size: 16px; font-weight: 700; color: var(--text); flex: 1; }
+.ai-header .close-btn { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+
+.ai-body {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
+}
+.ai-body::-webkit-scrollbar { width: 4px; }
+
+.chat-bubble {
+  max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6;
+}
+.chat-bubble.bot {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+  color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px;
+}
+.chat-bubble.user {
+  background: var(--gold-glow); border: 1px solid rgba(232,200,122,0.2);
+  color: #fff; align-self: flex-end; border-bottom-right-radius: 4px;
+}
+.typing-indicator {
+  display: flex; gap: 4px; padding: 8px 12px; align-self: flex-start;
+  background: rgba(255,255,255,0.05); border-radius: 16px; border-bottom-left-radius: 4px;
+}
+.typing-indicator span {
+  width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+  animation: typing 1s infinite alternate;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0% { transform: translateY(0); opacity: 0.5; } 100% { transform: translateY(-4px); opacity: 1; } }
+
+.ai-footer {
+  padding: 16px; border-top: 1px solid var(--glass-border); background: rgba(0,0,0,0.2);
+  display: flex; gap: 10px;
+}
+.ai-footer input {
+  flex: 1; background: var(--panel-2); border: 1px solid var(--glass-border);
+  color: var(--text); padding: 12px 16px; border-radius: 100px; outline: none;
+  font-family: inherit; font-size: 14px;
+}
+.ai-footer input:focus { border-color: var(--gold); }
+.ai-footer button {
+  background: var(--gold); border: none; width: 44px; height: 44px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #1a1306; transition: transform 0.2s;
+}
+.ai-footer button:hover { transform: scale(1.05); }
+
 /* ========== FOOTER ========== */
 .site-footer{
   position:relative;z-index:2;text-align:center;padding:40px 20px 50px;color:var(--muted);font-size:12px;
@@ -580,6 +642,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   .company-grid{grid-template-columns:1fr;}
   .values-grid,.services-grid{grid-template-columns:1fr;}
   .people-grid{grid-template-columns:repeat(2,1fr);}
+  .ai-window { right: 10px; left: 10px; width: auto; bottom: 90px; }
 }
 body.lang-ltr{direction:ltr;}
 select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:28px;}
@@ -599,81 +662,12 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   transition:opacity .3s;opacity:0;
 }
 @media (pointer:fine){ .cursor-glow{opacity:1;} }
-
-/* ========== AI CHATBOT ========== */
-.ai-fab {
-  position: fixed; bottom: 30px; right: 30px; z-index: 99;
-  width: 60px; height: 60px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--sector-1), var(--sector-1b));
-  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 32px rgba(139,108,240,0.4), inset 0 0 20px rgba(255,255,255,0.2);
-  color: #fff; transition: transform 0.3s cubic-bezier(.16,1,.3,1), box-shadow 0.3s;
-}
-.ai-fab:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 40px rgba(139,108,240,0.6), inset 0 0 20px rgba(255,255,255,0.4);
-}
-.ai-fab svg { width: 30px; height: 30px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
-
-.ai-chat-window {
-  position: fixed; bottom: 100px; right: 30px; z-index: 98;
-  width: 360px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 120px);
-  background: var(--panel); border: 1px solid var(--glass-border); border-radius: var(--r-lg);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139,108,240,0.15);
-  display: flex; flex-direction: column; overflow: hidden;
-  opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95);
-  transition: all 0.4s cubic-bezier(.16,1,.3,1);
-}
-.ai-chat-window.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-
-.ai-chat-header {
-  padding: 16px 20px; border-bottom: 1px solid var(--glass-border);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(255,255,255,0.02);
-}
-.ai-chat-title { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #fff; font-family: var(--ff-body); }
-.ai-chat-title span { color: var(--sector-1b); font-size: 12px; padding: 2px 8px; border-radius: 100px; background: rgba(93,232,240,0.1); border: 1px solid rgba(93,232,240,0.2); }
-.ai-close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; transition: color 0.2s; }
-.ai-close-btn:hover { color: #fff; }
-
-.ai-chat-body {
-  flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
-}
-.ai-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
-.ai-msg.bot { background: rgba(139,108,240,0.1); border: 1px solid rgba(139,108,240,0.2); align-self: flex-start; border-bottom-left-radius: 4px; color: #eaeaea; }
-.ai-msg.user { background: var(--gold); color: #111; font-weight: 500; align-self: flex-end; border-bottom-right-radius: 4px; }
-
-.ai-chat-input-area {
-  padding: 16px; border-top: 1px solid var(--glass-border); display: flex; gap: 10px;
-  background: rgba(0,0,0,0.2);
-}
-.ai-chat-input-area input {
-  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-  color: #fff; padding: 12px 16px; border-radius: 100px; outline: none; font-family: var(--ff-body);
-  transition: border-color 0.3s;
-}
-.ai-chat-input-area input:focus { border-color: var(--sector-1b); }
-.ai-chat-input-area button {
-  background: linear-gradient(135deg, var(--sector-1), var(--sector-1b));
-  border: none; width: 44px; height: 44px; border-radius: 50%; color: #fff;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  transition: transform 0.2s;
-}
-.ai-chat-input-area button:hover { transform: scale(1.05); }
-.ai-chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-.typing-indicator { display: none; align-items: center; gap: 4px; padding: 12px 16px; background: rgba(139,108,240,0.1); border-radius: 16px; align-self: flex-start; border-bottom-left-radius: 4px; }
-.typing-indicator span { width: 6px; height: 6px; background: var(--sector-1b); border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
-.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-@keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 </style>
 <base target="_blank">
 </head>
 <body>
 
-<!-- INITIAL LOADER (GSAP will fade this out) -->
+<!-- INITIAL LOADER -->
 <div id="init-loader">
   <div class="hero-orb" style="transform: scale(0.6);">
     <div class="home-logo">IX</div>
@@ -822,42 +816,35 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   </div>
 </section>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal-box" id="modalBox"></div>
 </div>
 
+<!-- FOOTER -->
 <footer class="site-footer">
   <span data-i18n="footer_rights">© 2026 إنترسكت. جميع الحقوق محفوظة.</span>
   &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
 </footer>
 
-<!-- ========== AI CHATBOT UI ========== -->
-<button class="ai-fab gs-hover" onclick="toggleAIChat()" aria-label="Ask Intersect AI">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
-    <path d="M12 8v4"></path>
-    <path d="M12 16h.01"></path>
-    <path d="M8 12h.01"></path>
-    <path d="M16 12h.01"></path>
-  </svg>
-</button>
+<!-- AI CHATBOT UI -->
+<div class="ai-fab" onclick="toggleAIChat()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+</div>
 
-<div class="ai-chat-window" id="aiChatWindow" dir="auto">
-  <div class="ai-chat-header">
-    <div class="ai-chat-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sector-1b)" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
-      Intersect AI <span>Powered by Gemini</span>
-    </div>
-    <button class="ai-close-btn" onclick="toggleAIChat()">×</button>
+<div class="ai-window" id="aiChatWindow">
+  <div class="ai-header">
+    <div class="orb"></div>
+    <h3>Intersect AI</h3>
+    <button class="close-btn" onclick="toggleAIChat()">×</button>
   </div>
-  <div class="ai-chat-body" id="aiChatBody">
-    <div class="ai-msg bot">مرحباً! أنا المساعد الذكي لشركة إنترسكت. كيف يمكنني مساعدتك في استكشاف محفظتنا الاستثمارية أو التعرف علينا أكثر؟</div>
-    <div class="typing-indicator" id="aiTyping"><span></span><span></span><span></span></div>
+  <div class="ai-body" id="aiChatBody">
+    <div class="chat-bubble bot">مرحباً! أنا المساعد الذكي لإنترسكت. كيف يمكنني مساعدتك للتعرف على محفظتنا أو قطاعاتنا؟ 🌌</div>
   </div>
-  <div class="ai-chat-input-area">
-    <input type="text" id="aiChatInput" placeholder="Ask about our companies..." onkeypress="if(event.key === 'Enter') sendAIMessage()">
-    <button id="aiSendBtn" onclick="sendAIMessage()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+  <div class="ai-footer">
+    <input type="text" id="aiChatInput" placeholder="اسألني أي شيء..." onkeydown="if(event.key==='Enter') sendAIMessage()">
+    <button onclick="sendAIMessage()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
     </button>
   </div>
 </div>
@@ -868,156 +855,17 @@ const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let DATA = { settings:{}, sectors:[], companies:[], consulting:[] };
+let DATA = { settings:{}, sectors:[], companies:[], consulting:[], knowledge:[] };
 
 /* ============ URL HELPER FIX ============ */
 function makeValidUrl(url) {
   if (!url) return '#';
   url = url.trim();
-  if (!/^https?:\/\//i.test(url)) {
-    return 'https://' + url;
-  }
+  if (!/^https?:\/\//i.test(url)) return 'https://' + url;
   return url;
 }
 
-/* ============ GEMINI AI INTEGRATION ============ */
-const GEMINI_API_KEY = "AQ.Ab8RN6JGCqU-Ptqu-cQoCaeejGm-iIEtLsenyZ1Cfr-aATh27Q"; 
-let aiChatHistory = [];
-let isChatOpen = false;
-
-function toggleAIChat() {
-  const windowEl = document.getElementById('aiChatWindow');
-  isChatOpen = !isChatOpen;
-  if (isChatOpen) {
-    windowEl.classList.add('open');
-    document.getElementById('aiChatInput').focus();
-  } else {
-    windowEl.classList.remove('open');
-  }
-}
-
-function buildAIContext() {
-  const brand = DATA.settings.brand || {};
-  const about = DATA.settings.vision_mission || {};
-  
-  let contextStr = `Company Name: Intersect Holding Company\n`;
-  contextStr += `Tagline: ${brand.tagline_en || brand.tagline_ar || ''}\n`;
-  contextStr += `Vision: ${about.vision_en || about.vision_ar || ''}\n`;
-  contextStr += `Mission: ${about.mission_en || about.mission_ar || ''}\n\n`;
-  
-  contextStr += `Sectors We Operate In:\n`;
-  DATA.sectors.forEach(s => {
-    contextStr += `- ${s.name_en || s.name_ar}: ${s.description_en || s.description_ar || ''}\n`;
-  });
-  
-  contextStr += `\nPortfolio Companies:\n`;
-  DATA.companies.forEach(c => {
-    const sec = DATA.sectors.find(s => s.id === c.sector_id);
-    contextStr += `- ${c.name_en || c.name_ar} (Sector: ${sec ? (sec.name_en || sec.name_ar) : 'Unknown'}): ${c.description_en || c.description_ar || c.tagline_en || ''}. Relationship: ${c.relationship_type}\n`;
-  });
-
-  return contextStr;
-}
-
-async function sendAIMessage() {
-  const inputEl = document.getElementById('aiChatInput');
-  const sendBtn = document.getElementById('aiSendBtn');
-  const text = inputEl.value.trim();
-  if (!text) return;
-
-  appendMessage(text, 'user');
-  inputEl.value = '';
-  inputEl.disabled = true;
-  sendBtn.disabled = true;
-
-  const typingInd = document.getElementById('aiTyping');
-  typingInd.style.display = 'flex';
-  scrollToBottom();
-
-  if(!GEMINI_API_KEY) {
-      setTimeout(() => {
-          appendMessage("عذراً، لم يتم إعداد مفتاح API الخاص بالذكاء الاصطناعي (Gemini) بعد.", 'bot');
-          typingInd.style.display = 'none';
-          inputEl.disabled = false; sendBtn.disabled = false; inputEl.focus(); scrollToBottom();
-      }, 1000);
-      return;
-  }
-
-  try {
-    const response = await fetchWithRetry(text);
-    if (response) {
-      appendMessage(response, 'bot');
-      aiChatHistory.push({ role: "user", parts: [{ text: text }] });
-      aiChatHistory.push({ role: "model", parts: [{ text: response }] });
-    } else {
-      appendMessage("عذراً، أواجه مشكلة في الاتصال حالياً.", 'bot');
-    }
-  } catch (error) {
-    console.error("Gemini Error:", error);
-    appendMessage("حدث خطأ أثناء إنشاء الرد.", 'bot');
-  } finally {
-    typingInd.style.display = 'none';
-    inputEl.disabled = false;
-    sendBtn.disabled = false;
-    inputEl.focus();
-    scrollToBottom();
-  }
-}
-
-function appendMessage(text, sender) {
-  const body = document.getElementById('aiChatBody');
-  const typingInd = document.getElementById('aiTyping');
-  const msgDiv = document.createElement('div');
-  msgDiv.className = `ai-msg ${sender}`;
-  msgDiv.textContent = text;
-  body.insertBefore(msgDiv, typingInd);
-  scrollToBottom();
-}
-
-function scrollToBottom() {
-  const body = document.getElementById('aiChatBody');
-  body.scrollTop = body.scrollHeight;
-}
-
-async function fetchWithRetry(userText, retries = 3, delay = 1000) {
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-  
-  const systemInstructionText = `You are 'Intersect AI', the official AI assistant for Intersect Holding Company. 
-  Your job is to answer visitor questions accurately based ONLY on the provided context about our company, sectors, and portfolio. 
-  If someone asks something unrelated to Intersect, politely steer the conversation back. 
-  Keep your answers concise, professional, and friendly. 
-  IMPORTANT: Always reply in the same language the user used to ask the question (Translate your knowledge to Arabic if they ask in Arabic, etc.).
-  
-  CONTEXT:
-  ${buildAIContext()}`;
-
-  const payload = {
-    contents: [...aiChatHistory, { role: "user", parts: [{ text: userText }] }],
-    systemInstruction: { parts: [{ text: systemInstructionText }] }
-  };
-
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      const result = await response.json();
-      if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts) {
-        return result.candidates[0].content.parts[0].text;
-      }
-      throw new Error("Invalid response structure");
-    } catch (e) {
-      if (i === retries - 1) throw e;
-      await new Promise(res => setTimeout(res, delay * Math.pow(2, i))); 
-    }
-  }
-}
-
-
-/* ============ PARTICLE SYSTEM (METEORS INCLUDED) ============ */
+/* ============ PARTICLE SYSTEM (Meteors & Stars) ============ */
 const pCanvas = document.getElementById('particleCanvas');
 const pCtx = pCanvas.getContext('2d');
 let particles = [];
@@ -1038,22 +886,26 @@ function resizePCanvas(){
     pulse: Math.random() * Math.PI * 2
   }));
 }
+
 function spawnMeteor() {
   meteors.push({
-    x: Math.random() * pCanvas.width + pCanvas.width/2,
+    x: Math.random() * pCanvas.width * 1.5,
     y: -50,
     vx: - (Math.random() * 4 + 4),
     vy: Math.random() * 4 + 4,
-    length: Math.random() * 80 + 40,
-    life: 1,
-    fadeRate: Math.random() * 0.02 + 0.01
+    len: Math.random() * 80 + 40,
+    life: 1
   });
+  setTimeout(spawnMeteor, Math.random() * 4000 + 2000);
 }
+setTimeout(spawnMeteor, 1000);
+
 function drawParticles(){
   pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
   pCtx.fillStyle = '#020308';
   pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
 
+  // Stars & Constellations
   for(let i=0; i<particles.length; i++){
     for(let j=i+1; j<particles.length; j++){
       const dx = particles[i].x - particles[j].x;
@@ -1088,21 +940,25 @@ function drawParticles(){
   });
 
   // Meteors
-  if(Math.random() < 0.015) spawnMeteor();
-  for(let i=meteors.length-1; i>=0; i--){
+  for (let i = meteors.length - 1; i >= 0; i--) {
     let m = meteors[i];
-    m.x += m.vx; m.y += m.vy; m.life -= m.fadeRate;
-    if(m.life <= 0 || m.y > pCanvas.height || m.x < 0) { meteors.splice(i,1); continue; }
+    m.x += m.vx; m.y += m.vy; m.life -= 0.01;
     
-    pCtx.beginPath();
-    pCtx.moveTo(m.x, m.y);
-    pCtx.lineTo(m.x - (m.vx * m.length/10), m.y - (m.vy * m.length/10));
-    
-    let grad = pCtx.createLinearGradient(m.x, m.y, m.x - (m.vx * m.length/10), m.y - (m.vy * m.length/10));
+    if (m.life <= 0 || m.x < -100 || m.y > pCanvas.height + 100) {
+      meteors.splice(i, 1);
+      continue;
+    }
+
+    const grad = pCtx.createLinearGradient(m.x, m.y, m.x - m.vx * m.len * 0.1, m.y - m.vy * m.len * 0.1);
     grad.addColorStop(0, `rgba(255, 255, 255, ${m.life})`);
     grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    
-    pCtx.strokeStyle = grad; pCtx.lineWidth = 1.5; pCtx.stroke();
+
+    pCtx.beginPath();
+    pCtx.moveTo(m.x, m.y);
+    pCtx.lineTo(m.x - m.vx * m.len * 0.1, m.y - m.vy * m.len * 0.1);
+    pCtx.strokeStyle = grad;
+    pCtx.lineWidth = 1.5;
+    pCtx.stroke();
   }
 
   requestAnimationFrame(drawParticles);
@@ -1123,8 +979,8 @@ const LANGS = [
   {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
 ];
 const I18N = {
-  ar:{brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',industries_title:'القطاعات التي نخدمها',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',kind_client:'عميل',kind_partner:'شريك استراتيجي',scroll_hint:'استكشف'},
-  en:{brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',industries_title:'Industries We Serve',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',portfolio_caption:'🌌 Intersect Interactive Portfolio',kind_client:'Client',kind_partner:'Strategic Partner',scroll_hint:'Explore'}
+  ar:{brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',rel_owned:'مملوكة',rel_jv:'شراكة استثمارية',rel_collaboration:'تعاون',rel_subsidiary:'تابعة',rel_initiative:'مبادرة',loading:'جارٍ التحميل…',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',industries_title:'القطاعات التي نخدمها',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',portfolio_caption:'🌌 بروفايل إنترسكت التفاعلي',kind_client:'عميل',kind_partner:'شريك استراتيجي',scroll_hint:'استكشف', none:'بدون تصنيف'},
+  en:{brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',rel_owned:'Owned',rel_jv:'Joint Venture',rel_collaboration:'Collaboration',rel_subsidiary:'Subsidiary',rel_initiative:'Initiative',loading:'Loading…',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',industries_title:'Industries We Serve',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',portfolio_caption:'🌌 Intersect Interactive Portfolio',kind_client:'Client',kind_partner:'Strategic Partner',scroll_hint:'Explore', none:''}
 };
 let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'ar';
 
@@ -1187,14 +1043,16 @@ function autoTranslateField(el, obj, field){
 /* ============ DATA LOAD & INITIAL GSAP SEQUENCE ============ */
 async function loadData(){
   try{
-    const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}] = await Promise.all([
+    const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}, {data:knowledge}] = await Promise.all([
       sb.from('intersect_site_settings').select('*'),
       sb.from('intersect_sectors').select('*').eq('is_active',true).order('sort_order'),
       sb.from('intersect_companies').select('*').eq('is_active',true).order('sort_order'),
-      sb.from('intersect_consulting').select('*').eq('is_active',true).order('sort_order')
+      sb.from('intersect_consulting').select('*').eq('is_active',true).order('sort_order'),
+      sb.from('intersect_knowledge_base').select('*')
     ]);
     (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
-    DATA.sectors = sectors || []; DATA.companies = companies || []; DATA.consulting = consulting || [];
+    DATA.sectors = sectors || []; DATA.companies = companies || []; 
+    DATA.consulting = consulting || []; DATA.knowledge = knowledge || [];
   }catch(e){ console.error('Supabase load error', e); }
   renderAll();
   
@@ -1283,12 +1141,20 @@ function renderHome(){
   taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default'); aboutEl.textContent = tf(brand,'about') || '';
   if(brand.tagline_ar || brand.tagline_en) autoTranslateField(taglineEl, brand, 'tagline');
   if(brand.about_ar || brand.about_en) autoTranslateField(aboutEl, brand, 'about');
-  const logoEl = document.getElementById('homeLogo'); const wordmarkEl = document.getElementById('homeWordmark');
+  
+  const logoEl = document.getElementById('homeLogo'); 
+  const wordmarkEl = document.getElementById('homeWordmark');
+  
   if(brand.logo_url){
-    logoEl.classList.add('has-image'); logoEl.innerHTML = `<img src="${brand.logo_url}" alt="Intersect">`; wordmarkEl.style.display = 'none';
+    logoEl.classList.add('has-image'); 
+    logoEl.innerHTML = `<img src="${brand.logo_url}" alt="Intersect">`; 
+    wordmarkEl.style.display = 'none';
   } else {
-    logoEl.classList.remove('has-image'); logoEl.textContent = 'IX'; wordmarkEl.style.display = '';
+    logoEl.classList.remove('has-image'); 
+    logoEl.textContent = 'IX'; 
+    wordmarkEl.style.display = '';
   }
+  
   document.getElementById('homeStats').innerHTML = `
     <div class="home-stat"><b>${DATA.companies.length}</b><span>${i18n('stat_ventures')}</span></div>
     <div class="home-stat"><b>${DATA.sectors.length}</b><span>${i18n('stat_sectors')}</span></div>
@@ -1296,72 +1162,68 @@ function renderHome(){
   `;
 }
 
-const orbitOffsets = [{ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},{ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}];
+const orbitOffsets = [{ox:0,oy:0,r:130},{ox:46,oy:-34,r:190},{ox:-42,oy:32,r:250},{ox:36,oy:40,r:310},{ox:-40,oy:-38,r:370},{ox:24,oy:-24,r:420}];
 function renderGalaxy(){
   const wrap = document.getElementById('orbitWrap'); const legend = document.getElementById('galaxyLegend');
   if(!wrap) return; const cx=450, cy=450;
-  
-  // Center logo from Admin (if exists)
   const brand = DATA.settings.brand || {};
-  const centerLogo = brand.galaxy_center_logo_url;
   
-  let svg = `<svg viewBox="0 0 900 900">
+  let svg = `
+  <svg viewBox="0 0 900 900">
     <defs>
-      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff8d6" stop-opacity="1"/>
-        <stop offset="40%" stop-color="#e8c87a" stop-opacity="0.8"/>
-        <stop offset="100%" stop-color="#b89850" stop-opacity="0"/>
-      </radialGradient>
       <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+        <feGaussianBlur stdDeviation="8" result="blur1" />
+        <feGaussianBlur stdDeviation="15" result="blur2" />
+        <feGaussianBlur stdDeviation="25" result="blur3" />
         <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="blur3" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="blur1" />
+          <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff5d1" />
+        <stop offset="60%" stop-color="#e8c87a" />
+        <stop offset="100%" stop-color="#b89850" />
+      </radialGradient>
     </defs>
     
-    <!-- Central Galactic Core -->
-    <g class="sun-image" style="transform-origin: ${cx}px ${cy}px;">
-      <circle cx="${cx}" cy="${cy}" r="45" fill="url(#sunGlow)"/>
-      ${centerLogo 
-        ? `<image href="${centerLogo}" x="${cx-22}" y="${cy-22}" width="44" height="44" preserveAspectRatio="xMidYMid slice" clip-path="inset(0% round 50%)"/>` 
-        : `<text x="${cx}" y="${cy+7}" text-anchor="middle" font-family="Aref Ruqaa" font-size="20" fill="#1a1306" font-weight="700">IX</text>`
+    <g class="sun-pulse">
+      <circle cx="${cx}" cy="${cy}" r="34" fill="url(#sunGrad)" filter="url(#neonGlow)"/>
+      ${brand.galaxy_center_logo_url 
+        ? `<image href="${brand.galaxy_center_logo_url}" x="${cx-24}" y="${cy-24}" height="48" width="48" preserveAspectRatio="xMidYMid slice" clip-path="circle(24px at 24px 24px)"/>` 
+        : `<text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="20" fill="#1a1306" font-weight="700">IX</text>`
       }
+      
       <!-- Galactic Rings -->
-      <circle cx="${cx}" cy="${cy}" r="60" stroke="#e8c87a" stroke-width="1" fill="none" stroke-opacity="0.4" stroke-dasharray="2,6">
-        <animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="20s" repeatCount="indefinite"/>
+      <circle cx="${cx}" cy="${cy}" r="55" stroke="#e8c87a" stroke-width="1" stroke-dasharray="10 15" fill="none" opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="20s" repeatCount="indefinite" />
       </circle>
-      <circle cx="${cx}" cy="${cy}" r="75" stroke="#e8c87a" stroke-width="0.5" fill="none" stroke-opacity="0.2" stroke-dasharray="10,4">
-        <animateTransform attributeName="transform" type="rotate" from="360 ${cx} ${cy}" to="0 ${cx} ${cy}" dur="30s" repeatCount="indefinite"/>
+      <circle cx="${cx}" cy="${cy}" r="75" stroke="#e8c87a" stroke-width="0.5" stroke-dasharray="2 6" fill="none" opacity="0.2">
+        <animateTransform attributeName="transform" type="rotate" from="360 ${cx} ${cy}" to="0 ${cx} ${cy}" dur="35s" repeatCount="indefinite" />
       </circle>
-    </g>`;
-
-  // Planets & Orbits
+    </g>
+  `;
+  
   DATA.sectors.forEach((sector,i)=>{
     const off = orbitOffsets[i % orbitOffsets.length]; const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
     const dur = 40 + i*9; const color = sector.color_primary || '#8b6cf0';
-    
-    // Neon light orbit path
-    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-width="1.5" stroke-opacity="0.15" fill="none" stroke-dasharray="4,8"/>`;
-    
+    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-opacity="0.4"/>`;
     const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
-    
     svg += `<g class="planet-node gs-hover" onclick="showSector('${sector.slug}')">
-      <circle class="planet-dot" r="14" fill="${color}" style="color:${color}" filter="url(#neonGlow)">
+      <circle class="planet-dot" r="16" fill="${color}" style="color:${color}">
         <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
       </circle>
-      <text class="planet-label" x="0" y="0">
+      <text class="planet-label" x="0" y="-28" text-anchor="middle">
         ${tf(sector,'name')}
         <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/>
       </text>
     </g>`;
   });
-  
   svg += `</svg>`; wrap.innerHTML = svg;
-  
   if(legend){
-    legend.innerHTML = DATA.sectors.map(sector=>`<button class="legend-pill gs-hover" onclick="showSector('${sector.slug}')">${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}<span id="leg-${sector.id}">${tf(sector,'name')}</span></button>`).join('');
+    legend.innerHTML = DATA.sectors.map(sector=>`<button class="legend-pill" onclick="showSector('${sector.slug}')">${miniIcon(pickIconKeys(sector)[0], sector.color_primary, 18)}<span id="leg-${sector.id}">${tf(sector,'name')}</span></button>`).join('');
     DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
   }
 }
@@ -1405,6 +1267,155 @@ function relationshipLabel(c){
   return i18n(map[c.relationship_type] || 'rel_owned');
 }
 
+/* ============ AI CHATBOT (GEMINI) ============ */
+const GEMINI_API_KEY = "AQ.Ab8RN6JGCqU-Ptqu-cQoCaeejGm-iIEtLsenyZ1Cfr-aATh27Q"; 
+let aiChatHistory = [];
+let isChatOpen = false;
+
+function toggleAIChat() {
+  const windowEl = document.getElementById('aiChatWindow');
+  isChatOpen = !isChatOpen;
+  if (isChatOpen) {
+    windowEl.classList.add('open');
+    document.getElementById('aiChatInput').focus();
+  } else {
+    windowEl.classList.remove('open');
+  }
+}
+
+function buildAIContext() {
+  const brand = DATA.settings.brand || {};
+  const about = DATA.settings.vision_mission || {};
+  
+  let contextStr = `Company Name: Intersect Holding Company\n`;
+  contextStr += `Tagline: ${brand.tagline_en || brand.tagline_ar || ''}\n`;
+  contextStr += `Vision: ${about.vision_en || about.vision_ar || ''}\n`;
+  contextStr += `Mission: ${about.mission_en || about.mission_ar || ''}\n\n`;
+  
+  contextStr += `Sectors We Operate In:\n`;
+  DATA.sectors.forEach(s => {
+    contextStr += `- ${s.name_en || s.name_ar}: ${s.description_en || s.description_ar || ''}\n`;
+  });
+  
+  contextStr += `\nPortfolio Companies:\n`;
+  DATA.companies.forEach(c => {
+    const sec = DATA.sectors.find(s => s.id === c.sector_id);
+    contextStr += `- ${c.name_en || c.name_ar} (Sector: ${sec ? (sec.name_en || sec.name_ar) : 'Unknown'}): ${c.description_en || c.description_ar || c.tagline_en || ''}. Relationship: ${c.relationship_type}\n`;
+  });
+
+  if(DATA.knowledge && DATA.knowledge.length > 0){
+      contextStr += `\nInternal Knowledge Base & Additional Information:\n`;
+      DATA.knowledge.forEach(k => {
+          contextStr += `Title: ${k.title_en || k.title_ar}\nContent: ${k.content_en || k.content_ar}\n\n`;
+      });
+  }
+
+  return contextStr;
+}
+
+async function fetchWithRetry(url, options, maxRetries = 3) {
+    let attempt = 0;
+    while (attempt < maxRetries) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.warn(`Attempt ${attempt + 1} failed:`, error.message);
+            attempt++;
+            if (attempt >= maxRetries) {
+                console.error("Max retries reached.");
+                throw error;
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+    }
+}
+
+async function sendAIMessage() {
+  const inputEl = document.getElementById('aiChatInput');
+  const msg = inputEl.value.trim();
+  if(!msg) return;
+  
+  inputEl.value = '';
+  appendChatMsg(msg, 'user');
+  
+  const typingId = showTypingIndicator();
+  
+  const systemInstruction = `You are 'Intersect AI', the official AI assistant for Intersect Holding Company. 
+  Your job is to answer user questions accurately based ONLY on the context provided below about our company, sectors, knowledge base and portfolio. 
+  If asked about something unrelated, politely steer the conversation back to Intersect. Keep answers concise, professional, and friendly. 
+  IMPORTANT: ALWAYS answer in the SAME LANGUAGE the user asks in (If they ask in Arabic, answer in Arabic. If English, answer in English).
+  
+  CONTEXT DATA:
+  ${buildAIContext()}`;
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    
+    let contents = aiChatHistory.map(h => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.text }] }));
+    contents.push({ role: 'user', parts: [{ text: msg }] });
+
+    const payload = {
+      systemInstruction: { parts: [{ text: systemInstruction }] },
+      contents: contents,
+      generationConfig: { temperature: 0.2, maxOutputTokens: 250 }
+    };
+
+    const data = await fetchWithRetry(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const reply = data.candidates[0].content.parts[0].text;
+    
+    aiChatHistory.push({role: 'user', text: msg});
+    aiChatHistory.push({role: 'bot', text: reply});
+    
+    removeTypingIndicator(typingId);
+    appendChatMsg(reply, 'bot');
+    
+  } catch (err) {
+    console.error("AI Error:", err);
+    removeTypingIndicator(typingId);
+    appendChatMsg(LANG === 'ar' ? "عذراً، أواجه مشكلة في الاتصال حالياً. يرجى المحاولة لاحقاً." : "Sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
+  }
+}
+
+function appendChatMsg(text, sender) {
+  const body = document.getElementById('aiChatBody');
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${sender}`;
+  
+  // Basic markdown to HTML for bold text
+  const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  div.innerHTML = formattedText;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTypingIndicator() {
+  const body = document.getElementById('aiChatBody');
+  const div = document.createElement('div');
+  const id = 'typing-' + Date.now();
+  div.id = id;
+  div.className = 'typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return id;
+}
+
+function removeTypingIndicator(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
 /* ============ MODAL (GSAP ENABLED) ============ */
 function openCompany(id){
   const c = DATA.companies.find(x=>x.id===id); if(!c) return;
@@ -1437,7 +1448,6 @@ function openCompany(id){
   autoTranslateField(document.getElementById('modalDesc'), c, 'description');
 }
 
-/* للشركات الاستشارية / الشراكات */
 function openConsulting(id){
   const c = DATA.consulting.find(x=>x.id===id);
   if(!c) return;
@@ -1447,8 +1457,15 @@ function openConsulting(id){
   let relLabel = '';
   if(c.relationship_kind === 'partner') relLabel = i18n('kind_partner');
   else if(c.relationship_kind === 'client') relLabel = i18n('kind_client');
-  else if(c.relationship_kind === 'none') relLabel = '';
-  else if(c.relationship_kind === 'custom') relLabel = c.custom_relationship_kind || '';
+  else if(c.relationship_kind === 'custom' && c.custom_relationship_kind) {
+      relLabel = c.custom_relationship_kind;
+      // محاولة الترجمة التلقائية إن لزم
+      if(LANG !== 'ar') {
+         const manual = c.translations && c.translations[LANG] && c.translations[LANG].custom_relationship_kind;
+         if(manual) relLabel = manual;
+         else mtTranslate(c.custom_relationship_kind, LANG).then(t => { const el = document.getElementById('modConCustRel'); if(el) el.textContent = t; });
+      }
+  }
 
   box.style.setProperty('--modal-accent', '#9ba3b8');
   box.innerHTML = `
@@ -1457,7 +1474,7 @@ function openConsulting(id){
       <div class="modal-logo" style="--modal-accent:#9ba3b8">${c.logo_url?`<img src="${c.logo_url}">`:(tf(c,'name')||'?').charAt(0)}</div>
       <div><h3 id="modalConName">${tf(c,'name')}</h3><div class="tag" id="modalConType">${tf(c,'type')||''}</div></div>
     </div>
-    ${relLabel ? `<span class="badge" id="modalConRel" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
+    ${relLabel ? `<span class="badge" id="modConCustRel" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
     <p class="modal-desc" id="modalConDesc">${tf(c,'description')||''}</p>
     <div class="modal-actions">
       ${c.website_url?`<a class="btn-primary gs-hover" style="--modal-accent:#9ba3b8" href="${makeValidUrl(c.website_url)}" target="_blank" rel="noopener">${i18n('visit_website')}</a>`:''}
@@ -1471,10 +1488,6 @@ function openConsulting(id){
   autoTranslateField(document.getElementById('modalConName'), c, 'name');
   autoTranslateField(document.getElementById('modalConDesc'), c, 'description');
   autoTranslateField(document.getElementById('modalConType'), c, 'type');
-  
-  if (c.relationship_kind === 'custom' && LANG !== 'ar' && c.custom_relationship_kind) {
-      autoTranslateInto(document.getElementById('modalConRel'), c.custom_relationship_kind);
-  }
 }
 
 function closeModal(){
@@ -1485,42 +1498,6 @@ function closeModal(){
 }
 
 /* ============ ICONS & UTILS ============ */
-const NEON_ICONS = {
-  ai: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="13" r="5"/><circle cx="13" cy="47" r="5"/><circle cx="51" cy="47" r="5"/><path d="M32 18 L17 43 M32 18 L47 43 M18 47 H46"/><circle cx="32" cy="33" r="2.2" fill="currentColor" stroke="none"/></svg>`,
-  health: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 34 H19 L25 19 L34 47 L40 34 H59"/><path d="M32 8 V18 M27 13 H37" stroke-width="3.2"/></svg>`,
-  tourism: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="32" cy="32" r="24"/><path d="M32 10 V17 M32 47 V54 M10 32 H17 M47 32 H54"/><path d="M41 23 L27 29 L23 43 L37 37 Z" stroke-linejoin="round"/></svg>`,
-  mobility: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 20 H32 M5 32 H40 M5 44 H24"/><path d="M44 32 H58 M50 24 L58 32 L50 40" stroke-linejoin="round"/></svg>`,
-  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`
-};
-function miniIcon(key, color, size){ return `<span class="mini-icon" style="color:${color||'#e8c87a'};width:${size}px;height:${size}px;">${NEON_ICONS[key] || NEON_ICONS.generic}</span>`; }
-function pickIconKeys(s){ return (s.icon_keys&&s.icon_keys.length) ? s.icon_keys : ['generic']; }
-
-function applyAmbient(c1,c2,iconKeys){
-  let amb = document.getElementById('sectorAmbient');
-  if(!amb){ amb = document.createElement('div'); amb.className='sector-ambient'; amb.id='sectorAmbient'; document.body.appendChild(amb); }
-  amb.style.background = `radial-gradient(circle at 50% 20%, ${c1}22, transparent 55%), radial-gradient(circle at 80% 80%, ${c2}18, transparent 50%)`;
-  let field = '<div class="icon-field" id="iconField">';
-  for(let i=0;i<14;i++){
-    const svg = NEON_ICONS[iconKeys[Math.floor(Math.random()*iconKeys.length)]] || NEON_ICONS.generic;
-    field += `<span class="floating-icon" style="--x:${Math.random()*100}%;--y:${Math.random()*100}%;--sz:${26+Math.random()*44}px;--op:${0.22+Math.random()*0.28};--dur:${14+Math.random()*16}s;--delay:-${Math.random()*14}s;--dx:${(Math.random()*60-30).toFixed(0)}px;--dy:${(Math.random()*60-30).toFixed(0)}px;--rot:${(Math.random()*24-12).toFixed(0)}deg;color:${i%2===0?c1:c2}">${svg}</span>`;
-  }
-  amb.innerHTML = field + '</div>';
-  requestAnimationFrame(()=>amb.classList.add('active'));
-}
-function clearAmbient(){ const amb = document.getElementById('sectorAmbient'); if(amb) amb.classList.remove('active'); }
-
-let parallaxRAF = null;
-document.addEventListener('mousemove', e=>{
-  if(parallaxRAF) return;
-  parallaxRAF = requestAnimationFrame(()=>{
-    const field = document.getElementById('iconField');
-    if(field) field.style.transform = `translate(${(e.clientX/window.innerWidth-0.5)*26}px, ${(e.clientY/window.innerHeight-0.5)*26}px)`;
-    parallaxRAF = null;
-  });
-});
-
-/* ============ OTHER VIEWS (CONSULTING & ABOUT) ============ */
-function bl(obj, baseKey){ return obj[baseKey+'_en'] || obj[baseKey+'_ar'] || ''; }
 function renderAbout(){
   const brand = DATA.settings.brand || {};
   document.getElementById('aboutLead').textContent = tf(brand,'about') || '';
@@ -1529,37 +1506,25 @@ function renderAbout(){
   document.getElementById('missionText').textContent = bl(vm,'mission');
 
   document.getElementById('valuesGrid').innerHTML = (DATA.settings.core_values||[]).map((v,i)=>`
-    <div class="value-card gs-card"><h4>◆ <span>${bl(v,'title')}</span></h4><p>${bl(v,'desc')}</p></div>
+    <div class="value-card"><h4>◆ <span>${bl(v,'title')}</span></h4><p>${bl(v,'desc')}</p></div>
   `).join('');
 
   document.getElementById('servicesGrid').innerHTML = (DATA.settings.services||[]).map((s,i)=>`
-    <div class="service-card gs-card"><h4><span class="snum">0${i+1}</span> <span>${bl(s,'title')}</span></h4><p>${bl(s,'desc')}</p></div>
+    <div class="service-card"><h4><span class="snum">0${i+1}</span> <span>${bl(s,'title')}</span></h4><p>${bl(s,'desc')}</p></div>
   `).join('');
 
-  document.getElementById('industriesCloud').innerHTML = (DATA.settings.industries||[]).map(name=>`<span class="gs-hover">${name}</span>`).join('');
+  document.getElementById('industriesCloud').innerHTML = (DATA.settings.industries||[]).map(name=>`<span>${name}</span>`).join('');
   document.getElementById('statsGrid').innerHTML = (DATA.settings.stats||[]).map(s=>`
-    <div class="stat-block gs-card"><b>${s.value}</b><span>${bl(s,'label')}</span></div>
+    <div class="stat-block"><b>${s.value}</b><span>${bl(s,'label')}</span></div>
   `).join('');
 
   document.getElementById('teamGrid').innerHTML = (DATA.settings.team||[]).map(p=>`
-    <div class="person-card gs-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div></div>
+    <div class="person-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div></div>
   `).join('');
 
-  document.getElementById('advisorsGrid').innerHTML = (DATA.settings.advisors||[]).map(p=>`
-    <div class="person-card gs-card"><div class="person-photo">${p.photo_url?`<img src="${p.photo_url}">`:(p.name||'?').charAt(0)}</div><h4>${p.name||''}</h4><div class="ptitle">${bl(p,'title')}</div><div class="pbio">${bl(p,'bio')}</div></div>
-  `).join('');
-
-  document.getElementById('logosCloud').innerHTML = (DATA.settings.client_logos||[]).map(l=>{
-    const name = typeof l === 'string' ? l : (l.name||'');
-    const logoUrl = typeof l === 'string' ? null : l.logo_url;
-    return logoUrl ? `<span class="logo-chip-img gs-hover"><img src="${logoUrl}" alt="${name}"></span>` : `<span class="gs-hover">${name}</span>`;
-  }).join('');
-
-  const contact = DATA.settings.contact_info || {};
   document.getElementById('contactRow').innerHTML = `
-    ${contact.website?`<a class="gs-hover" href="${makeValidUrl(contact.website)}" target="_blank" rel="noopener">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`:''}
-    ${contact.email?`<a class="gs-hover" href="mailto:${contact.email}">✉️ ${contact.email}</a>`:''}
-    ${contact.phone?`<a class="gs-hover" href="tel:${contact.phone.replace(/\s/g,'')}">📞 ${contact.phone}</a>`:''}
+    ${DATA.settings.contact_info?.website?`<a class="gs-hover" href="${makeValidUrl(DATA.settings.contact_info.website)}" target="_blank" rel="noopener">🌐 ${DATA.settings.contact_info.website.replace(/^https?:\/\//,'')}</a>`:''}
+    ${DATA.settings.contact_info?.email?`<a class="gs-hover" href="mailto:${DATA.settings.contact_info.email}">✉️ ${DATA.settings.contact_info.email}</a>`:''}
   `;
   setTimeout(attachGSAPInteractions, 50);
 }
@@ -1567,9 +1532,11 @@ function renderAbout(){
 function renderAll(){
   renderHome(); renderGalaxy();
   if(currentSector) showSector(currentSector.slug, true);
+  if(document.getElementById('view-about').classList.contains('active')) renderAbout();
   
+  // Render Consulting View correctly
   const grid = document.getElementById('consultingGrid');
-  if(document.getElementById('view-consulting').classList.contains('active')){
+  if(grid && document.getElementById('view-consulting').classList.contains('active')) {
       if(DATA.consulting.length===0){
         grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`;
       } else {
@@ -1579,28 +1546,23 @@ function renderAll(){
           else if(c.relationship_kind === 'client') relLabel = i18n('kind_client');
           else if(c.relationship_kind === 'custom') relLabel = c.custom_relationship_kind || '';
           
-          return `
-          <div class="company-card gs-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
+          return `<div class="company-card" style="--card-accent:#9ba3b8" onclick="openConsulting('${c.id}')">
             <div class="company-logo" style="--card-accent:#9ba3b8">
               ${c.logo_url ? `<img src="${c.logo_url}">` : (tf(c,'name')||'?').charAt(0)}
             </div>
             <h3 id="con-${c.id}">${tf(c,'name')}</h3>
             <div class="tag" id="cot-${c.id}">${tf(c,'type')||''}</div>
-            ${relLabel ? `<span class="badge" id="crl-${c.id}" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
-          </div>
-        `}).join('');
+            ${relLabel ? `<span class="badge" style="--card-accent:#9ba3b8">${relLabel}</span>` : ''}
+          </div>`;
+        }).join('');
         
         DATA.consulting.forEach(c=>{
           autoTranslateField(document.getElementById('con-'+c.id), c, 'name');
           autoTranslateField(document.getElementById('cot-'+c.id), c, 'type');
-          if (c.relationship_kind === 'custom' && LANG !== 'ar' && c.custom_relationship_kind) {
-              autoTranslateInto(document.getElementById('crl-'+c.id), c.custom_relationship_kind);
-          }
         });
+        setTimeout(attachGSAPInteractions, 50);
       }
   }
-  
-  if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
 // Start

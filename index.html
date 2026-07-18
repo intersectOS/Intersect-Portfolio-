@@ -351,7 +351,7 @@ body.lang-ltr .chat-window { right: auto; left: 30px; transform-origin: bottom l
   flex: 1; overflow-y: auto; padding: 20px;
   display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
 }
-.chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+.chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;}
 .chat-msg a { color: var(--gold); text-decoration: underline; }
 .chat-msg.bot { background: var(--panel-2); align-self: flex-start; border-bottom-right-radius: 4px; color: var(--text); }
 body.lang-ltr .chat-msg.bot { border-bottom-right-radius: 16px; border-bottom-left-radius: 4px; }
@@ -498,9 +498,10 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   
   <div class="about-block"><div class="stats-grid" id="statsGrid"></div></div>
   
-  <!-- TEAM -->
+  <!-- TEAM (Restored) -->
   <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="team_title">Our People</h3><div class="people-grid" id="teamGrid"></div></div>
-  <!-- ADVISORS -->
+  
+  <!-- ADVISORS (Restored) -->
   <div class="about-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3><div class="people-grid" id="advisorsGrid"></div></div>
 
   <div class="about-block contact-block"><div class="section-divider"></div><h3 class="about-block-title" data-i18n="contact_title">Get in Touch</h3><div class="contact-row" id="contactRow"></div><div class="social-row" id="socialRow"></div></div>
@@ -517,6 +518,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
       <span id="chatTitle">IX AI Assistant</span>
     </div>
+    <!-- Better Close Button UI applied here -->
     <button class="chat-close" onclick="toggleChat()">×</button>
   </div>
   <div class="chat-body" id="chatBody">
@@ -667,7 +669,6 @@ const LANGS = [
   {code:'pt', label:'Português'}, {code:'ru', label:'Русский'}, {code:'tr', label:'Türkçe'},
   {code:'zh', label:'中文'}, {code:'ja', label:'日本語'}, {code:'ko', label:'한국어'}
 ];
-
 const I18N = {
   ar:{
     brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',explore_cta:'استكشف الكون ←',sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
@@ -679,8 +680,7 @@ const I18N = {
     bot_ask_sector: 'شكراً لك. ما هو المجال أو القطاع الذي يهمك الاستفسار عنه؟',
     bot_all_sectors: 'جميع القطاعات / أخرى',
     bot_ready: 'تم حفظ بياناتك بنجاح! كيف يمكنني مساعدتك اليوم؟ (يمكنك سؤالي عن خدماتنا، مشاريعنا، أو أي شيء يخص إنترسكت)',
-    bot_skip_country: 'شركة عالمية، ممتاز! نتعامل مع العديد من الشركات الدولية.',
-    bot_error: 'عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً.'
+    bot_skip_country: 'شركة عالمية، ممتاز! نتعامل مع العديد من الشركات الدولية.'
   },
   en:{
     brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',explore_cta:'Explore the Universe →',sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
@@ -692,8 +692,7 @@ const I18N = {
     bot_ask_sector: 'Thank you. Which sector or field are you interested in?',
     bot_all_sectors: 'All Sectors / Other',
     bot_ready: 'Your details are saved! How can I assist you today? (Ask me about our services, projects, or anything about Intersect)',
-    bot_skip_country: 'A global company, wonderful! We work with many international entities.',
-    bot_error: 'Sorry, I am having trouble connecting to the server right now. Please try again later.'
+    bot_skip_country: 'A global company, wonderful! We work with many international entities.'
   }
 };
 
@@ -1079,7 +1078,7 @@ function renderAll(){
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION & RETRY ============ */
+/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
@@ -1114,7 +1113,7 @@ async function botSayWithOptions(key, options, callback) {
   let translatedOptions = [];
   for(let opt of options) {
     let optText = opt.text;
-    if(!I18N[LANG] && opt.val !== 'Global' && opt.val !== 'All') {
+    if(LANG !== 'en' && LANG !== 'ar' && opt.val !== 'Global' && opt.val !== 'All') {
        optText = await mtTranslate(optText, LANG);
     }
     translatedOptions.push({text: optText, val: opt.val});
@@ -1225,7 +1224,7 @@ function askSector() {
 
 function finishOnboarding() { chatState = 'CHAT'; botSay('bot_ready'); }
 
-/* --- Submit Logic & API Retry --- */
+/* --- Submit Logic & API Connection --- */
 async function handleChatSubmit() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
@@ -1296,21 +1295,6 @@ function buildAIContext() {
   return ctx;
 }
 
-// دالة المحاولة الذكية 
-async function fetchWithRetry(url, options, maxRetries = 3) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      return await response.json();
-    } catch (e) {
-      if (i === maxRetries - 1) throw e;
-      console.warn(`Gemini API connection failed. Retrying... (${i + 1}/${maxRetries})`);
-      await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i))); 
-    }
-  }
-}
-
 async function askGemini(question) {
   const context = buildAIContext();
   const currentLangObj = LANGS.find(l => l.code === LANG) || {label: 'English'};
@@ -1331,20 +1315,34 @@ async function askGemini(question) {
   `;
 
   try {
-    const data = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: sysPrompt }] },
-        contents: [{ parts: [{ text: question }] }]
+        contents: [{ parts: [{ text: question }] }],
+        generationConfig: { temperature: 0.7 }
       })
     });
 
+    const data = await response.json();
+
+    if (!response.ok) {
+        let errorMsg = data.error?.message || "HTTP Error: " + response.status;
+        throw new Error(errorMsg);
+    }
+
     let answerText = "";
-    if (data && data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
-      answerText = data.candidates[0].content.parts[0].text;
+    if (data.candidates && data.candidates.length > 0) {
+        const cand = data.candidates[0];
+        if (cand.content && cand.content.parts && cand.content.parts.length > 0) {
+            answerText = cand.content.parts[0].text;
+        } else {
+            throw new Error("No text returned from Gemini");
+        }
     } else {
-      throw new Error("No valid response from Gemini");
+        throw new Error("No candidates returned from Gemini");
     }
 
     setTyping(false);
@@ -1358,9 +1356,9 @@ async function askGemini(question) {
     }).then(() => {});
 
   } catch (err) {
-    console.error("Gemini API Final Exception:", err);
+    console.error("Gemini Details:", err);
     setTyping(false);
-    botSay('bot_error'); // This now properly translates the error message into the user's language!
+    addBotMsg("⚠️ تنبيه نظام: السيرفر رفض الطلب. السبب من جوجل: <br><br><code>" + err.message + "</code><br><br>يرجى التأكد من صلاحية مفتاح الـ API وتفعيل Generative Language API في Google Cloud.");
   }
 }
 

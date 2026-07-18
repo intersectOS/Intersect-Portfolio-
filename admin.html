@@ -294,14 +294,16 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
         </div>
       </div>
       <div class="row2">
-        <div class="field"><label>نوع العلاقة</label>
+        <div class="field"><label>نوع العلاقة (قياسي)</label>
           <select id="conRelKind">
+            <option value="">بدون تصنيف / أخرى</option>
             <option value="client">عميل</option>
             <option value="partner">شريك استراتيجي</option>
           </select>
         </div>
-        <div class="field"><label>فئة المشروع (وصف قصير، اختياري)</label><input id="conType" placeholder="مثال: تطوير أنظمة تنفيذية"></div>
+        <div class="field"><label>وصف العلاقة (تخصيص - اختياري)</label><input id="conRelLabel" placeholder="مثال: شريك تقني"></div>
       </div>
+      <div class="field"><label>فئة المشروع (وصف قصير، اختياري)</label><input id="conType" placeholder="مثال: تطوير أنظمة تنفيذية"></div>
       <div class="field"><label>الوصف</label><textarea id="conDescAr"></textarea></div>
       <div class="field"><label>الموقع الإلكتروني (اختياري)</label><input id="conWebsite" placeholder="https://"></div>
       <div style="display:flex;gap:10px;">
@@ -806,13 +808,16 @@ async function deleteCompany(id){
 
 /* ============ CONSULTING ============ */
 function renderConsulting(){
-  document.getElementById('consultingList').innerHTML = CONSULTING.map(c=>`
+  document.getElementById('consultingList').innerHTML = CONSULTING.map(c=>{
+    let relStr = c.relationship_label_ar || (c.relationship_kind === 'partner' ? 'شريك استراتيجي' : (c.relationship_kind === 'client' ? 'عميل' : ''));
+    return `
     <div class="item-row">
       ${c.logo_url?`<img src="${c.logo_url}">`:`<div class="thumb-fallback">${(c.name_ar||'?').charAt(0)}</div>`}
-      <div class="meta"><b>${c.name_ar}</b><span>${c.relationship_kind==='partner'?'شريك استراتيجي':'عميل'}${c.type_ar?' · '+c.type_ar:''}</span></div>
+      <div class="meta"><b>${c.name_ar}</b><span>${relStr}${c.type_ar?' · '+c.type_ar:''}</span></div>
       <div class="item-actions"><button class="btn-outline btn-sm" onclick="editConsulting('${c.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('consulting','${c.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteConsulting('${c.id}')">حذف</button></div>
     </div>
-  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شراكات بعد.</p>';
+    `;
+  }).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد شراكات بعد.</p>';
 }
 let editingConsultingId = null;
 async function saveConsulting(){
@@ -820,7 +825,9 @@ async function saveConsulting(){
   if(!name_ar){ showToast('عبّي الاسم'); return; }
   const row = {
     name_ar, name_en: document.getElementById('conNameEn').value.trim(), logo_url: pendingConLogo,
-    relationship_kind: document.getElementById('conRelKind').value, type_ar: document.getElementById('conType').value.trim(),
+    relationship_kind: document.getElementById('conRelKind').value, 
+    relationship_label_ar: document.getElementById('conRelLabel').value.trim(),
+    type_ar: document.getElementById('conType').value.trim(),
     description_ar: document.getElementById('conDescAr').value.trim(), website_url: document.getElementById('conWebsite').value.trim()
   };
   let error;
@@ -834,7 +841,9 @@ function editConsulting(id){
   const c = CONSULTING.find(x=>x.id===id); if(!c) return;
   editingConsultingId = id;
   document.getElementById('conNameAr').value = c.name_ar||''; document.getElementById('conNameEn').value = c.name_en||'';
-  document.getElementById('conRelKind').value = c.relationship_kind||'client'; document.getElementById('conType').value = c.type_ar||'';
+  document.getElementById('conRelKind').value = c.relationship_kind||''; 
+  document.getElementById('conRelLabel').value = c.relationship_label_ar||'';
+  document.getElementById('conType').value = c.type_ar||'';
   document.getElementById('conDescAr').value = c.description_ar||''; document.getElementById('conWebsite').value = c.website_url||'';
   pendingConLogo = c.logo_url||null; const im = document.getElementById('conLogoPreview');
   if(c.logo_url){ im.src=c.logo_url; im.style.display='block'; } else { im.style.display='none'; }
@@ -844,8 +853,8 @@ function editConsulting(id){
 }
 function cancelConsultingEdit(){
   editingConsultingId = null;
-  ['conNameAr','conNameEn','conType','conDescAr','conWebsite'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('conRelKind').value = 'client';
+  ['conNameAr','conNameEn','conType','conDescAr','conWebsite','conRelLabel'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('conRelKind').value = '';
   pendingConLogo = null; document.getElementById('conLogoPreview').style.display='none';
   document.getElementById('conFormTitle').textContent = 'إضافة شراكة / مشروع استشاري';
   document.getElementById('conSaveBtn').textContent = 'إضافة'; document.getElementById('conCancelBtn').classList.add('hidden');
@@ -865,7 +874,7 @@ const TR_TABLES = {sectors:'intersect_sectors', companies:'intersect_companies',
 const TR_FIELD_SETS = {
   sectors: [{key:'name',label:'الاسم',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
   companies: [{key:'name',label:'الاسم',kind:'input'}, {key:'tagline',label:'وصف قصير (Tagline)',kind:'input'}, {key:'description',label:'الوصف الكامل',kind:'textarea'}, {key:'relationship_label',label:'وصف العلاقة المخصص',kind:'input'}, {key:'reference_text',label:'نص الاقتباس',kind:'textarea'}],
-  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'نوع العلاقة',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
+  consulting: [{key:'name',label:'الاسم',kind:'input'}, {key:'type',label:'فئة المشروع',kind:'input'}, {key:'relationship_label',label:'وصف العلاقة المخصص',kind:'input'}, {key:'description',label:'الوصف',kind:'textarea'}],
   brand: [{key:'tagline',label:'الشعار الفرعي',kind:'input'}, {key:'about',label:'نبذة عن إنترسكت',kind:'textarea'}]
 };
 let trContext = null;

@@ -474,6 +474,27 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .chat-fab:hover { transform: scale(1.1) translateY(-5px); }
+
+/* ========== زر الصوت العائم ========== */
+.sound-fab{
+  position:fixed; bottom:max(30px, env(safe-area-inset-bottom)); left:30px; z-index:99;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--gold);transition:all .3s;
+}
+.sound-fab.visible{display:flex;}
+.sound-fab svg{width:22px;height:22px;}
+.sound-fab:hover{border-color:var(--gold);box-shadow:0 0 24px var(--gold-glow);transform:scale(1.08);}
+.sound-fab.playing::after{
+  content:'';position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid rgba(232,200,122,.4);
+  animation:sound-pulse 2.4s ease-out infinite;pointer-events:none;
+}
+@keyframes sound-pulse{ 0%{transform:scale(.9);opacity:.8;} 100%{transform:scale(1.35);opacity:0;} }
+body.lang-ltr .sound-fab{ left:auto; right:30px; }
+@media (max-width:640px){ .sound-fab{ bottom:max(20px, env(safe-area-inset-bottom)); left:20px; } body.lang-ltr .sound-fab{ left:auto; right:20px; } }
 .chat-fab svg { width: 30px; height: 30px; color: #1a1306; }
 body.lang-ltr .chat-fab { right: auto; left: 30px; }
 
@@ -773,6 +794,11 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
     </button>
   </div>
 </div>
+
+<button class="sound-fab" id="soundFab" onclick="toggleSound()" title="الصوت" aria-label="Toggle sound">
+  <svg id="soundOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+  <svg id="soundOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+</button>
 
 <footer class="site-footer">
   <span data-i18n="footer_rights">© 2026 إنترسكت. جميع الحقوق محفوظة.</span> &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
@@ -1138,6 +1164,7 @@ async function loadData(){
   // الحل العبقري: معالجة وعرض قنوات التواصل فوراً دون أي تأخير
   renderContacts();
   renderAll();
+  applyAudioSettings();
   startLiveSync();
   
   const tl = gsap.timeline();
@@ -1154,6 +1181,7 @@ async function refetchData(){
     await fetchTables();
     renderContacts();
     renderAll();
+    applyAudioSettings();
   }catch(e){ console.warn('Silent refetch failed', e); }
   isRefetching = false;
 }
@@ -1188,6 +1216,157 @@ async function fetchIP() {
   } catch(e) { console.log('IP fetch failed'); }
 }
 
+/* ============ AMBIENT AUDIO ENGINE ============ */
+let AUDIO_CFG = {}, SECTOR_AUDIO = {};
+let bgAudio = null, bgTargetVol = 0, oldBgAudio = null;
+let soundMuted = false;
+try{ soundMuted = localStorage.getItem('ix_sound_muted') === '1'; }catch(e){}
+let audioUnlocked = false;
+let uiCtx = null;
+
+function audioDefaults(){
+  const a = DATA.settings.audio_settings || {};
+  AUDIO_CFG = {
+    enabled: a.enabled !== false && !!(a.main_track_url || Object.keys(DATA.settings.sector_audio||{}).length),
+    raw_enabled: a.enabled !== false,
+    master_volume: (a.master_volume ?? 70) / 100,
+    main_track_url: a.main_track_url || '',
+    main_volume: (a.main_volume ?? 50) / 100,
+    main_mode: a.main_mode || 'sector_override',
+    ui_sounds: a.ui_sounds !== false,
+    ui_volume: (a.ui_volume ?? 40) / 100
+  };
+  SECTOR_AUDIO = DATA.settings.sector_audio || {};
+}
+
+function applyAudioSettings(){
+  audioDefaults();
+  const fab = document.getElementById('soundFab');
+  const hasAnything = AUDIO_CFG.raw_enabled && (AUDIO_CFG.main_track_url || Object.values(SECTOR_AUDIO).some(x=>x&&x.url) || AUDIO_CFG.ui_sounds);
+  if(fab) fab.classList.toggle('visible', !!hasAnything);
+  updateSoundFabIcon();
+  updateAudioForContext();
+}
+
+/* يحدد النغمة المطلوبة حسب الصفحة الحالية ووضع الاستمرارية */
+function desiredTrack(){
+  if(!AUDIO_CFG.raw_enabled) return null;
+  const active = document.querySelector('.view.active');
+  const viewId = active ? active.id : 'view-home';
+  if(viewId === 'view-sector' && AUDIO_CFG.main_mode !== 'everywhere'){
+    const slug = document.getElementById('view-sector').dataset.currentSlug;
+    const s = DATA.sectors.find(x=>x.slug===slug);
+    const sa = s ? SECTOR_AUDIO[s.id] : null;
+    if(sa && sa.url) return { url: sa.url, vol: (sa.volume ?? 50)/100 };
+  }
+  if(AUDIO_CFG.main_track_url) return { url: AUDIO_CFG.main_track_url, vol: AUDIO_CFG.main_volume };
+  return null;
+}
+
+function fadeAudio(audio, to, ms, onDone){
+  if(!audio) { if(onDone) onDone(); return; }
+  const from = audio.volume, steps = Math.max(1, Math.round(ms/40));
+  let i = 0;
+  clearInterval(audio._fadeTimer);
+  audio._fadeTimer = setInterval(()=>{
+    i++;
+    audio.volume = Math.min(1, Math.max(0, from + (to-from)*(i/steps)));
+    if(i>=steps){ clearInterval(audio._fadeTimer); if(onDone) onDone(); }
+  }, 40);
+}
+
+function updateAudioForContext(){
+  const target = desiredTrack();
+  const master = AUDIO_CFG.master_volume;
+
+  if(!target){
+    if(bgAudio){ const a=bgAudio; bgAudio=null; fadeAudio(a, 0, 800, ()=>{ a.pause(); }); }
+    updateSoundFabIcon();
+    return;
+  }
+  bgTargetVol = Math.min(1, target.vol * master);
+
+  const absUrl = new URL(target.url, location.href).href;
+  if(bgAudio && bgAudio.src === absUrl){
+    if(!soundMuted && audioUnlocked && bgAudio.paused){ bgAudio.play().catch(()=>{}); }
+    fadeAudio(bgAudio, soundMuted ? 0 : bgTargetVol, 600);
+    updateSoundFabIcon();
+    return;
+  }
+
+  /* تلاشي متقاطع: النغمة القديمة تخفت والجديدة تصعد */
+  if(oldBgAudio){ oldBgAudio.pause(); oldBgAudio = null; }
+  if(bgAudio){ oldBgAudio = bgAudio; const o=oldBgAudio; fadeAudio(o, 0, 900, ()=>{ o.pause(); if(oldBgAudio===o) oldBgAudio=null; }); }
+
+  bgAudio = new Audio(target.url);
+  bgAudio.loop = true;
+  bgAudio.volume = 0;
+  bgAudio.preload = 'auto';
+  if(!soundMuted && audioUnlocked){
+    bgAudio.play().then(()=>{ fadeAudio(bgAudio, bgTargetVol, 1200); }).catch(()=>{});
+  }
+  updateSoundFabIcon();
+}
+
+/* المتصفحات تمنع التشغيل التلقائي قبل أول تفاعل — نفك القفل مع أول لمسة */
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+  try{ if(!uiCtx) uiCtx = new (window.AudioContext||window.webkitAudioContext)(); uiCtx.resume(); }catch(e){}
+  if(!soundMuted && bgAudio && bgAudio.paused){
+    bgAudio.play().then(()=>{ fadeAudio(bgAudio, bgTargetVol, 1200); }).catch(()=>{});
+  }
+  updateSoundFabIcon();
+}
+document.addEventListener('pointerdown', unlockAudio, {once:true, capture:true});
+document.addEventListener('keydown', unlockAudio, {once:true, capture:true});
+
+function toggleSound(){
+  soundMuted = !soundMuted;
+  try{ localStorage.setItem('ix_sound_muted', soundMuted ? '1' : '0'); }catch(e){}
+  if(soundMuted){
+    if(bgAudio){ const a=bgAudio; fadeAudio(a, 0, 400, ()=>{ if(soundMuted) a.pause(); }); }
+  } else {
+    audioUnlocked = true;
+    try{ if(!uiCtx) uiCtx = new (window.AudioContext||window.webkitAudioContext)(); uiCtx.resume(); }catch(e){}
+    if(bgAudio){ bgAudio.play().catch(()=>{}); fadeAudio(bgAudio, bgTargetVol, 800); }
+    else updateAudioForContext();
+  }
+  updateSoundFabIcon();
+}
+
+function updateSoundFabIcon(){
+  const on = document.getElementById('soundOnIcon');
+  const off = document.getElementById('soundOffIcon');
+  const fab = document.getElementById('soundFab');
+  if(!on||!off||!fab) return;
+  on.style.display = soundMuted ? 'none' : 'block';
+  off.style.display = soundMuted ? 'block' : 'none';
+  fab.classList.toggle('playing', !soundMuted && !!bgAudio && !bgAudio.paused);
+}
+
+/* نقرة نيون خفيفة للأزرار — مولّدة صوتياً بدون ملفات */
+function uiBlip(){
+  if(soundMuted || !AUDIO_CFG.raw_enabled || !AUDIO_CFG.ui_sounds || !uiCtx) return;
+  try{
+    const t = uiCtx.currentTime;
+    const osc = uiCtx.createOscillator();
+    const g = uiCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(740, t);
+    osc.frequency.exponentialRampToValueAtTime(980, t + 0.06);
+    const vol = 0.25 * AUDIO_CFG.ui_volume * AUDIO_CFG.master_volume;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.001, vol), t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+    osc.connect(g); g.connect(uiCtx.destination);
+    osc.start(t); osc.stop(t + 0.12);
+  }catch(e){}
+}
+document.addEventListener('click', (e)=>{
+  if(e.target.closest('button, a, select, .planet-node, .legend-pill, .company-card, .tab')) uiBlip();
+}, true);
+
 /* ============ VIEW ROUTER ============ */
 let isAnimatingView = false;
 function switchView(id){
@@ -1217,9 +1396,11 @@ function switchView(id){
         gsap.fromTo('#consultingGrid .company-card', {y: 40, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"});
       }
       if(id === 'view-about') renderAbout();
+      updateAudioForContext();
     }});
   } else {
     next.classList.add('active');
+    updateAudioForContext();
   }
 }
 
@@ -1539,6 +1720,7 @@ function showSector(slug, silent) {
   next.dataset.currentSlug = slug;
   /* لا نعيد توليد الخلفية في التحديث الصامت لنفس القطاع حتى لا تقفز الأيقونات */
   if(!silent || slugChanged) renderSectorBgField(s);
+  if(!silent || slugChanged) updateAudioForContext();
 
   const nameEl = document.getElementById('sectorName');
   const descEl = document.getElementById('sectorDesc');

@@ -79,6 +79,11 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
 }
 .toast.show{opacity:1;}
 .upload-row{display:flex;align-items:center;gap:10px;}
+.aud-hint{font-size:12.5px;color:#8b93a7;line-height:1.8;}
+.sector-audio-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:10px;background:rgba(255,255,255,0.02);}
+.sector-audio-row b{min-width:120px;}
+.sector-audio-row input[type=range]{flex:1;min-width:110px;}
+.sector-audio-row .sa-status{font-size:12px;color:#8b93a7;width:100%;}
 .upload-row img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--panel-2);}
 .icon-picker-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;
@@ -118,6 +123,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
     <button class="tab" data-tab="companies" onclick="switchTab('companies')">الشركات</button>
     <button class="tab" data-tab="consulting" onclick="switchTab('consulting')">شراكات واستشارات</button>
     <button class="tab" data-tab="about" onclick="switchTab('about')">عن إنترسكت</button>
+    <button class="tab" data-tab="audio" onclick="switchTab('audio')">🎵 الأصوات والنغمات</button>
   </div>
 
   <!-- BRAND -->
@@ -246,6 +252,50 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       </div>
     </div>
     <div class="card"><h3>الشراكات الحالية</h3><div id="consultingList"></div></div>
+  </div>
+
+
+  <!-- AUDIO -->
+  <div class="panel" id="panel-audio">
+    <div class="card">
+      <h3>🎵 النظام الصوتي</h3>
+      <div class="field"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="audEnabled" checked style="width:18px;height:18px;"> تفعيل الأصوات في الموقع (إيقافه يكتم كل شيء عند الزوار فوراً)</label></div>
+      <div class="field"><label>مستوى الصوت العام: <b id="audMasterVal">70</b>%</label><input type="range" id="audMaster" min="0" max="100" value="70" style="width:100%;" oninput="document.getElementById('audMasterVal').textContent=this.value"></div>
+      <div class="aud-hint">ملاحظة تقنية: المتصفحات تمنع تشغيل الصوت قبل أول لمسة من الزائر — النغمة تبدأ تلقائياً مع أول تفاعل له مع الصفحة.</div>
+    </div>
+
+    <div class="card">
+      <h3>نغمة الصفحات الرئيسية</h3>
+      <div class="aud-hint">تعمل في الرئيسية وصفحة الكون (القطاعات) وصفحة "عن إنترسكت"، وتستمر أثناء التنقل بدون انقطاع.</div>
+      <div class="upload-row" style="margin:12px 0;">
+        <input type="file" id="audMainFile" accept="audio/*" style="display:none" onchange="onMainAudioPick(this)">
+        <button class="btn-outline" onclick="document.getElementById('audMainFile').click()">🎵 رفع ملف صوتي</button>
+        <button class="btn-outline btn-sm" id="audMainPreviewBtn" style="display:none" onclick="previewAudio(document.getElementById('audMainStatus').dataset.url, this)">▶ استماع</button>
+        <button class="btn-outline btn-sm" id="audMainClearBtn" style="display:none" onclick="clearMainAudio()">✕ إزالة</button>
+      </div>
+      <div class="aud-hint" id="audMainStatus" data-url="">لا يوجد ملف — يُفضل MP3 أو M4A هادئ وقابل للتكرار، بحجم أقل من 8MB</div>
+      <div class="field" style="margin-top:12px;"><label>مستوى نغمة الرئيسية: <b id="audMainVal">50</b>%</label><input type="range" id="audMainVol" min="0" max="100" value="50" style="width:100%;" oninput="document.getElementById('audMainVal').textContent=this.value"></div>
+      <div class="field"><label>وضع الاستمرارية</label>
+        <select id="audMainMode">
+          <option value="sector_override">تستمر في كل الصفحات — والقطاع الذي له نغمة خاصة تُقدَّم نغمته داخله</option>
+          <option value="everywhere">تستمر في كل الصفحات حتى داخل القطاعات (تجاهُل نغمات القطاعات)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>أصوات الأزرار</h3>
+      <div class="field"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="audUi" checked style="width:18px;height:18px;"> نقرة نيون خفيفة عند الضغط على أي زر (مولّدة تلقائياً، بدون ملفات)</label></div>
+      <div class="field"><label>مستواها: <b id="audUiVal">40</b>%</label><input type="range" id="audUiVol" min="0" max="100" value="40" style="width:100%;" oninput="document.getElementById('audUiVal').textContent=this.value"></div>
+    </div>
+
+    <div class="card">
+      <h3>نغمات القطاعات</h3>
+      <div class="aud-hint">لكل قطاع نغمته الخاصة تعمل داخل صفحته. القطاع بدون نغمة يستمر فيه صوت الرئيسية.</div>
+      <div id="sectorAudioList" style="margin-top:12px;"></div>
+    </div>
+
+    <button class="btn" onclick="saveAudioSettings()">💾 حفظ إعدادات الصوت</button>
   </div>
 
   <!-- ABOUT INTERSECT -->
@@ -460,6 +510,135 @@ async function handleGenericLogo(e, cb){
 /* ============ LOAD ============ */
 let BRAND_DATA = {};
 let ABOUT = { vision_mission:{}, core_values:[], services:[], industries:[], stats:[], team:[], advisors:[], client_logos:[], contact_info:{} };
+
+/* ============ AUDIO SETTINGS (الأصوات والنغمات) ============ */
+let AUDIO_SET = {}, SECTOR_AUDIO_MAP = {};
+let adminPreviewPlayer = null, adminPreviewBtn = null;
+
+async function uploadAudioFile(file){
+  if(!file.type.startsWith('audio/')){ showToast('اختر ملفاً صوتياً (MP3 / M4A / OGG)'); return null; }
+  if(file.size > 15*1024*1024){ showToast('الملف كبير — الحد 15MB، ويُفضل أقل من 8MB'); return null; }
+  const ext = file.name.split('.').pop();
+  const path = `audio/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  showToast('جاري رفع الملف الصوتي…');
+  const {error} = await sb.storage.from('intersect-media').upload(path, file);
+  if(error){ showToast('فشل الرفع: '+error.message); return null; }
+  const {data} = sb.storage.from('intersect-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function previewAudio(url, btn){
+  if(!url) return;
+  if(adminPreviewPlayer && !adminPreviewPlayer.paused && adminPreviewPlayer.src === url){
+    adminPreviewPlayer.pause();
+    if(adminPreviewBtn) adminPreviewBtn.textContent = '▶ استماع';
+    return;
+  }
+  if(adminPreviewPlayer){ adminPreviewPlayer.pause(); if(adminPreviewBtn) adminPreviewBtn.textContent = '▶ استماع'; }
+  adminPreviewPlayer = new Audio(url);
+  adminPreviewPlayer.volume = 0.6;
+  adminPreviewPlayer.play().catch(()=>showToast('تعذر التشغيل — تأكد من صيغة الملف'));
+  adminPreviewBtn = btn || null;
+  if(btn) btn.textContent = '⏸ إيقاف';
+  adminPreviewPlayer.onended = ()=>{ if(adminPreviewBtn) adminPreviewBtn.textContent = '▶ استماع'; };
+}
+
+function fillAudioForm(){
+  const a = AUDIO_SET || {};
+  document.getElementById('audEnabled').checked = a.enabled !== false;
+  document.getElementById('audMaster').value = a.master_volume ?? 70;
+  document.getElementById('audMasterVal').textContent = a.master_volume ?? 70;
+  document.getElementById('audMainVol').value = a.main_volume ?? 50;
+  document.getElementById('audMainVal').textContent = a.main_volume ?? 50;
+  document.getElementById('audMainMode').value = a.main_mode || 'sector_override';
+  document.getElementById('audUi').checked = a.ui_sounds !== false;
+  document.getElementById('audUiVol').value = a.ui_volume ?? 40;
+  document.getElementById('audUiVal').textContent = a.ui_volume ?? 40;
+  setMainAudioStatus(a.main_track_url || '');
+}
+
+function setMainAudioStatus(url){
+  const st = document.getElementById('audMainStatus');
+  st.dataset.url = url || '';
+  document.getElementById('audMainPreviewBtn').style.display = url ? '' : 'none';
+  document.getElementById('audMainClearBtn').style.display = url ? '' : 'none';
+  st.textContent = url ? ('✔ ملف مرفوع: ' + decodeURIComponent(url.split('/').pop())) : 'لا يوجد ملف — يُفضل MP3 أو M4A هادئ وقابل للتكرار، بحجم أقل من 8MB';
+}
+
+async function onMainAudioPick(input){
+  const file = input.files[0]; if(!file) return;
+  const url = await uploadAudioFile(file);
+  input.value = '';
+  if(!url) return;
+  setMainAudioStatus(url);
+  showToast('تم رفع النغمة — لا تنس حفظ الإعدادات');
+}
+
+function clearMainAudio(){ setMainAudioStatus(''); showToast('أُزيلت النغمة — احفظ الإعدادات لتأكيد الإزالة'); }
+
+function renderSectorAudioList(){
+  const wrap = document.getElementById('sectorAudioList');
+  if(!wrap) return;
+  if(!SECTORS.length){ wrap.innerHTML = '<div class="aud-hint">أضف قطاعات أولاً من تبويب القطاعات</div>'; return; }
+  wrap.innerHTML = SECTORS.map(s=>{
+    const sa = SECTOR_AUDIO_MAP[s.id] || {};
+    const vol = sa.volume ?? 50;
+    return `
+    <div class="sector-audio-row" style="border-color:${(s.color_primary||'#7b5cff')}33;">
+      <b style="color:${s.color_primary||'#e8c87a'}">${s.name_ar||s.name_en||s.slug}</b>
+      <input type="file" id="saFile-${s.id}" accept="audio/*" style="display:none" onchange="onSectorAudioPick(this, ${s.id})">
+      <button class="btn-outline btn-sm" onclick="document.getElementById('saFile-${s.id}').click()">🎵 رفع</button>
+      ${sa.url ? `<button class="btn-outline btn-sm" onclick="previewAudio(SECTOR_AUDIO_MAP[${s.id}].url, this)">▶ استماع</button>
+      <button class="btn-outline btn-sm" onclick="removeSectorAudio(${s.id})">✕</button>` : ''}
+      <label style="display:flex;align-items:center;gap:8px;flex:1;min-width:160px;">🔊 <input type="range" min="0" max="100" value="${vol}" oninput="setSectorAudioVol(${s.id}, this.value)"> <b id="saVol-${s.id}">${vol}</b>%</label>
+      <div class="sa-status">${sa.url ? '✔ نغمة خاصة مفعّلة' : 'بدون نغمة — يستمر صوت الرئيسية داخل هذا القطاع'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function onSectorAudioPick(input, id){
+  const file = input.files[0]; if(!file) return;
+  const url = await uploadAudioFile(file);
+  input.value = '';
+  if(!url) return;
+  SECTOR_AUDIO_MAP[id] = { url, volume: SECTOR_AUDIO_MAP[id]?.volume ?? 50 };
+  renderSectorAudioList();
+  showToast('تم رفع نغمة القطاع — لا تنس حفظ الإعدادات');
+}
+
+function setSectorAudioVol(id, v){
+  SECTOR_AUDIO_MAP[id] = SECTOR_AUDIO_MAP[id] || {};
+  SECTOR_AUDIO_MAP[id].volume = parseInt(v);
+  const b = document.getElementById('saVol-'+id); if(b) b.textContent = v;
+}
+
+function removeSectorAudio(id){
+  delete SECTOR_AUDIO_MAP[id];
+  renderSectorAudioList();
+  showToast('أُزيلت نغمة القطاع — احفظ الإعدادات للتأكيد');
+}
+
+async function saveAudioSettings(){
+  const value = {
+    enabled: document.getElementById('audEnabled').checked,
+    master_volume: parseInt(document.getElementById('audMaster').value),
+    main_track_url: document.getElementById('audMainStatus').dataset.url || '',
+    main_volume: parseInt(document.getElementById('audMainVol').value),
+    main_mode: document.getElementById('audMainMode').value,
+    ui_sounds: document.getElementById('audUi').checked,
+    ui_volume: parseInt(document.getElementById('audUiVol').value)
+  };
+  /* نظّف نغمات قطاعات محذوفة */
+  const validIds = new Set(SECTORS.map(s=>String(s.id)));
+  Object.keys(SECTOR_AUDIO_MAP).forEach(k=>{ if(!validIds.has(String(k)) || !SECTOR_AUDIO_MAP[k]?.url) delete SECTOR_AUDIO_MAP[k]; });
+
+  const r1 = await sb.from('intersect_site_settings').upsert({key:'audio_settings', value});
+  const r2 = await sb.from('intersect_site_settings').upsert({key:'sector_audio', value: SECTOR_AUDIO_MAP});
+  if(r1.error || r2.error){ showToast('فشل الحفظ: '+(r1.error||r2.error).message); return; }
+  AUDIO_SET = value;
+  showToast('✔ حُفظت إعدادات الصوت — ستصل الزوار لحظياً');
+}
+
 async function loadAll(){
   const [{data:settings},{data:sectors},{data:companies},{data:consulting}] = await Promise.all([
     sb.from('intersect_site_settings').select('*'),
@@ -469,6 +648,9 @@ async function loadAll(){
   ]);
   const settingsMap = {};
   (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
+  AUDIO_SET = settingsMap.audio_settings || {};
+  SECTOR_AUDIO_MAP = settingsMap.sector_audio || {};
+  fillAudioForm();
   const brand = settingsMap.brand || {};
   BRAND_DATA = brand;
   document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
@@ -497,6 +679,7 @@ async function loadAll(){
 
   SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
   renderSectors(); renderCompanies(); renderConsulting();
+  renderSectorAudioList();
   const sel = document.getElementById('compSector');
   sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
 }

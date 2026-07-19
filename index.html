@@ -202,12 +202,47 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .orbit-wrap{
   position:relative;width:min(800px,95vw);aspect-ratio:1/1;margin:10px auto 20px;
   transform-origin: center center;
+  perspective:1100px;
 }
 .orbit-wrap svg{width:100%;height:100%;overflow:visible;}
-.orbit-path{fill:none;stroke-width:1.5;}
-.planet-node{cursor:pointer; transform-origin: center;}
-.planet-node:hover .planet-dot{ filter:drop-shadow(0 0 15px currentColor) drop-shadow(0 0 30px currentColor); }
-.planet-dot{filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor); transition: filter 0.3s;}
+#galaxyTilt{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  animation:galaxy-sway 22s ease-in-out infinite alternate;
+  transition:transform .8s cubic-bezier(.16,1,.3,1);
+  will-change:transform;
+}
+@keyframes galaxy-sway{
+  0%{transform:rotateX(13deg) rotateY(-2.5deg);}
+  100%{transform:rotateX(19deg) rotateY(2.5deg);}
+}
+.nebula{
+  position:absolute;border-radius:50%;pointer-events:none;
+  filter:blur(46px);opacity:.85;mix-blend-mode:screen;
+  animation:neb-drift 26s ease-in-out infinite alternate;
+}
+.neb-a{width:52%;height:52%;top:2%;left:-6%;background:radial-gradient(circle, rgba(139,108,240,.16), transparent 70%);}
+.neb-b{width:58%;height:58%;bottom:-4%;right:-8%;background:radial-gradient(circle, rgba(76,201,176,.13), transparent 70%);animation-delay:-9s;}
+.neb-c{width:44%;height:44%;top:32%;left:30%;background:radial-gradient(circle, rgba(232,200,122,.10), transparent 70%);animation-delay:-17s;}
+@keyframes neb-drift{
+  0%{transform:translate(0,0) scale(1);}
+  100%{transform:translate(4%, -3%) scale(1.12);}
+}
+.orbit-path{fill:none;stroke-width:1.2;}
+.orbit-glow{fill:none;}
+.planet-node{cursor:pointer;}
+.p-body{transition:transform .35s cubic-bezier(.16,1,.3,1);transform-box:fill-box;transform-origin:center;}
+.planet-node:hover .p-body, .planet-node:active .p-body{transform:scale(1.18);}
+.planet-label{
+  font-family:var(--ff-body);font-size:11px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;opacity:.9;
+  paint-order:stroke;stroke:rgba(2,3,8,.7);stroke-width:3px;
+  pointer-events:none;
+}
+@media (prefers-reduced-motion: reduce){
+  #galaxyTilt{animation:none;transform:none;}
+  .nebula{animation:none;}
+}
 
 .galaxy-legend{
   display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
@@ -1023,33 +1058,76 @@ function autoTranslateField(el, obj, field){
 }
 
 /* ============ FETCH DATA ============ */
+let LAST_FETCH_AT = 0;
+
+async function fetchTables(){
+  const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}, {data:kb}] = await Promise.all([
+    sb.from('intersect_site_settings').select('*'),
+    sb.from('intersect_sectors').select('*').order('sort_order'),
+    sb.from('intersect_companies').select('*').order('sort_order'),
+    sb.from('intersect_consulting').select('*').order('sort_order'),
+    sb.from('intersect_knowledge_base').select('*')
+  ]);
+  DATA.settings = {};
+  (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
+  DATA.sectors = sectors || []; DATA.companies = companies || []; DATA.consulting = consulting || [];
+  DATA.knowledge_base = kb || [];
+  LAST_FETCH_AT = Date.now();
+
+  if(DATA.settings.bot_status === 'disabled') {
+    const fab = document.getElementById('chatFabBtn');
+    if(fab) fab.style.display = 'none';
+  }
+}
+
 async function loadData(){
   fetchIP();
-  try{
-    const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}, {data:kb}] = await Promise.all([
-      sb.from('intersect_site_settings').select('*'),
-      sb.from('intersect_sectors').select('*').order('sort_order'),
-      sb.from('intersect_companies').select('*').order('sort_order'),
-      sb.from('intersect_consulting').select('*').order('sort_order'),
-      sb.from('intersect_knowledge_base').select('*')
-    ]);
-    (settings||[]).forEach(row => DATA.settings[row.key] = row.value);
-    DATA.sectors = sectors || []; DATA.companies = companies || []; DATA.consulting = consulting || [];
-    DATA.knowledge_base = kb || [];
-    
-    if(DATA.settings.bot_status === 'disabled') {
-      const fab = document.getElementById('chatFabBtn');
-      if(fab) fab.style.display = 'none';
-    }
-  }catch(e){ console.error('Supabase load error', e); }
+  try{ await fetchTables(); }catch(e){ console.error('Supabase load error', e); }
   
   // الحل العبقري: معالجة وعرض قنوات التواصل فوراً دون أي تأخير
   renderContacts();
   renderAll();
+  startLiveSync();
   
   const tl = gsap.timeline();
   tl.to('#init-loader', {opacity: 0, duration: 0.8, onComplete: ()=> document.getElementById('init-loader').style.display = 'none'})
     .fromTo('.home-wordmark', {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: 0.8});
+}
+
+/* إعادة جلب صامتة: تحدّث البيانات وتعيد الرسم بدون شاشة تحميل */
+let isRefetching = false;
+async function refetchData(){
+  if(isRefetching) return;
+  isRefetching = true;
+  try{
+    await fetchTables();
+    renderContacts();
+    renderAll();
+  }catch(e){ console.warn('Silent refetch failed', e); }
+  isRefetching = false;
+}
+
+/* مزامنة حية: أي تعديل من الأدمن ينعكس على المتصفحات المفتوحة فوراً،
+   + إعادة جلب تلقائية عند رجوع المستخدم للتبويب بعد غياب */
+let rtDebounce = null;
+function startLiveSync(){
+  try{
+    const ch = sb.channel('ix_public_live');
+    ['intersect_site_settings','intersect_sectors','intersect_companies','intersect_consulting','intersect_knowledge_base'].forEach(t=>{
+      ch.on('postgres_changes', {event:'*', schema:'public', table:t}, ()=>{
+        clearTimeout(rtDebounce);
+        rtDebounce = setTimeout(refetchData, 700);
+      });
+    });
+    ch.subscribe();
+  }catch(e){ console.warn('Realtime unavailable', e); }
+
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible' && Date.now() - LAST_FETCH_AT > 30000) refetchData();
+  });
+  window.addEventListener('pageshow', (ev)=>{
+    if(ev.persisted) refetchData(); // رجوع من bfcache في سفاري
+  });
 }
 
 async function fetchIP() {
@@ -1069,17 +1147,20 @@ function switchView(id){
   
   document.getElementById('brandMini').classList.toggle('show', id!=='view-home');
   
+  gsap.killTweensOf([current, next]);
   if(current) {
     gsap.to(current, {opacity: 0, duration: 0.3, onComplete: () => {
       current.classList.remove('active');
+      gsap.set(current, {clearProps:'opacity,transform'});
       next.classList.add('active');
       window.scrollTo({top:0,behavior:'smooth'});
-      gsap.fromTo(next, {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.4});
+      gsap.fromTo(next, {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.4, clearProps:'transform'});
       
       if(id === 'view-galaxy') {
         gsap.set('.orbit-wrap', { scale: 1, opacity: 1 });
-        gsap.set('.galaxy-legend, .galaxy-head, .consulting-link', { y: 0, opacity: 1 });
+        gsap.set('#view-galaxy .galaxy-legend, #view-galaxy .galaxy-head, #view-galaxy .consulting-link', { y: 0, opacity: 1 });
         renderGalaxy();
+        playGalaxyEntrance();
       }
       if(id === 'view-consulting') {
         gsap.fromTo('#consultingGrid .company-card', {y: 40, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"});
@@ -1135,22 +1216,139 @@ function renderHome(){
   `;
 }
 
+/* ============ INTERSECT UNIVERSE ENGINE ============ */
+function hexToRgb(h){ h=(h||'#8b6cf0').replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); return [n>>16&255, n>>8&255, n&255]; }
+function shade(hex, p){ const [r,g,b]=hexToRgb(hex); const t=p<0?0:255; const a=Math.abs(p); const f=v=>Math.round(v+(t-v)*a); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function rgba(hex, a){ const [r,g,b]=hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; }
+function escXml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function renderGalaxy(){
   const wrap = document.getElementById('orbitWrap'); 
   const legend = document.getElementById('galaxyLegend');
   if(!wrap) return; const cx=400, cy=400;
   
-  let svg = `<svg viewBox="0 0 800 800"><circle cx="${cx}" cy="${cy}" r="24" fill="#e8c87a"/><text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="16" fill="#1a1306" font-weight="700">IX</text>`;
-  const orbitOffsets = [{ox:0,oy:0,r:120},{ox:36,oy:-24,r:170},{ox:-32,oy:22,r:220},{ox:26,oy:30,r:270},{ox:-30,oy:-28,r:320},{ox:14,oy:-14,r:365}];
-  
-  DATA.sectors.forEach((sector,i)=>{
-    const off = orbitOffsets[i % orbitOffsets.length]; const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
-    const dur = 40 + i*9; const color = sector.color_primary || '#8b6cf0';
-    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${color}" stroke-opacity="0.28"/>`;
-    const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
-    svg += `<g class="planet-node gs-hover" onclick="triggerSectorZoom('${sector.slug}')"><circle class="planet-dot" r="16" fill="${color}" style="color:${color}"><animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${-i*3}s"/></circle></g>`;
+  const sizes = [17, 14, 15.5, 13, 16, 12.5];
+  const orbitOffsets = [{ox:0,oy:0,r:118},{ox:30,oy:-20,r:168},{ox:-28,oy:18,r:218},{ox:22,oy:26,r:268},{ox:-26,oy:-24,r:318},{ox:12,oy:-12,r:362}];
+
+  /* ---- defs: تدرجات كروية لكل كوكب + شمس + مذنبات ---- */
+  let defs = `<defs>
+    <radialGradient id="sunCore" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fff8e1"/><stop offset="35%" stop-color="#f5dfa0"/>
+      <stop offset="70%" stop-color="#e8c87a"/><stop offset="100%" stop-color="#9a7433"/>
+    </radialGradient>
+    <radialGradient id="sunGlow"><stop offset="0%" stop-color="rgba(245,222,160,.55)"/><stop offset="35%" stop-color="rgba(232,200,122,.22)"/><stop offset="100%" stop-color="rgba(232,200,122,0)"/></radialGradient>
+    <linearGradient id="cometTail" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"/><stop offset="100%" stop-color="rgba(220,235,255,.9)"/>
+    </linearGradient>`;
+  DATA.sectors.forEach((s,i)=>{
+    const c = s.color_primary || '#8b6cf0';
+    defs += `
+    <radialGradient id="pg${i}" cx="32%" cy="28%" r="85%">
+      <stop offset="0%" stop-color="${shade(c,.62)}"/><stop offset="38%" stop-color="${shade(c,.15)}"/>
+      <stop offset="72%" stop-color="${shade(c,-.35)}"/><stop offset="100%" stop-color="${shade(c,-.68)}"/>
+    </radialGradient>
+    <radialGradient id="ag${i}"><stop offset="0%" stop-color="${rgba(c,.4)}"/><stop offset="55%" stop-color="${rgba(c,.14)}"/><stop offset="100%" stop-color="${rgba(c,0)}"/></radialGradient>`;
   });
-  wrap.innerHTML = svg + `</svg>`;
+  defs += `</defs>`;
+
+  let svg = `<svg id="galaxySvg" viewBox="0 0 800 800">${defs}`;
+
+  /* ---- نجوم متلألئة في عمق المشهد ---- */
+  svg += `<g opacity="0.9">`;
+  for(let i=0;i<26;i++){
+    const x=Math.random()*800, y=Math.random()*800, r=Math.random()*1.1+0.4;
+    const d=(Math.random()*4+3).toFixed(1), b=(-Math.random()*5).toFixed(1);
+    svg += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="#dfe6f5"><animate attributeName="opacity" values="0.12;0.85;0.12" dur="${d}s" begin="${b}s" repeatCount="indefinite"/></circle>`;
+  }
+  svg += `</g>`;
+
+  /* ---- حزام الكويكبات: غبار نجمي يدور ببطء بين المدارات ---- */
+  svg += `<g opacity="0.55"><animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="260s" repeatCount="indefinite"/>`;
+  for(let i=0;i<64;i++){
+    const ang = Math.random()*Math.PI*2;
+    const rr = 292 + (Math.random()*16-8);
+    const ax = cx + Math.cos(ang)*rr, ay = cy + Math.sin(ang)*rr;
+    svg += `<circle cx="${ax.toFixed(0)}" cy="${ay.toFixed(0)}" r="${(Math.random()*1.2+0.5).toFixed(1)}" fill="rgba(200,190,170,${(Math.random()*0.4+0.25).toFixed(2)})"/>`;
+  }
+  svg += `</g>`;
+
+  /* ---- المدارات: خط توهج خافت + خط منقّط ينساب ---- */
+  DATA.sectors.forEach((sector,i)=>{
+    const off = orbitOffsets[i % orbitOffsets.length];
+    const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
+    const color = sector.color_primary || '#8b6cf0';
+    svg += `<circle class="orbit-glow" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${rgba(color,.06)}" stroke-width="7" fill="none"/>`;
+    svg += `<circle class="orbit-path" cx="${ocx}" cy="${ocy}" r="${r}" stroke="${rgba(color,.34)}" stroke-dasharray="2 9" fill="none">
+      <animate attributeName="stroke-dashoffset" from="0" to="220" dur="${70+i*15}s" repeatCount="indefinite"/>
+    </circle>`;
+  });
+
+  /* ---- شمس إنترسكت: هالة نابضة + حلقتا وهج تدوران + نواة كروية ---- */
+  svg += `<g class="sun-group">
+    <circle cx="${cx}" cy="${cy}" r="72" fill="url(#sunGlow)"><animate attributeName="r" values="66;80;66" dur="6.5s" repeatCount="indefinite"/></circle>
+    <circle cx="${cx}" cy="${cy}" r="42" fill="none" stroke="rgba(232,200,122,.3)" stroke-width="1" stroke-dasharray="3 10"><animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="32s" repeatCount="indefinite"/></circle>
+    <circle cx="${cx}" cy="${cy}" r="52" fill="none" stroke="rgba(232,200,122,.16)" stroke-width="1" stroke-dasharray="1 14"><animateTransform attributeName="transform" type="rotate" from="360 ${cx} ${cy}" to="0 ${cx} ${cy}" dur="48s" repeatCount="indefinite"/></circle>
+    <circle cx="${cx}" cy="${cy}" r="27" fill="url(#sunCore)"/>
+    <ellipse cx="${cx-8}" cy="${cy-10}" rx="10" ry="6" fill="rgba(255,252,240,.5)"/>
+    <text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Aref Ruqaa" font-size="17" fill="#221806" font-weight="700">IX</text>
+  </g>`;
+
+  /* ---- الكواكب: كرة مضاءة + غلاف جوي + حلقات وأقمار + اسم القطاع يسبح معها ---- */
+  DATA.sectors.forEach((sector,i)=>{
+    const off = orbitOffsets[i % orbitOffsets.length];
+    const ocx = cx+off.ox, ocy = cy+off.oy, r = off.r;
+    const dur = 55 + i*12;
+    const beginOff = -(dur * (i / Math.max(DATA.sectors.length,1))).toFixed(1);
+    const color = sector.color_primary || '#8b6cf0';
+    const pr = sizes[i % sizes.length];
+    const hasRing = (i % 3 === 1);
+    const hasMoon = (i % 2 === 0);
+    const pathD = `M ${ocx+r},${ocy} A ${r},${r} 0 1,1 ${ocx-r},${ocy} A ${r},${r} 0 1,1 ${ocx+r},${ocy}`;
+
+    let inner = `<circle r="${(pr*2.1).toFixed(1)}" fill="url(#ag${i})"/>`;
+    if(hasRing){
+      inner += `<g transform="rotate(-22)">
+        <ellipse rx="${(pr*1.9).toFixed(1)}" ry="${(pr*0.62).toFixed(1)}" fill="none" stroke="${rgba(color,.32)}" stroke-width="3.4"/>
+        <ellipse rx="${(pr*2.35).toFixed(1)}" ry="${(pr*0.8).toFixed(1)}" fill="none" stroke="${rgba(color,.14)}" stroke-width="1.6"/>
+      </g>`;
+    }
+    inner += `<circle class="p-sphere" r="${pr}" fill="url(#pg${i})"/>`;
+    inner += `<ellipse cx="${(-pr*0.32).toFixed(1)}" cy="${(-pr*0.38).toFixed(1)}" rx="${(pr*0.34).toFixed(1)}" ry="${(pr*0.2).toFixed(1)}" fill="rgba(255,255,255,.35)"/>`;
+    if(hasRing){
+      inner += `<path d="M ${-(pr*1.9).toFixed(1)} 0 A ${(pr*1.9).toFixed(1)} ${(pr*0.62).toFixed(1)} 0 0 0 ${(pr*1.9).toFixed(1)} 0" transform="rotate(-22)" fill="none" stroke="${rgba(color,.45)}" stroke-width="3.4"/>`;
+    }
+    if(hasMoon){
+      inner += `<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${(7+i*1.6).toFixed(1)}s" repeatCount="indefinite"/><circle cx="${(pr*1.7+6).toFixed(1)}" cy="0" r="2.6" fill="${shade(color,.5)}"/></g>`;
+    }
+    inner += `<text id="plab-${sector.id}" class="planet-label" y="${(pr+20).toFixed(0)}" text-anchor="middle" fill="${shade(color,.55)}">${escXml(tf(sector,'name'))}</text>`;
+
+    svg += `<g class="planet-node gs-hover" onclick="triggerSectorZoom('${sector.slug}')">
+      <animateMotion dur="${dur}s" repeatCount="indefinite" path="${pathD}" begin="${beginOff}s"/>
+      <g class="p-body">${inner}</g>
+    </g>`;
+  });
+
+  /* ---- مذنّبان يعبران السماء ---- */
+  svg += `
+  <g opacity="0"><animateMotion dur="9s" begin="4s" repeatCount="indefinite" rotate="auto" path="M -80,140 L 900,430"/>
+    <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.06;0.42;0.55" dur="9s" begin="4s" repeatCount="indefinite"/>
+    <line x1="-64" y1="0" x2="0" y2="0" stroke="url(#cometTail)" stroke-width="2"/><circle r="2.4" fill="#f2f7ff"/>
+  </g>
+  <g opacity="0"><animateMotion dur="13s" begin="10s" repeatCount="indefinite" rotate="auto" path="M 880,120 L -100,560"/>
+    <animate attributeName="opacity" values="0;0.75;0.75;0" keyTimes="0;0.05;0.4;0.52" dur="13s" begin="10s" repeatCount="indefinite"/>
+    <line x1="-52" y1="0" x2="0" y2="0" stroke="url(#cometTail)" stroke-width="1.6"/><circle r="2" fill="#eef3ff"/>
+  </g>`;
+
+  svg += `</svg>`;
+
+  /* سُدُم ملوّنة خلف المجرة + طبقة الميلان ثلاثي الأبعاد */
+  wrap.innerHTML = `
+    <div class="nebula neb-a"></div>
+    <div class="nebula neb-b"></div>
+    <div class="nebula neb-c"></div>
+    <div id="galaxyTilt">${svg}</div>`;
+
+  initGalaxyParallax();
 
   if(legend){
     legend.innerHTML = DATA.sectors.map(sector=>
@@ -1161,6 +1359,53 @@ function renderGalaxy(){
     ).join('');
     DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
   }
+  DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('plab-'+sector.id), sector, 'name'));
+}
+
+/* ميلان تفاعلي: الكون يستجيب لحركة الإصبع/المؤشر وكأنك تنظر إليه من الفضاء */
+function initGalaxyParallax(){
+  const tilt = document.getElementById('galaxyTilt');
+  const wrap = document.getElementById('orbitWrap');
+  if(!tilt || !wrap || wrap.dataset.parallaxBound) { applyTiltBase(); return; }
+  wrap.dataset.parallaxBound = '1';
+
+  let raf = null;
+  const onMove = (clientX, clientY)=>{
+    const t = document.getElementById('galaxyTilt'); if(!t) return;
+    const rect = wrap.getBoundingClientRect();
+    const dx = (clientX - rect.left) / rect.width - 0.5;
+    const dy = (clientY - rect.top) / rect.height - 0.5;
+    if(raf) return;
+    raf = requestAnimationFrame(()=>{
+      t.style.animation = 'none';
+      t.style.transform = `rotateX(${(16 + dy*-7).toFixed(2)}deg) rotateY(${(dx*9).toFixed(2)}deg)`;
+      raf = null;
+    });
+  };
+  wrap.addEventListener('pointermove', e=> onMove(e.clientX, e.clientY), {passive:true});
+  wrap.addEventListener('pointerleave', ()=>{
+    const t = document.getElementById('galaxyTilt'); if(!t) return;
+    t.style.transform = ''; t.style.animation = '';
+  });
+  window.addEventListener('deviceorientation', (e)=>{
+    if(e.beta === null || !document.getElementById('view-galaxy').classList.contains('active')) return;
+    const t = document.getElementById('galaxyTilt'); if(!t) return;
+    t.style.animation = 'none';
+    t.style.transform = `rotateX(${(16 + Math.max(-8,Math.min(8,(e.beta-40)/6))).toFixed(2)}deg) rotateY(${(Math.max(-8,Math.min(8,e.gamma/6))).toFixed(2)}deg)`;
+  }, {passive:true});
+}
+function applyTiltBase(){
+  const t = document.getElementById('galaxyTilt');
+  if(t){ t.style.transform=''; t.style.animation=''; }
+}
+
+/* دخول ملحمي: المجرة تولد من قلب إنترسكت */
+function playGalaxyEntrance(){
+  const svgEl = document.getElementById('galaxySvg');
+  if(!svgEl) return;
+  gsap.fromTo(svgEl, {scale:0.55, opacity:0, transformOrigin:'center center'}, {scale:1, opacity:1, duration:1.15, ease:'power3.out'});
+  gsap.fromTo('.nebula', {opacity:0}, {opacity:1, duration:1.6, stagger:0.15, ease:'power2.out'});
+  gsap.fromTo('#galaxyLegend .legend-pill', {y:18, opacity:0}, {y:0, opacity:1, duration:0.5, stagger:0.06, delay:0.35, ease:'back.out(1.4)', clearProps:'transform,opacity'});
 }
 
 function triggerSectorZoom(slug) {
@@ -1179,7 +1424,7 @@ function triggerSectorZoom(slug) {
   flash.style.pointerEvents = 'none';
   document.body.appendChild(flash);
 
-  gsap.to('.galaxy-legend, .galaxy-head, .consulting-link', { y: 20, opacity: 0, duration: 0.5 });
+  gsap.to('#view-galaxy .galaxy-legend, #view-galaxy .galaxy-head, #view-galaxy .consulting-link', { y: 20, opacity: 0, duration: 0.5 });
   gsap.to('.orbit-wrap', { scale: 8, opacity: 0, duration: 1, ease: "power2.in" });
   
   gsap.to(flash, {
@@ -1192,14 +1437,26 @@ function triggerSectorZoom(slug) {
   });
 }
 
-function showSector(slug) {
+function showSector(slug, silent) {
   const s = DATA.sectors.find(x=>x.slug===slug); if(!s) return;
   
-  const current = document.querySelector('.view.active');
   const next = document.getElementById('view-sector');
-  if(current) current.classList.remove('active');
-  next.classList.add('active'); 
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(!silent){
+    const current = document.querySelector('.view.active');
+    if(current && current !== next) {
+      gsap.killTweensOf(current);
+      current.classList.remove('active');
+      gsap.set(current, {clearProps:'opacity,transform'});
+    }
+    /* الإصلاح الجذري: switchView كانت تترك opacity:0 على view-sector بعد الرجوع،
+       فيظهر القسم "فارغاً" (الشركات وزر الرجوع مخفية) حتى يعمل المستخدم تحديث.
+       هنا نقتل أي أنيميشن معلق ونرجع الشفافية لوضعها الطبيعي قبل العرض. */
+    gsap.killTweensOf(next);
+    next.classList.add('active');
+    gsap.set(next, {clearProps:'opacity,transform'});
+    gsap.fromTo(next, {opacity:0}, {opacity:1, duration:0.45, ease:'power2.out'});
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
   document.getElementById('brandMini').classList.add('show');
   
   next.dataset.currentSlug = slug;
@@ -1234,7 +1491,7 @@ function showSector(slug) {
     autoTranslateField(document.getElementById('ct-'+c.id), c, 'tagline');
   });
 
-  gsap.fromTo('.company-card', {y: 40, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"});
+  if(!silent) gsap.fromTo('#companyGrid .company-card', {y: 40, opacity: 0}, {y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)", clearProps:'transform,opacity'});
 }
 
 function renderConsulting(){
@@ -1389,7 +1646,7 @@ function renderAll(){
   const activeSector = document.getElementById('view-sector');
   if(activeSector.classList.contains('active')) {
       const currentSlug = activeSector.dataset.currentSlug;
-      if(currentSlug) showSector(currentSlug);
+      if(currentSlug) showSector(currentSlug, true);
   }
 }
 

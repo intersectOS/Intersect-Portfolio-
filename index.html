@@ -248,6 +248,40 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
   margin-top:24px;position:relative;z-index:2;
 }
+
+/* ========== أيقونات النيون السابحة في خلفية القطاع ========== */
+.sector-bg-field{
+  position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+}
+#view-sector > *:not(.sector-bg-field){position:relative;z-index:1;}
+.float-icon{
+  position:absolute;opacity:0;
+  filter:drop-shadow(0 0 10px currentColor) drop-shadow(0 0 26px currentColor);
+  will-change:transform;
+}
+.float-icon svg{width:100%;height:100%;display:block;}
+.fi-a{animation:fi-drift-a var(--fi-dur,30s) ease-in-out infinite alternate, fi-in 1.2s ease-out forwards;}
+.fi-b{animation:fi-drift-b var(--fi-dur,34s) ease-in-out infinite alternate, fi-in 1.2s ease-out forwards;}
+.fi-c{animation:fi-drift-c var(--fi-dur,38s) ease-in-out infinite alternate, fi-in 1.2s ease-out forwards;}
+@keyframes fi-in{ from{opacity:0;} to{opacity:var(--fi-op,.1);} }
+@keyframes fi-drift-a{
+  0%{transform:translate(0,0) rotate(-6deg) scale(1);}
+  50%{transform:translate(4vw,-6vh) rotate(4deg) scale(1.08);}
+  100%{transform:translate(-3vw,5vh) rotate(-3deg) scale(.96);}
+}
+@keyframes fi-drift-b{
+  0%{transform:translate(0,0) rotate(5deg) scale(.95);}
+  50%{transform:translate(-5vw,4vh) rotate(-5deg) scale(1.05);}
+  100%{transform:translate(3vw,-5vh) rotate(2deg) scale(1);}
+}
+@keyframes fi-drift-c{
+  0%{transform:translate(0,0) rotate(0deg) scale(1.05);}
+  50%{transform:translate(3vw,5vh) rotate(8deg) scale(.94);}
+  100%{transform:translate(-4vw,-4vh) rotate(-6deg) scale(1.02);}
+}
+@media (prefers-reduced-motion: reduce){
+  .float-icon{animation:fi-in 1s ease-out forwards !important;}
+}
 .legend-pill{
   background:var(--glass-bg);border:1px solid var(--glass-border);
   color:#f1f0ea;padding:10px 20px;border-radius:100px;
@@ -623,6 +657,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 
 <!-- SECTOR -->
 <section class="view" id="view-sector" data-current-slug="">
+  <div class="sector-bg-field" id="sectorBgField" aria-hidden="true"></div>
   <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">← Back to sectors</span></a>
   <div class="sector-header"><span class="sector-icon" id="sectorIcon"></span><h2 id="sectorName">—</h2><p id="sectorDesc"></p></div>
   <div class="company-grid" id="companyGrid"></div>
@@ -767,7 +802,23 @@ const NEON_ICONS = {
   health: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 34 H19 L25 19 L34 47 L40 34 H59"/><path d="M32 8 V18 M27 13 H37" stroke-width="3.2"/></svg>`,
   tourism: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="32" cy="32" r="24"/><path d="M32 10 V17 M32 47 V54 M10 32 H17 M47 32 H54"/><path d="M41 23 L27 29 L23 43 L37 37 Z" stroke-linejoin="round"/></svg>`,
   mobility: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 20 H32 M5 32 H40 M5 44 H24"/><path d="M44 32 H58 M50 24 L58 32 L50 40" stroke-linejoin="round"/></svg>`,
-  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`
+  intelligence: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="32" r="5.5"/><circle cx="32" cy="32" r="16" stroke-dasharray="3 6"/><circle cx="32" cy="32" r="26" stroke-dasharray="1.5 7"/><circle cx="32" cy="6" r="2.4" fill="currentColor" stroke="none"/><circle cx="55" cy="45" r="2.4" fill="currentColor" stroke="none"/></svg>`,
+  culture: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M39 11 A20 20 0 1 0 39 53 A16 16 0 1 1 39 11 Z"/><path d="M50 13 L52 18 L57 20 L52 22 L50 27 L48 22 L43 20 L48 18 Z" fill="currentColor" stroke="none"/></svg>`,
+  partnerships: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="24" cy="32" r="16"/><circle cx="40" cy="32" r="16"/></svg>`,
+  generic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`,
+  satellite: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="26" y="26" width="12" height="12" rx="2"/><rect x="4" y="22" width="14" height="20" rx="1.5"/><rect x="46" y="22" width="14" height="20" rx="1.5"/><path d="M18 32 H26 M38 32 H46 M38 26 L48 16"/><circle cx="50" cy="14" r="2.4" fill="currentColor" stroke="none"/></svg>`,
+  rocket: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6 C40 16 42 28 42 38 L22 38 C22 28 24 16 32 6 Z"/><circle cx="32" cy="26" r="4"/><path d="M22 34 L12 44 M42 34 L52 44"/><path d="M27 40 L24 52 M37 40 L40 52 M32 40 L32 54"/></svg>`,
+  car: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 38 L12 26 L22 20 H42 L52 26 L56 38"/><path d="M8 38 H56 V44 H8 Z"/><circle cx="18" cy="44" r="5"/><circle cx="46" cy="44" r="5"/><path d="M20 26 H40"/></svg>`,
+  train: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="10" width="36" height="34" rx="8"/><path d="M14 26 H50"/><circle cx="24" cy="18" r="3"/><circle cx="40" cy="18" r="3"/><path d="M20 50 V56 M44 50 V56 M10 44 H54"/></svg>`,
+  tower: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="48"/><path d="M26 16 H30 M34 16 H38 M26 24 H30 M34 24 H38 M26 32 H30 M34 32 H38 M26 40 H30 M34 40 H38"/><path d="M12 56 H52"/></svg>`,
+  plane: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 32 L58 12 L36 34 L58 52 Z"/><path d="M36 34 L26 44"/></svg>`,
+  coffee: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 26 H42 V40 C42 48 36 52 28 52 C20 52 14 48 14 40 Z"/><path d="M42 30 H48 C52 30 52 38 48 38 H42"/><path d="M22 10 C22 14 26 14 26 18 M32 10 C32 14 36 14 36 18"/></svg>`,
+  arabic_letter: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M46 20 C46 12 36 10 28 14 C18 18 14 28 20 34 C26 40 38 38 40 30 C42 24 34 22 32 28 C30 34 38 36 40 30"/></svg>`,
+  japanese_kanji: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="10" width="28" height="44" rx="2"/><path d="M18 32 H46"/></svg>`,
+  mosaic: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="14" y="14" width="36" height="36"/><rect x="14" y="14" width="36" height="36" transform="rotate(45 32 32)"/></svg>`,
+  lightning: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M36 6 L16 36 H30 L26 58 L50 26 H36 Z"/></svg>`,
+  chart: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 54 H54"/><rect x="14" y="38" width="8" height="16"/><rect x="28" y="28" width="8" height="26"/><rect x="42" y="16" width="8" height="38"/><path d="M14 24 L26 14 L36 20 L52 6 M44 6 H52 V14"/></svg>`,
+  guide: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="26" cy="14" r="7"/><path d="M26 21 V42 M18 30 H26 M26 26 L44 20 V32 L26 30" stroke-linejoin="round"/><path d="M18 42 L14 56 M26 42 L30 56"/></svg>`
 };
 function miniIcon(key, color, size){ return `<span class="mini-icon" style="color:${color||'#e8c87a'};width:${size}px;height:${size}px;">${NEON_ICONS[key] || NEON_ICONS.generic}</span>`; }
 function pickIconKeys(s){ return (s.icon_keys&&s.icon_keys.length) ? s.icon_keys : ['generic']; }
@@ -1437,6 +1488,31 @@ function triggerSectorZoom(slug) {
   });
 }
 
+/* أيقونات القطاع المختارة من الأدمن تسبح متوهجة في خلفية صفحة القطاع */
+function renderSectorBgField(s){
+  const field = document.getElementById('sectorBgField');
+  if(!field) return;
+  const keys = pickIconKeys(s);
+  const color = s.color_primary || '#e8c87a';
+  const variants = ['fi-a','fi-b','fi-c'];
+  /* وزّع نسخاً متعددة من الأيقونات المختارة بأحجام وأماكن وسرعات متفاوتة */
+  const count = Math.min(Math.max(keys.length * 3, 6), 10);
+  let html = '';
+  for(let i=0;i<count;i++){
+    const key = keys[i % keys.length];
+    const svg = NEON_ICONS[key] || NEON_ICONS.generic;
+    const size = 70 + Math.random()*150;             // 70–220px
+    const left = Math.random()*88;                    // %
+    const top  = 4 + Math.random()*84;                // %
+    const dur  = (22 + Math.random()*20).toFixed(1);  // 22–42s
+    const delay= (-Math.random()*30).toFixed(1);      // يبدأ من منتصف الحركة
+    const op   = (0.05 + Math.random()*0.09).toFixed(3); // 0.05–0.14
+    const v = variants[i % variants.length];
+    html += `<span class="float-icon ${v}" style="color:${color};width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;left:${left.toFixed(1)}%;top:${top.toFixed(1)}%;--fi-dur:${dur}s;--fi-op:${op};animation-delay:${delay}s,0s;">${svg}</span>`;
+  }
+  field.innerHTML = html;
+}
+
 function showSector(slug, silent) {
   const s = DATA.sectors.find(x=>x.slug===slug); if(!s) return;
   
@@ -1459,7 +1535,10 @@ function showSector(slug, silent) {
   }
   document.getElementById('brandMini').classList.add('show');
   
+  const slugChanged = next.dataset.currentSlug !== slug;
   next.dataset.currentSlug = slug;
+  /* لا نعيد توليد الخلفية في التحديث الصامت لنفس القطاع حتى لا تقفز الأيقونات */
+  if(!silent || slugChanged) renderSectorBgField(s);
 
   const nameEl = document.getElementById('sectorName');
   const descEl = document.getElementById('sectorDesc');

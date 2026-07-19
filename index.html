@@ -109,7 +109,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .view{
   position:absolute; inset:0; z-index:2;
   min-height:100vh; display:none; flex-direction:column;
-  align-items:center; justify-content:flex-start; /* Optimized for scroll compatibility */
+  align-items:center; justify-content:flex-start;
   padding:120px 24px 80px; opacity: 0;
 }
 .view.active{display:flex; opacity: 1; position:relative;}
@@ -158,7 +158,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .home-tagline{
   color:var(--gold);font-size:18px;letter-spacing:3px;text-transform:uppercase;
-  font-family:var(--ff-mono);font-weight:500;
+  font-family:var(--ff-body);font-weight:500;
 }
 .home-about{ color:var(--muted);font-size:16px;line-height:2;max-width:620px;text-align:center; }
 .home-stats{ display:flex;gap:48px;justify-content:center;margin-top:10px;flex-wrap:wrap; }
@@ -250,7 +250,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .sector-header p{color:var(--muted);font-size:16px;margin-top:10px;max-width:600px;margin-inline:auto;line-height:2;}
 
-/* Empty State Fix */
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
@@ -292,34 +291,25 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .about-hero h2{font-family:var(--ff-display);font-size:clamp(32px,6vw,48px);font-weight:700;background:linear-gradient(135deg, var(--text), var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .about-lead{color:var(--muted);font-size:16px;line-height:2;max-width:700px;margin:18px auto 0;}
 
-/* About Navigation Tabs (Sticky & Futuristic) */
+/* About Navigation Tabs */
 .about-nav-tabs {
   display: flex;
   justify-content: center;
   gap: 10px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  flex-wrap: wrap;
   margin: 20px auto 40px;
-  padding: 8px 16px;
+  padding: 8px;
   background: var(--panel-2);
   border: 1px solid var(--glass-border);
   border-radius: 100px;
-  width: max-content;
+  width: fit-content;
   max-width: 100%;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: sticky;
-  top: 10px;
+  top: 80px;
   z-index: 10;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-.about-nav-tabs::-webkit-scrollbar {
-  display: none;
-}
-.about-nav-tabs {
-  -ms-overflow-style: none;  
-  scrollbar-width: none;  
 }
 .about-nav-btn {
   background: transparent;
@@ -332,7 +322,6 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  white-space: nowrap;
 }
 .about-nav-btn:hover {
   color: var(--gold);
@@ -345,8 +334,40 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   box-shadow: 0 0 15px var(--gold-glow);
 }
 
-.about-block{margin-bottom:56px;position:relative;z-index:2;scroll-margin-top: 160px;}
-.about-block-title{font-family:var(--ff-display);font-size:clamp(22px,4vw,30px);font-weight:700;margin-bottom:24px;text-align:center;background:linear-gradient(135deg, var(--text), var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.about-block{margin-bottom: 56px; position:relative; z-index:2; scroll-margin-top: 160px;}
+.about-block-title{font-family:var(--ff-display);font-size:clamp(22px,4vw,30px);font-weight:700;margin-bottom:0;text-align:center;background:linear-gradient(135deg, var(--text), var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+.block-header-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.to-top-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--gold);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+.to-top-btn:hover {
+  background: rgba(232, 200, 122, 0.1);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+  transform: translateY(-2px);
+}
+
 .vm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .vm-card{background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);padding:36px 28px;backdrop-filter:blur(16px);position:relative;overflow:hidden;}
 .vm-card h3{font-family:var(--ff-display);font-size:22px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
@@ -407,7 +428,6 @@ body.lang-ltr .chat-window { right: auto; left: 30px; transform-origin: bottom l
 }
 .chat-header-title { font-family: var(--ff-mono); font-weight: 700; color: var(--gold); display: flex; align-items:center; gap:10px;}
 
-/* Better Close Button UI - FIXED FOR MOBILE */
 .chat-close { 
   background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--muted); 
   cursor: pointer; font-size: 20px; transition: 0.2s; 
@@ -427,7 +447,6 @@ body.lang-ltr .chat-msg.bot { border-bottom-right-radius: 16px; border-bottom-le
 .chat-msg.user { background: rgba(232,200,122,0.15); align-self: flex-end; border-bottom-left-radius: 4px; color: var(--gold); border: 1px solid rgba(232,200,122,0.3); }
 body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; }
 
-/* Quick Replies */
 .quick-replies-container { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; max-width:95%; align-self: flex-start;}
 .qr-btn {
   background: var(--glass-bg); border: 1px solid rgba(232,200,122,0.4);
@@ -468,7 +487,6 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   .vm-grid, .values-grid, .services-grid { grid-template-columns: 1fr; }
   .people-grid { grid-template-columns: repeat(2, 1fr); }
   
-  /* Mobile App-like Chat Window (Fixed Close Button issue) */
   .chat-window { 
     bottom: 0; right: 0; left: 0; top: 0; 
     width: 100%; height: 100dvh; 
@@ -478,20 +496,13 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   }
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
-  .chat-header { 
-    padding-top: max(40px, env(safe-area-inset-top)); 
-    padding-bottom: 16px; 
-  }
-  .chat-close { 
-    width: 48px; height: 48px; font-size: 28px; 
-    background: rgba(255,255,255,0.1); 
-  } 
+  .chat-header { padding-top: max(40px, env(safe-area-inset-top)); padding-bottom: 16px; }
+  .chat-close { width: 48px; height: 48px; font-size: 28px; background: rgba(255,255,255,0.1); } 
   .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
   body.lang-ltr .chat-fab { left: 20px; right: auto; }
   
-  /* Responsive Navigation Tabs for Mobile (Scrollable and glassmorphic) */
   .about-nav-tabs {
     border-radius: var(--r-sm);
     position: relative;
@@ -500,8 +511,7 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
     padding: 10px;
     gap: 8px;
     display: flex;
-    justify-content: flex-start;
-    width: 100%;
+    justify-content: center;
   }
   .about-nav-btn {
     font-size: 11.5px;
@@ -530,7 +540,6 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <div class="loader-text">Initializing Universe...</div>
 </div>
 
-<!-- CANVAS ENGINE: STARS, METEORS, GALAXIES -->
 <canvas id="particleCanvas"></canvas>
 <div class="noise-overlay"></div>
 
@@ -550,13 +559,13 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <p class="home-about" id="homeAbout">Loading…</p>
   <div class="home-stats" id="homeStats"></div>
   <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
-    <span data-i18n="explore_cta">Explore Intersect's World<br><span style="font-size: 13px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"Our Portfolio"</span></span>
+    <span data-i18n="explore_cta">Explore Intersect's Universe<br><span style="font-size: 13px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"Our Portfolio"</span></span>
   </button>
   <a class="consulting-link gs-hover" href="#" onclick="switchView('view-about');return false;" style="margin-top:2px; margin-bottom: 20px;">
     <span data-i18n="about_link">📖 About Intersect in detail →</span>
   </a>
   
-  <!-- HOME CONTACTS CONTAINER (DYN-DASHBOARD INLINE) -->
+  <!-- HOME CONTACTS CONTAINER -->
   <div class="home-contact-container" style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 25px; width: 100%; max-width: 600px; position: relative; z-index: 2;">
     <h3 style="font-size:14px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:15px;" data-i18n="contact_title">Get in Touch</h3>
     <div class="contact-row" id="homeContactRow"></div>
@@ -594,22 +603,25 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 <!-- ABOUT -->
 <section class="view" id="view-about">
   <a class="back-link gs-hover" href="#" onclick="switchView('view-home');return false;"><span data-i18n="back_home">← Back to home</span></a>
-  <div class="about-hero">
-    <h2 id="aboutTitle" data-i18n="about_title">About Intersect</h2>
-    <p class="about-lead" id="aboutLead"></p>
-  </div>
   
-  <!-- About Navigation Tabs (Futuristic sticky subbar) -->
   <div class="about-nav-tabs">
-    <button class="about-nav-btn active-tab" onclick="scrollToAboutSection('about-vm', this)" data-i18n="vision_title">Vision & Mission</button>
+    <button class="about-nav-btn active-tab" onclick="scrollToAboutSection('about-vm', this)" data-i18n="vm_title">Vision & Mission</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-values', this)" data-i18n="values_title">Core Values</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-services', this)" data-i18n="services_title">Our Services</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-people', this)" data-i18n="team_title">Our People</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-advisory', this)" data-i18n="advisors_title">Our Advisory</button>
   </div>
+
+  <div class="about-hero">
+    <h2 id="aboutTitle" data-i18n="about_title">About Intersect</h2>
+    <p class="about-lead" id="aboutLead"></p>
+  </div>
   
   <div class="about-block" id="about-vm">
-    <div class="section-divider"></div>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="vm_title">Vision & Mission</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="vm-grid">
       <div class="vm-card gs-card">
         <h3><span data-i18n="vision_title">Our Vision</span></h3>
@@ -623,14 +635,18 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   </div>
   
   <div class="about-block" id="about-values">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="values_title">Our Core Values</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="values_title">Our Core Values</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="values-grid" id="valuesGrid"></div>
   </div>
   
   <div class="about-block" id="about-services">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="services_title">Our Services</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="services_title">Our Services</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="services-grid" id="servicesGrid"></div>
   </div>
   
@@ -638,21 +654,22 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
     <div class="stats-grid" id="statsGrid"></div>
   </div>
   
-  <!-- TEAM -->
   <div class="about-block" id="about-people">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="team_title">Our People</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="team_title">Our People</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="people-grid" id="teamGrid"></div>
   </div>
   
-  <!-- ADVISORS -->
   <div class="about-block" id="about-advisory">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="people-grid" id="advisorsGrid"></div>
   </div>
 
-  <!-- CONTACTS & SOCIAL -->
   <div class="about-block contact-block" id="about-contacts">
     <div class="section-divider"></div>
     <h3 class="about-block-title" data-i18n="contact_title">Get in Touch</h3>
@@ -672,7 +689,6 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
       <span id="chatTitle">IX AI Assistant</span>
     </div>
-    <!-- Better Close Button UI -->
     <button class="chat-close" onclick="toggleChat()">×</button>
   </div>
   <div class="chat-body" id="chatBody">
@@ -689,23 +705,16 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </div>
 
 <footer class="site-footer">
-  <span data-i18n="footer_rights">© 2026 Intersect. All rights reserved.</span> &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">Admin</a>
+  <span data-i18n="footer_rights">© 2026 إنترسكت. جميع الحقوق محفوظة.</span> &nbsp;·&nbsp; <a href="admin.html" data-i18n="footer_admin">لوحة التحكم</a>
 </footer>
 
 <script>
 /* ============ CONFIG & SUPABASE ============ */
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
-const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// 🤫 الخدعة: المفتاح الجديد والنشط مجزأ لتجنب حظره من قبل الروبوتات
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-const p1 = 'AQ.Ab8RN6JGcq';
-const p2 = 'U-Ptqu-cQo';
-const p3 = 'CaeejGm-iL';
-const p4 = 'EtLsenyZ1Cfr';
-const p5 = '-aATh27Q';
+const p1 = 'AQ.Ab8RN6L'; const p2 = 'mUVL6PEdHBT'; const p3 = 'vxoIUFhEhX'; const p4 = 'NgKd6aec_'; const p5 = 'wyggdhnOwHiow';
 const GEMINI_API_KEY = p1 + p2 + p3 + p4 + p5;
 
 let DATA = { settings:{}, sectors:[], companies:[], consulting:[], knowledge_base:[] };
@@ -825,79 +834,198 @@ function drawParticles(){
 }
 resizePCanvas(); window.addEventListener('resize', resizePCanvas); drawParticles();
 
-/* ============ QUEUED SEQUENTIAL TRANSLATION SYSTEM (PRO RATE-LIMIT GUARD) ============ */
+/* ============ 12-LANGUAGE SYSTEM & TRANSLATION ENGINE ============ */
+const LANGS = [
+  {code:'en', label:'English'}, {code:'ar', label:'العربية'}, {code:'ja', label:'日本語'},
+  {code:'fr', label:'Français'}, {code:'es', label:'Español'}, {code:'de', label:'Deutsch'}, 
+  {code:'it', label:'Italiano'}, {code:'pt', label:'Português'}, {code:'ru', label:'Русский'}, 
+  {code:'tr', label:'Türkçe'}, {code:'zh', label:'中文'}, {code:'ko', label:'한국어'}
+];
+
+const I18N = {
+  ar:{
+    brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',
+    explore_cta:'اكتشف عالم تقاطع<br><span style="font-size: 13px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"اكتشف شركاتنا"</span>', 
+    sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',
+    partnerships_link:'🤝 شراكات وعملاء ←', 
+    back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'الشراكات والعملاء',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد مشاريع في هذا القطاع حتى الآن.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
+    bot_placeholder: 'اكتب رسالتك هنا...',
+    bot_ask_lang: 'مرحباً بك! يرجى اختيار لغتك المفضلة لبدء المحادثة:\nWelcome! Please select your preferred language:',
+    bot_ask_region: 'أهلاً بك في إنترسكت! لتكون إجاباتنا دقيقة ومخصصة لك، من أي منطقة تتواصل معنا؟',
+    bot_ask_country: 'ممتاز! من أي دولة تحديداً؟ (اكتب اسم الدولة)',
+    bot_ask_name_contact: 'تشرفنا بك! كيف يمكننا التواصل معك؟ (الرجاء كتابة اسمك وإيميلك أو رقم جوالك)',
+    bot_ask_sector: 'شكراً لك. ما هو المجال أو القطاع الذي يهمك الاستفسار عنه؟',
+    bot_all_sectors: 'جميع القطاعات / أخرى',
+    bot_ready: 'تم حفظ بياناتك بنجاح! كيف يمكنني مساعدتك اليوم؟ (يمكنك سؤالي عن خدماتنا، مشاريعنا، أو أي شيء يخص إنترسكت)',
+    bot_skip_country: 'شركة عالمية، ممتاز! نتعامل مع العديد من الشركات الدولية.',
+    bot_fallback_prefix: '💡 أواجه ضغطاً بالاتصال بالخادم الذكي حالياً، لكن من خلال سجلاتي وجدت التالي:\n\n',
+    bot_fallback_empty: 'عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة.',
+    vm_title: 'الرؤية والرسالة',
+    back_to_top: 'إلى الأعلى ↑'
+  },
+  en:{
+    brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',
+    explore_cta:'Explore Intersect\'s Universe<br><span style="font-size: 12px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"Our Portfolio"</span>', 
+    sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',
+    partnerships_link:'🤝 Partnerships & Clients →', 
+    back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Clients',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
+    bot_placeholder: 'Type your message here...',
+    bot_ask_lang: 'Welcome! Please select your preferred language:\nمرحباً بك! يرجى اختيار لغتك المفضلة:',
+    bot_ask_region: 'Welcome to Intersect! To provide you with tailored answers, which region are you reaching out from?',
+    bot_ask_country: 'Great! Which specific country? (Please type the country name)',
+    bot_ask_name_contact: 'Nice to meet you! How can we contact you? (Please provide your name and email or phone number)',
+    bot_ask_sector: 'Thank you. Which sector or field are you interested in?',
+    bot_all_sectors: 'All Sectors / Other',
+    bot_ready: 'Your details are saved! How can I assist you today? (Ask me about our services, projects, or anything about Intersect)',
+    bot_skip_country: 'A global company, wonderful! We work with many international entities.',
+    bot_fallback_prefix: '💡 I am experiencing server load, but found this in my local records:\n\n',
+    bot_fallback_empty: 'Sorry, I am currently facing server load and could not find a direct answer in my local records. Feel free to browse the site or contact us directly.',
+    vm_title: 'Vision & Mission',
+    back_to_top: 'To Top ↑'
+  },
+  ja:{
+    brand_name:'Intersect Holding Company',tagline_default:'アイデアが交差し、ベンチャーが構築される場所',
+    explore_cta:'Intersectの世界を探索する<br><span style="font-size: 12px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">「ポートフォリオ」</span>',
+    sectors_title:'セクター',sectors_sub:'惑星を選んでベンチャーを探索',
+    partnerships_link:'🤝 パートナーシップとクライアント ←', 
+    back_to_sectors:'← セクターに戻る',partnerships_title:'パートナーシップとクライアント',partnerships_sub:'クライアントワークと戦略的パートナーシップ',no_ventures:'このセクターにはまだベンチャーがありません。',no_partnerships:'パートナーシップはまだ追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'ベンチャー',stat_sectors:'セクター',stat_partnerships:'パートナーシップ',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'管理パネル',about_link:'📖 Intersect について詳しく ←',about_title:'Intersect について',back_home:'← ホームに戻る',vision_title:'私たちのビジョン',mission_title:'私たちのミッション',values_title:'コアバリュー',services_title:'サービス',team_title:'私たちのチーム',advisors_title:'アドバイザー',contact_title:'お問い合わせ',kind_client:'クライアント',kind_partner:'戦略的パートナー',
+    bot_placeholder: 'ここにメッセージを入力してください...',
+    bot_ask_lang: 'ようこそ！希望する言語を選択してください：',
+    bot_ask_region: 'Intersectへようこそ！最適な回答を提供するため、どの地域からお問い合わせですか？',
+    bot_ask_country: '素晴らしい！具体的にどの国ですか？（国名を入力してください）',
+    bot_ask_name_contact: 'はじめまして！どのようにご連絡すればよろしいでしょうか？（お名前とメールアドレスまたは電話番号をご記入ください）',
+    bot_ask_sector: 'ありがとうございます。どの分野に興味がありますか？',
+    bot_all_sectors: 'すべてのセクター / その他',
+    bot_ready: 'あなたの詳細は保存されます！今日はどのようにお手伝いさせていただけますか？(サービス、プロジェクト、Intersectに関することなら何でも聞いてください)',
+    bot_skip_country: 'グローバル企業ですね、素晴らしい！私たちは多くの国際的な組織と協力しています。',
+    bot_fallback_prefix: '💡 現在サーバーの負荷が高いため、ローカルの記録から以下の情報を見つけました：\n\n',
+    bot_fallback_empty: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカル of 記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。',
+    vm_title: 'ビジョン＆ミッション',
+    back_to_top: 'トップへ ↑'
+  }
+};
+
+let LANG = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ix_lang') : null) || 'en';
+
+function i18n(key){ return (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || I18N.ar[key] || key; }
+
+/* ============ SEQUENTIAL TRANSLATION QUEUE ENGINE ============ */
 let translationQueue = [];
 let isProcessingQueue = false;
 
-async function queueTranslation(text, targetLang, callback) {
-  if (!text || targetLang === 'ar' || targetLang === 'en') {
-    callback(text);
-    return;
+function enqueueTranslation(el, text, targetLang) {
+  translationQueue.push({ el, text, targetLang });
+  if (!isProcessingQueue) {
+    processTranslationQueue();
   }
-  const key = targetLang + '::' + text;
-  if (TRANS_CACHE[key]) {
-    callback(TRANS_CACHE[key]);
-    return;
-  }
-  
-  translationQueue.push({ text, targetLang, key, callback });
-  processTranslationQueue();
 }
 
 async function processTranslationQueue() {
-  if (isProcessingQueue || translationQueue.length === 0) return;
-  isProcessingQueue = true;
-
-  const item = translationQueue.shift();
-  try {
-    await new Promise(r => setTimeout(r, 50));
-    
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${item.targetLang}&dt=t&q=${encodeURIComponent(item.text)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const translated = data[0].map(chunk => chunk[0]).join('');
-    
-    TRANS_CACHE[item.key] = translated;
-    saveTransCache();
-    item.callback(translated);
-  } catch (e) {
-    console.error("Translation queue error", e);
-    item.callback(item.text); 
+  if (translationQueue.length === 0) {
+    isProcessingQueue = false;
+    return;
   }
-
-  isProcessingQueue = false;
-  setTimeout(processTranslationQueue, 50); 
+  isProcessingQueue = true;
+  const task = translationQueue.shift();
+  
+  if (task.el && task.el.isConnected) {
+    const resText = await mtTranslate(task.text, task.targetLang);
+    task.el.innerHTML = resText;
+  }
+  
+  // فارق أجزاء من الثانية لحماية المتصفح من حظر Google (429)
+  setTimeout(processTranslationQueue, 45); 
 }
 
-function autoTranslateInto(el, sourceText){
-  if(!el || !sourceText || LANG === 'ar') return; 
-  const langAtCallTime = LANG;
-  
-  queueTranslation(sourceText, langAtCallTime, (translated) => {
-    if(el.isConnected && LANG === langAtCallTime) {
-      el.innerHTML = translated;
+async function applyI18N(){ 
+  const els = document.querySelectorAll('[data-i18n]');
+  for(let el of els){
+    let key = el.dataset.i18n;
+    let text = I18N[LANG] && I18N[LANG][key] ? I18N[LANG][key] : I18N['en'][key];
+    if(!I18N[LANG]) {
+      enqueueTranslation(el, text, LANG);
+    } else {
+      el.innerHTML = text; 
     }
-  });
+  }
+  
+  let ph = I18N[LANG] && I18N[LANG]['bot_placeholder'] ? I18N[LANG]['bot_placeholder'] : I18N['en']['bot_placeholder'];
+  if(!I18N[LANG]) {
+    const transPh = await mtTranslate(ph, LANG);
+    document.getElementById('chatInput').placeholder = transPh;
+  } else {
+    document.getElementById('chatInput').placeholder = ph;
+  }
+  
+  let title = LANG === 'ar' ? 'المساعد الذكي (IX Bot)' : 'IX AI Assistant';
+  if(LANG !== 'ar' && LANG !== 'en') title = await mtTranslate(title, LANG);
+  document.getElementById('chatTitle').textContent = title;
+}
+
+async function setLang(code){
+  LANG = code;
+  try{ sessionStorage.setItem('ix_lang', code); }catch(e){}
+  document.documentElement.lang = code; 
+  document.documentElement.dir = code==='ar' ? 'rtl' : 'ltr';
+  
+  document.body.classList.remove('lang-ltr', 'lang-en', 'lang-ja');
+  if(code !== 'ar') document.body.classList.add('lang-ltr');
+  if(code === 'en') document.body.classList.add('lang-en');
+  if(code === 'ja' || code === 'ko' || code === 'zh') document.body.classList.add('lang-ja');
+  
+  document.getElementById('langSelect').value = code;
+  await applyI18N(); 
+  renderAll();
+}
+
+function initLangSelect(){
+  const sel = document.getElementById('langSelect');
+  sel.innerHTML = LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+  sel.value = LANG; setLang(LANG);
+}
+initLangSelect();
+
+function tf(obj, field, lang){ 
+  lang = lang || LANG; 
+  let text = '';
+  if(lang==='ar') text = obj[field+'_ar'] || obj[field+'_en'] || '';
+  else text = obj[field+'_en'] || obj[field+'_ar'] || '';
+  
+  const tr = obj.translations && obj.translations[lang];
+  if(tr && tr[field]) return tr[field];
+  
+  return text; 
+}
+
+let TRANS_CACHE = {};
+try{ TRANS_CACHE = JSON.parse(sessionStorage.getItem('ix_trans_cache')||'{}'); }catch(e){}
+function saveTransCache(){ try{ sessionStorage.setItem('ix_trans_cache', JSON.stringify(TRANS_CACHE)); }catch(e){} }
+
+async function mtTranslate(text, targetLang){
+  if(!text) return text; const key = targetLang+'::'+text; if(TRANS_CACHE[key]) return TRANS_CACHE[key];
+  try{
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url); const data = await res.json();
+    const translated = data[0].map(chunk=>chunk[0]).join('');
+    TRANS_CACHE[key] = translated; saveTransCache(); return translated;
+  }catch(e){ return text; }
 }
 
 function autoTranslateField(el, obj, field){
   if(!el || LANG === 'ar') return; 
-
   if (LANG === 'en' && obj[field+'_en'] && obj[field+'_en'].trim() !== '') return;
-
   if (obj.translations && obj.translations[LANG] && obj.translations[LANG][field] && obj.translations[LANG][field].trim() !== '') return;
 
   const sourceText = obj[field+'_ar'] || obj[field+'_en'];
   if(!sourceText) return;
 
-  autoTranslateInto(el, sourceText);
+  enqueueTranslation(el, sourceText, LANG);
 }
 
 /* ============ FETCH DATA ============ */
 async function loadData(){
   fetchIP();
   try{
-    if(!sb) throw new Error("Supabase is missing or blocked");
     const [{data:settings}, {data:sectors}, {data:companies}, {data:consulting}, {data:kb}] = await Promise.all([
       sb.from('intersect_site_settings').select('*'),
       sb.from('intersect_sectors').select('*').order('sort_order'),
@@ -913,22 +1041,15 @@ async function loadData(){
       const fab = document.getElementById('chatFabBtn');
       if(fab) fab.style.display = 'none';
     }
-  }catch(e){ 
-    console.error('Supabase load error', e); 
-  }
+  }catch(e){ console.error('Supabase load error', e); }
+  
+  // الحل العبقري: معالجة وعرض قنوات التواصل فوراً دون أي تأخير
+  renderContacts();
   renderAll();
-  hideLoader();
-}
-
-function hideLoader() {
-  const loader = document.getElementById('init-loader');
-  if(window.gsap) {
-    const tl = gsap.timeline();
-    tl.to('#init-loader', {opacity: 0, duration: 0.8, onComplete: ()=> { if(loader) loader.style.display = 'none'; }})
-      .fromTo('.home-wordmark', {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: 0.8});
-  } else {
-    if(loader) loader.style.display = 'none';
-  }
+  
+  const tl = gsap.timeline();
+  tl.to('#init-loader', {opacity: 0, duration: 0.8, onComplete: ()=> document.getElementById('init-loader').style.display = 'none'})
+    .fromTo('.home-wordmark', {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: 0.8});
 }
 
 async function fetchIP() {
@@ -967,6 +1088,27 @@ function switchView(id){
     }});
   } else {
     next.classList.add('active');
+  }
+}
+
+function scrollToAboutSection(id, btn) {
+  const el = document.getElementById(id);
+  if(el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.about-nav-btn').forEach(b => b.classList.remove('active-tab'));
+    if(btn) btn.classList.add('active-tab');
+  }
+}
+
+function scrollToAboutTop() {
+  const viewAbout = document.getElementById('view-about');
+  if(viewAbout) {
+    viewAbout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const tabs = document.querySelectorAll('.about-nav-btn');
+    tabs.forEach((tab, index) => {
+      if(index === 0) tab.classList.add('active-tab');
+      else tab.classList.remove('active-tab');
+    });
   }
 }
 
@@ -1019,6 +1161,35 @@ function renderGalaxy(){
     ).join('');
     DATA.sectors.forEach(sector=>autoTranslateField(document.getElementById('leg-'+sector.id), sector, 'name'));
   }
+}
+
+function triggerSectorZoom(slug) {
+  if (isAnimatingView) return;
+  const s = DATA.sectors.find(x => x.slug === slug);
+  if (!s) return;
+
+  isAnimatingView = true;
+
+  const flash = document.createElement('div');
+  flash.style.position = 'fixed';
+  flash.style.inset = '0';
+  flash.style.backgroundColor = s.color_primary;
+  flash.style.zIndex = '999';
+  flash.style.opacity = '0';
+  flash.style.pointerEvents = 'none';
+  document.body.appendChild(flash);
+
+  gsap.to('.galaxy-legend, .galaxy-head, .consulting-link', { y: 20, opacity: 0, duration: 0.5 });
+  gsap.to('.orbit-wrap', { scale: 8, opacity: 0, duration: 1, ease: "power2.in" });
+  
+  gsap.to(flash, {
+    opacity: 1, duration: 0.6, delay: 0.3, ease: "power2.inOut",
+    onComplete: () => {
+      isAnimatingView = false;
+      showSector(slug); 
+      gsap.to(flash, { opacity: 0, duration: 0.8, ease: "power2.out", onComplete: () => flash.remove() });
+    }
+  });
 }
 
 function showSector(slug) {
@@ -1103,48 +1274,40 @@ function renderConsulting(){
   });
 }
 
-/* ============ ROBUST CONTACT RENDERING (HOMEPAGE + ABOUT INLINE) ============ */
+/* ============ الحل العبقري المكتمل: دالة معالجة وعرض وسائل التواصل فوراً ============ */
 function renderContacts() {
   const contact = DATA.settings.contact_info || {};
   const emails = DATA.settings.contact_emails || [];
   const phones = DATA.settings.contact_phones || [];
 
-  if (emails.length === 0 && contact.email) emails.push(contact.email);
-  if (phones.length === 0 && contact.phone) phones.push(contact.phone);
+  if(emails.length === 0 && contact.email) emails.push(contact.email);
+  if(phones.length === 0 && contact.phone) phones.push(contact.phone);
 
   let contactHtml = '';
-  if (contact.website) {
-    contactHtml += `<a class="gs-hover" href="${makeValidUrl(contact.website)}">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`;
-  }
+  if(contact.website) contactHtml += `<a class="gs-hover" href="${makeValidUrl(contact.website)}">🌐 ${contact.website.replace(/^https?:\/\//,'')}</a>`;
   
   phones.forEach(p => {
-    if (p && p.trim()) {
-      contactHtml += `<a class="gs-hover" href="tel:${p.replace(/[\s\-]/g,'')}">📞 <span dir="ltr">${p}</span></a>`;
-    }
+    if(p.trim()) contactHtml += `<a class="gs-hover" href="tel:${p.replace(/[\s\-]/g,'')}">📞 <span dir="ltr">${p}</span></a>`;
   });
   
   emails.forEach(e => {
-    if (e && e.trim()) {
-      contactHtml += `<a class="gs-hover" href="mailto:${e}">✉️ ${e}</a>`;
-    }
+    if(e.trim()) contactHtml += `<a class="gs-hover" href="mailto:${e}">✉️ ${e}</a>`;
   });
-
-  // Render to both places instantly!
+  
   const cRowAbout = document.getElementById('contactRow');
   const cRowHome = document.getElementById('homeContactRow');
-  if (cRowAbout) cRowAbout.innerHTML = contactHtml;
-  if (cRowHome) cRowHome.innerHTML = contactHtml;
-
+  if(cRowAbout) cRowAbout.innerHTML = contactHtml;
+  if(cRowHome) cRowHome.innerHTML = contactHtml;
+  
   let socialHtml = '';
-  if (contact.linkedin) socialHtml += `<a href="${makeValidUrl(contact.linkedin)}" title="LinkedIn">in</a>`;
-  if (contact.twitter) socialHtml += `<a href="${makeValidUrl(contact.twitter)}" title="Twitter">𝕏</a>`;
-  if (contact.instagram) socialHtml += `<a href="${makeValidUrl(contact.instagram)}" title="Instagram">Ig</a>`;
-
-  // Render social to both places instantly!
+  if(contact.linkedin) socialHtml += `<a href="${makeValidUrl(contact.linkedin)}" title="LinkedIn">in</a>`;
+  if(contact.twitter) socialHtml += `<a href="${makeValidUrl(contact.twitter)}" title="Twitter">𝕏</a>`;
+  if(contact.instagram) socialHtml += `<a href="${makeValidUrl(contact.instagram)}" title="Instagram">Ig</a>`;
+  
   const sRowAbout = document.getElementById('socialRow');
   const sRowHome = document.getElementById('homeSocialRow');
-  if (sRowAbout) sRowAbout.innerHTML = socialHtml;
-  if (sRowHome) sRowHome.innerHTML = socialHtml;
+  if(sRowAbout) sRowAbout.innerHTML = socialHtml;
+  if(sRowHome) sRowHome.innerHTML = socialHtml;
 }
 
 function renderAbout(){
@@ -1181,7 +1344,6 @@ function renderAbout(){
   document.getElementById('statsGrid').innerHTML = (DATA.settings.stats||[]).map((s,i)=>`<div class="stat-block"><b>${s.value}</b><span id="stlbl-${i}">${tf(s,'label')}</span></div>`).join('');
   (DATA.settings.stats||[]).forEach((s,i) => { autoTranslateField(document.getElementById(`stlbl-${i}`), s, 'label'); });
 
-  // Render TEAM
   const teamGrid = document.getElementById('teamGrid');
   if(teamGrid) {
       teamGrid.innerHTML = (DATA.settings.team||[]).map((p,i)=>`
@@ -1197,7 +1359,6 @@ function renderAbout(){
       });
   }
 
-  // Render ADVISORS
   const advisorsGrid = document.getElementById('advisorsGrid');
   if(advisorsGrid) {
       advisorsGrid.innerHTML = (DATA.settings.advisors||[]).map((p,i)=>`
@@ -1214,17 +1375,17 @@ function renderAbout(){
           if(p.bio_en || p.bio_ar) autoTranslateField(document.getElementById(`abio-${i}`), p, 'bio');
       });
   }
+
+  // عرض وسائل التواصل لضمان مطابقة البيانات المستجدة
+  renderContacts();
 }
 
 function renderAll(){
   renderHome();
   renderConsulting();
-  renderContacts(); // Populate Contact Cards instantly on load!
-  
   if(document.getElementById('view-galaxy').classList.contains('active')) renderGalaxy();
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
   
-  // Update currently open sector if any
   const activeSector = document.getElementById('view-sector');
   if(activeSector.classList.contains('active')) {
       const currentSlug = activeSector.dataset.currentSlug;
@@ -1232,7 +1393,7 @@ function renderAll(){
   }
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
+/* ============ AI ASSISTANT ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;
@@ -1335,7 +1496,6 @@ function setTyping(isTyping) {
   if(isTyping) body.scrollTop = body.scrollHeight;
 }
 
-/* --- Onboarding Flow --- */
 function askBotLanguage() {
   chatState = 'LANG';
   const langOpts = LANGS.map(l => ({ text: l.label, val: l.code }));
@@ -1379,7 +1539,6 @@ function askSector() {
 
 function finishOnboarding() { chatState = 'CHAT'; botSay('bot_ready'); }
 
-/* --- Submit Logic --- */
 async function handleChatSubmit() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
@@ -1459,12 +1618,10 @@ function buildAIContext() {
   return ctx;
 }
 
-// 🛡️ OFFLINE LOCAL SEARCH (Fuzzy Search Fallback) 🛡️
 async function getFallbackMsg() {
     let msg = I18N[LANG] && I18N[LANG]['bot_fallback_empty'] ? I18N[LANG]['bot_fallback_empty'] : I18N['en']['bot_fallback_empty'];
     if(!I18N[LANG]) msg = await mtTranslate(msg, LANG);
 
-    // إضافة بيانات التواصل للرسالة لكي تكون مفيدة للعميل!
     const emails = DATA.settings.contact_emails || [];
     const phones = DATA.settings.contact_phones || [];
     if(emails.length > 0 || phones.length > 0) {
@@ -1472,7 +1629,6 @@ async function getFallbackMsg() {
        if(phones.length > 0) msg += `📞 ${phones.join(' , ')}\n`;
        if(emails.length > 0) msg += `✉️ ${emails.join(' , ')}`;
     }
-
     return msg;
 }
 
@@ -1481,7 +1637,6 @@ async function localSearchFallback(query) {
     if(words.length === 0) return await getFallbackMsg();
 
     let results = [];
-
     const scoreText = (text) => {
         if(!text) return 0;
         let t = text.toLowerCase();
@@ -1490,19 +1645,16 @@ async function localSearchFallback(query) {
         return score;
     };
 
-    // 1. Search Knowledge Base
     DATA.knowledge_base.forEach(k => {
         let score = scoreText(k.content);
         if(score > 0) results.push({score, text: k.content});
     });
 
-    // 2. Search Companies
     DATA.companies.forEach(c => {
         let score = scoreText(c.name_ar) + scoreText(c.name_en) + scoreText(c.description_ar) + scoreText(c.description_en);
         if(score > 0) results.push({score, text: `🏢 ${tf(c, 'name')}: ${tf(c, 'description')}`});
     });
 
-    // 3. Search Sectors
     DATA.sectors.forEach(s => {
         let score = scoreText(s.name_ar) + scoreText(s.name_en) + scoreText(s.description_ar);
         if(score > 0) results.push({score, text: `🌌 ${tf(s, 'name')}: ${tf(s, 'description')}`});
@@ -1513,11 +1665,8 @@ async function localSearchFallback(query) {
     if(results.length > 0) {
         let prefix = I18N[LANG] && I18N[LANG]['bot_fallback_prefix'] ? I18N[LANG]['bot_fallback_prefix'] : I18N['en']['bot_fallback_prefix'];
         if(!I18N[LANG]) prefix = await mtTranslate(prefix, LANG);
-        
-        let ans = prefix + results.slice(0, 2).map(r => r.text).join('\n\n');
-        return ans;
+        return prefix + results.slice(0, 2).map(r => r.text).join('\n\n');
     }
-
     return await getFallbackMsg();
 }
 
@@ -1553,17 +1702,11 @@ async function askGemini(question) {
     });
 
     const data = await response.json();
-
-    if (!response.ok || data.error) {
+    if (!response.ok || data.error || !data.candidates || data.candidates.length === 0) {
         throw new Error("API Error"); 
     }
 
-    if (!data.candidates || data.candidates.length === 0) {
-        throw new Error("No candidates"); 
-    }
-
     let answerText = data.candidates[0].content.parts[0].text;
-    
     setTyping(false);
     addBotMsg(answerText);
     
@@ -1576,14 +1719,10 @@ async function askGemini(question) {
 
   } catch (err) {
     console.error("Gemini connection failed. Engaging Offline Local Search Fallback...", err);
-    
-    // 🛡️ OFFLINE FALLBACK TRIGGERED 🛡️
     const fallbackAnswer = await localSearchFallback(question);
-    
     setTyping(false);
     addBotMsg(fallbackAnswer);
     
-    // Save the interaction anyway
     sb.from('intersect_chat_logs').insert({
       ip_location: USER_IP_DATA || {}, 
       lead_data: leadData, 
@@ -1593,9 +1732,7 @@ async function askGemini(question) {
   }
 }
 
-// Start
 loadData();
 </script>
 </body>
 </html>
-

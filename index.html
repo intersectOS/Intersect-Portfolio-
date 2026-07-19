@@ -250,6 +250,19 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 }
 .sector-header p{color:var(--muted);font-size:16px;margin-top:10px;max-width:600px;margin-inline:auto;line-height:2;}
 
+/* Empty State Fix */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--panel);
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--r-md);
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 20px;
+}
+
 .company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;width:100%;position:relative;z-index:2;}
 .company-card{
   background:var(--panel); border:1px solid var(--glass-border);border-radius:var(--r-lg);
@@ -400,7 +413,7 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   .vm-grid, .values-grid, .services-grid { grid-template-columns: 1fr; }
   .people-grid { grid-template-columns: repeat(2, 1fr); }
   
-  /* Mobile App-like Chat Window */
+  /* Mobile App-like Chat Window (Fixed Close Button issue) */
   .chat-window { 
     bottom: 0; right: 0; left: 0; top: 0; 
     width: 100%; height: 100dvh; 
@@ -410,8 +423,14 @@ body.lang-ltr .chat-msg.user { border-bottom-left-radius: 16px; border-bottom-ri
   }
   body.lang-ltr .chat-window { transform-origin: bottom center; }
   
-  .chat-header { padding-top: max(40px, env(safe-area-inset-top)); padding-bottom: 16px; }
-  .chat-close { width: 48px; height: 48px; font-size: 28px; background: rgba(255,255,255,0.1); } 
+  .chat-header { 
+    padding-top: max(40px, env(safe-area-inset-top)); 
+    padding-bottom: 16px; 
+  }
+  .chat-close { 
+    width: 48px; height: 48px; font-size: 28px; 
+    background: rgba(255,255,255,0.1); 
+  } 
   .chat-input-area { padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)); }
   
   .chat-fab { bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; }
@@ -449,7 +468,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 <section class="view active" id="view-home">
   <div class="hero-orb"><div class="home-logo" id="homeLogo">IX</div></div>
   <h1 class="home-wordmark" id="homeWordmark" data-i18n="brand_name">Intersect</h1>
-  <p class="home-tagline" id="homeTagline">Where ideas intersect and ventures are built</p>
+  <p class="home-tagline" id="homeTagline" data-i18n="tagline_default">Where ideas intersect and ventures are built</p>
   <p class="home-about" id="homeAbout">Loading…</p>
   <div class="home-stats" id="homeStats"></div>
   <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
@@ -474,7 +493,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 </section>
 
 <!-- SECTOR -->
-<section class="view" id="view-sector">
+<section class="view" id="view-sector" data-current-slug="">
   <a class="back-link gs-hover" href="#" onclick="switchView('view-galaxy');return false;"><span data-i18n="back_to_sectors">← Back to sectors</span></a>
   <div class="sector-header"><span class="sector-icon" id="sectorIcon"></span><h2 id="sectorName">—</h2><p id="sectorDesc"></p></div>
   <div class="company-grid" id="companyGrid"></div>
@@ -519,7 +538,6 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
       <span id="chatTitle">IX AI Assistant</span>
     </div>
-    <!-- Better Close Button UI -->
     <button class="chat-close" onclick="toggleChat()">×</button>
   </div>
   <div class="chat-body" id="chatBody">
@@ -683,8 +701,8 @@ const LANGS = [
 const I18N = {
   ar:{
     brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',
-    explore_cta:'اكتشف عالم تقاطع "شركاتنا"', // التعديل الجديد للزر الرئيسي
-    sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد شركات في هذا القطاع بعد.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
+    explore_cta:'اكتشف عالم تقاطع "شركاتنا"', 
+    sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',partnerships_link:'🤝 شراكات واستشارات ←',back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'شراكات واستشارات',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد مشاريع في هذا القطاع حتى الآن.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
     bot_placeholder: 'اكتب رسالتك هنا...',
     bot_ask_lang: 'مرحباً بك! يرجى اختيار لغتك المفضلة لبدء المحادثة:\nWelcome! Please select your preferred language:',
     bot_ask_region: 'أهلاً بك في إنترسكت! لتكون إجاباتنا دقيقة ومخصصة لك، من أي منطقة تتواصل معنا؟',
@@ -695,12 +713,11 @@ const I18N = {
     bot_ready: 'تم حفظ بياناتك بنجاح! كيف يمكنني مساعدتك اليوم؟ (يمكنك سؤالي عن خدماتنا، مشاريعنا، أو أي شيء يخص إنترسكت)',
     bot_skip_country: 'شركة عالمية، ممتاز! نتعامل مع العديد من الشركات الدولية.',
     bot_fallback_prefix: '💡 أواجه ضغطاً بالاتصال بالخادم الذكي حالياً، لكن من خلال سجلاتي وجدت التالي:\n\n',
-    bot_fallback_empty: 'عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة.',
-    bot_error: 'عذراً، أواجه صعوبة في الاتصال بالخادم الآن. يرجى المحاولة لاحقاً.'
+    bot_fallback_empty: 'عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة.'
   },
   en:{
     brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',
-    explore_cta:'Explore Intersect\'s World "Our Companies"', // Base translation for auto-translate
+    explore_cta:'Explore Intersect\'s World "Our Companies"', 
     sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',partnerships_link:'🤝 Partnerships & Consulting →',back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Consulting',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
     bot_placeholder: 'Type your message here...',
     bot_ask_lang: 'Welcome! Please select your preferred language:\nمرحباً بك! يرجى اختيار لغتك المفضلة:',
@@ -712,8 +729,7 @@ const I18N = {
     bot_ready: 'Your details are saved! How can I assist you today? (Ask me about our services, projects, or anything about Intersect)',
     bot_skip_country: 'A global company, wonderful! We work with many international entities.',
     bot_fallback_prefix: '💡 I am experiencing server load, but found this in my local records:\n\n',
-    bot_fallback_empty: 'Sorry, I am currently facing server load and could not find a direct answer in my local records. Feel free to browse the site or contact us directly.',
-    bot_error: 'Sorry, I am having trouble connecting to the server right now. Please try again later.'
+    bot_fallback_empty: 'Sorry, I am currently facing server load and could not find a direct answer in my local records. Feel free to browse the site or contact us directly.'
   },
   ja:{
     brand_name:'Intersect Holding Company',tagline_default:'アイデアが交差し、ベンチャーが構築される場所',
@@ -729,8 +745,7 @@ const I18N = {
     bot_ready: 'あなたの詳細は保存されます！今日はどのようにお手伝いさせていただけますか？(サービス、プロジェクト、Intersectに関することなら何でも聞いてください)',
     bot_skip_country: 'グローバル企業ですね、素晴らしい！私たちは多くの国際的な組織と協力しています。',
     bot_fallback_prefix: '💡 現在サーバーの負荷が高いため、ローカルの記録から以下の情報を見つけました：\n\n',
-    bot_fallback_empty: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカルの記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。',
-    bot_error: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカルの記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。'
+    bot_fallback_empty: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカルの記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。'
   }
 };
 
@@ -782,11 +797,16 @@ initLangSelect();
 
 function tf(obj, field, lang){ 
   lang = lang || LANG; 
-  if(lang==='ar') return obj[field+'_ar'] || obj[field+'_en'] || '';
-  if(lang==='en') return obj[field+'_en'] || obj[field+'_ar'] || '';
+  // Get base text
+  let text = '';
+  if(lang==='ar') text = obj[field+'_ar'] || obj[field+'_en'] || '';
+  else text = obj[field+'_en'] || obj[field+'_ar'] || '';
+  
+  // Return manual translation if available
   const tr = obj.translations && obj.translations[lang];
   if(tr && tr[field]) return tr[field];
-  return obj[field+'_en'] || obj[field+'_ar'] || ''; 
+  
+  return text; 
 }
 
 /* Auto-Translate Engine (Google Translate API) */
@@ -805,24 +825,26 @@ async function mtTranslate(text, targetLang){
 }
 
 async function autoTranslateInto(el, sourceText){
-  // All languages except AR/EN will pass through google translate
-  if(!el || !sourceText || LANG==='ar' || LANG==='en') return; 
+  if(!el || !sourceText || LANG === 'ar') return; // Do not touch Arabic if AR is selected
   const langAtCallTime = LANG;
   const translated = await mtTranslate(sourceText, langAtCallTime);
-  if(el.isConnected && LANG===langAtCallTime) el.textContent = translated;
+  if(el.isConnected && LANG === langAtCallTime) el.textContent = translated;
 }
 
 function autoTranslateField(el, obj, field){
-  if(!el || LANG==='ar' || LANG==='en') return; 
-  
-  // If we have manual translation saved from admin dashboard, use it
-  if (obj.translations && obj.translations[LANG] && obj.translations[LANG][field]) {
-      return; 
-  }
-  
-  // Otherwise auto translate using Google Translate
-  const source = obj[field+'_en'] || obj[field+'_ar'];
-  autoTranslateInto(el, source);
+  if(!el || LANG === 'ar') return; 
+
+  // 1. If English is selected, and admin manually entered English text, do NOT auto-translate.
+  if (LANG === 'en' && obj[field+'_en'] && obj[field+'_en'].trim() !== '') return;
+
+  // 2. If another language is selected, and admin manually entered translation, do NOT auto-translate.
+  if (obj.translations && obj.translations[LANG] && obj.translations[LANG][field] && obj.translations[LANG][field].trim() !== '') return;
+
+  // 3. Auto translate is required! Source is Arabic (primary).
+  const sourceText = obj[field+'_ar'] || obj[field+'_en'];
+  if(!sourceText) return;
+
+  autoTranslateInto(el, sourceText);
 }
 
 /* ============ FETCH DATA ============ */
@@ -899,7 +921,6 @@ function renderHome(){
   
   taglineEl.textContent = tf(brand,'tagline') || i18n('tagline_default');
   aboutEl.textContent = tf(brand,'about') || '';
-  
   autoTranslateField(taglineEl, brand, 'tagline');
   autoTranslateField(aboutEl, brand, 'about');
 
@@ -978,8 +999,12 @@ function showSector(slug){
   const current = document.querySelector('.view.active');
   const next = document.getElementById('view-sector');
   if(current) current.classList.remove('active');
-  next.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'});
+  next.classList.add('active'); 
+  window.scrollTo({top:0,behavior:'smooth'});
   document.getElementById('brandMini').classList.add('show');
+  
+  // Store current slug to re-render properly on language change
+  next.dataset.currentSlug = slug;
 
   const nameEl = document.getElementById('sectorName');
   const descEl = document.getElementById('sectorDesc');
@@ -992,7 +1017,10 @@ function showSector(slug){
   
   const list = DATA.companies.filter(c=>c.sector_id===s.id);
   const grid = document.getElementById('companyGrid');
-  if(list.length===0){ grid.innerHTML = `<div class="empty-state">${i18n('no_ventures')}</div>`; return; }
+  if(list.length===0){ 
+    grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--panel); border: 1px dashed var(--glass-border); border-radius: var(--r-md); color: var(--muted); font-size: 15px; margin-top: 20px;">${i18n('no_ventures')}</div>`; 
+    return; 
+  }
   
   grid.innerHTML = list.map(c=>`
     <div class="company-card" style="--card-accent:${s.color_primary}">
@@ -1014,7 +1042,10 @@ function showSector(slug){
 function renderConsulting(){
   const grid = document.getElementById('consultingGrid');
   if(!grid) return;
-  if(DATA.consulting.length === 0){ grid.innerHTML = `<div class="empty-state">${i18n('no_partnerships')}</div>`; return; }
+  if(DATA.consulting.length === 0){ 
+    grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--panel); border: 1px dashed var(--glass-border); border-radius: var(--r-md); color: var(--muted); font-size: 15px; margin-top: 20px;">${i18n('no_partnerships')}</div>`; 
+    return; 
+  }
 
   grid.innerHTML = DATA.consulting.map(c=> {
     let relStr = tf(c, 'relationship_label');
@@ -1037,7 +1068,12 @@ function renderConsulting(){
   DATA.consulting.forEach(c=>{
     autoTranslateField(document.getElementById('conn-'+c.id), c, 'name');
     autoTranslateField(document.getElementById('cont-'+c.id), c, 'type');
-    if(c.relationship_label_ar) autoTranslateField(document.getElementById('conrl-'+c.id), c, 'relationship_label');
+    
+    // Auto translate relationship label if it was manually entered
+    const labelEl = document.getElementById('conrl-'+c.id);
+    if(labelEl && c.relationship_label_ar) {
+        autoTranslateField(labelEl, c, 'relationship_label');
+    }
   });
 }
 
@@ -1109,7 +1145,6 @@ function renderAbout(){
       });
   }
 
-  // Render Contacts
   const contact = DATA.settings.contact_info || {};
   const emails = DATA.settings.contact_emails || [];
   const phones = DATA.settings.contact_phones || [];
@@ -1142,9 +1177,16 @@ function renderAll(){
   renderConsulting();
   if(document.getElementById('view-galaxy').classList.contains('active')) renderGalaxy();
   if(document.getElementById('view-about').classList.contains('active')) renderAbout();
+  
+  // Update currently open sector if any
+  const activeSector = document.getElementById('view-sector');
+  if(activeSector.classList.contains('active')) {
+      const currentSlug = activeSector.dataset.currentSlug;
+      if(currentSlug) showSector(currentSlug);
+  }
 }
 
-/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION & RETRY ============ */
+/* ============ AI ASSISTANT (GEMINI & LEAD GEN) WITH AUTO-TRANSLATION ============ */
 let chatState = 'INIT'; 
 let leadData = { region: '', country: '', contact: '', sector: '' };
 let isChatOpen = false;

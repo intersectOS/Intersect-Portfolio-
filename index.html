@@ -109,7 +109,7 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
 .view{
   position:absolute; inset:0; z-index:2;
   min-height:100vh; display:none; flex-direction:column;
-  align-items:center; justify-content:flex-start; /* Changed from center to flex-start for scrolling layout compatibility */
+  align-items:center; justify-content:flex-start; /* Corrected to start to enable natural scrolls */
   padding:120px 24px 80px; opacity: 0;
 }
 .view.active{display:flex; opacity: 1; position:relative;}
@@ -335,8 +335,42 @@ body.lang-ja, body.lang-ko, body.lang-zh{font-family:var(--ff-jp);}
   box-shadow: 0 0 15px var(--gold-glow);
 }
 
-.about-block{margin-bottom:56px;position:relative;z-index:2;scroll-margin-top: 160px;}
-.about-block-title{font-family:var(--ff-display);font-size:clamp(22px,4vw,30px);font-weight:700;margin-bottom:24px;text-align:center;background:linear-gradient(135deg, var(--text), var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.about-block{margin-bottom: 56px; position:relative; z-index:2; scroll-margin-top: 160px;}
+.about-block-title{font-family:var(--ff-display);font-size:clamp(22px,4vw,30px);font-weight:700;margin-bottom:0;text-align:center;background:linear-gradient(135deg, var(--text), var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* Header Wrap for Titles with To-Top Buttons */
+.block-header-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+/* Premium Neo To-Top Button Style */
+.to-top-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--gold);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+.to-top-btn:hover {
+  background: rgba(232, 200, 122, 0.1);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+  transform: translateY(-2px);
+}
+
 .vm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .vm-card{background:var(--panel);border:1px solid var(--glass-border);border-radius:var(--r-lg);padding:36px 28px;backdrop-filter:blur(16px);position:relative;overflow:hidden;}
 .vm-card h3{font-family:var(--ff-display);font-size:22px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
@@ -397,7 +431,7 @@ body.lang-ltr .chat-window { right: auto; left: 30px; transform-origin: bottom l
 }
 .chat-header-title { font-family: var(--ff-mono); font-weight: 700; color: var(--gold); display: flex; align-items:center; gap:10px;}
 
-/* Better Close Button UI */
+/* Better Close Button UI - FIXED FOR MOBILE */
 .chat-close { 
   background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--muted); 
   cursor: pointer; font-size: 20px; transition: 0.2s; 
@@ -529,7 +563,7 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
 <section class="view active" id="view-home">
   <div class="hero-orb"><div class="home-logo" id="homeLogo">IX</div></div>
   <h1 class="home-wordmark" id="homeWordmark" data-i18n="brand_name">Intersect</h1>
-  <p class="home-tagline" id="homeTagline" data-i18n="tagline_default">Where ideas intersect and ventures are built</p>
+  <p class="home-tagline" id="homeTagline">Where ideas intersect and ventures are built</p>
   <p class="home-about" id="homeAbout">Loading…</p>
   <div class="home-stats" id="homeStats"></div>
   <button class="cta-btn gs-hover" onclick="switchView('view-galaxy')">
@@ -574,26 +608,30 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
   <div class="company-grid" id="consultingGrid"></div>
 </section>
 
-<!-- ABOUT -->
+<!-- ABOUT (Entire view-about rebuilt with tabs on top and To-Top buttons on headings) -->
 <section class="view" id="view-about">
   <a class="back-link gs-hover" href="#" onclick="switchView('view-home');return false;"><span data-i18n="back_home">← Back to home</span></a>
   
-  <div class="about-hero">
-    <h2 id="aboutTitle" data-i18n="about_title">About Intersect</h2>
-    <p class="about-lead" id="aboutLead"></p>
-  </div>
-  
-  <!-- About Navigation Tabs (Futuristic sticky subbar) -->
+  <!-- About Navigation Tabs (Now placed strictly at the top) -->
   <div class="about-nav-tabs">
-    <button class="about-nav-btn active-tab" onclick="scrollToAboutSection('about-vm', this)" data-i18n="vision_title">Vision & Mission</button>
+    <button class="about-nav-btn active-tab" onclick="scrollToAboutSection('about-vm', this)" data-i18n="vm_title">Vision & Mission</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-values', this)" data-i18n="values_title">Core Values</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-services', this)" data-i18n="services_title">Our Services</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-people', this)" data-i18n="team_title">Our People</button>
     <button class="about-nav-btn" onclick="scrollToAboutSection('about-advisory', this)" data-i18n="advisors_title">Our Advisory</button>
   </div>
+
+  <div class="about-hero">
+    <h2 id="aboutTitle" data-i18n="about_title">About Intersect</h2>
+    <p class="about-lead" id="aboutLead"></p>
+  </div>
   
+  <!-- Vision & Mission Section -->
   <div class="about-block" id="about-vm">
-    <div class="section-divider"></div>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="vm_title">Vision & Mission</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="vm-grid">
       <div class="vm-card gs-card">
         <h3><span data-i18n="vision_title">Our Vision</span></h3>
@@ -606,15 +644,21 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
     </div>
   </div>
   
+  <!-- Core Values Section -->
   <div class="about-block" id="about-values">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="values_title">Our Core Values</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="values_title">Our Core Values</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="values-grid" id="valuesGrid"></div>
   </div>
   
+  <!-- Services Section -->
   <div class="about-block" id="about-services">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="services_title">Our Services</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="services_title">Our Services</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="services-grid" id="servicesGrid"></div>
   </div>
   
@@ -622,17 +666,21 @@ select.lang-toggle{appearance:none;-webkit-appearance:none;cursor:pointer;paddin
     <div class="stats-grid" id="statsGrid"></div>
   </div>
   
-  <!-- TEAM -->
+  <!-- Team Section -->
   <div class="about-block" id="about-people">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="team_title">Our People</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="team_title">Our People</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="people-grid" id="teamGrid"></div>
   </div>
   
-  <!-- ADVISORS -->
+  <!-- Advisors Section -->
   <div class="about-block" id="about-advisory">
-    <div class="section-divider"></div>
-    <h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3>
+    <div class="block-header-wrap">
+      <h3 class="about-block-title" data-i18n="advisors_title">Our Advisory</h3>
+      <button class="to-top-btn" onclick="scrollToAboutTop()" data-i18n="back_to_top">To Top ↑</button>
+    </div>
     <div class="people-grid" id="advisorsGrid"></div>
   </div>
 
@@ -822,7 +870,7 @@ const I18N = {
     brand_name:'شركة تقاطع القابضة "انترسيكت"',tagline_default:'حيث تتقاطع الأفكار وتُبنى المشاريع',
     explore_cta:'اكتشف عالم تقاطع<br><span style="font-size: 13px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"اكتشف شركاتنا"</span>', 
     sectors_title:'القطاعات',sectors_sub:'اختر كوكبًا لاستكشاف مشاريعه',
-    partnerships_link:'🤝 شراكات وعملاء ←', // Changed to "Clients" instead of "Consulting"
+    partnerships_link:'🤝 شراكات وعملاء ←', 
     back_to_sectors:'→ رجوع للقطاعات',partnerships_title:'الشراكات والعملاء',partnerships_sub:'مشاريع عملاء وشراكات استراتيجية خارج محفظة الملكية المباشرة',no_ventures:'لا توجد مشاريع في هذا القطاع حتى الآن.',no_partnerships:'لا توجد شراكات مضافة بعد.',visit_website:'زيارة الموقع ↗',stat_ventures:'مشروع',stat_sectors:'قطاعات',stat_partnerships:'شراكات',footer_rights:'© 2026 إنترسكت. جميع الحقوق محفوظة.',footer_admin:'لوحة التحكم',about_link:'📖 عن إنترسكت بالتفصيل ←',about_title:'عن إنترسكت',back_home:'→ رجوع للرئيسية',vision_title:'رؤيتنا',mission_title:'رسالتنا',values_title:'قيمنا الأساسية',services_title:'خدماتنا',team_title:'فريقنا',advisors_title:'مستشارونا',contact_title:'تواصل معنا',kind_client:'عميل',kind_partner:'شريك استراتيجي',
     bot_placeholder: 'اكتب رسالتك هنا...',
     bot_ask_lang: 'مرحباً بك! يرجى اختيار لغتك المفضلة لبدء المحادثة:\nWelcome! Please select your preferred language:',
@@ -834,13 +882,15 @@ const I18N = {
     bot_ready: 'تم حفظ بياناتك بنجاح! كيف يمكنني مساعدتك اليوم؟ (يمكنك سؤالي عن خدماتنا، مشاريعنا، أو أي شيء يخص إنترسكت)',
     bot_skip_country: 'شركة عالمية، ممتاز! نتعامل مع العديد من الشركات الدولية.',
     bot_fallback_prefix: '💡 أواجه ضغطاً بالاتصال بالخادم الذكي حالياً، لكن من خلال سجلاتي وجدت التالي:\n\n',
-    bot_fallback_empty: 'عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة.'
+    bot_fallback_empty: 'عذراً، أواجه ضغطاً في الاتصال بالخادم الذكي حالياً ولم أجد إجابة دقيقة في سجلاتي. يمكنك تصفح الموقع لمعرفة المزيد أو التواصل معنا مباشرة.',
+    vm_title: 'الرؤية والرسالة',
+    back_to_top: 'إلى الأعلى ↑'
   },
   en:{
     brand_name:'Intersect Holding Company',tagline_default:'Where ideas intersect and ventures are built',
     explore_cta:'Explore Intersect\'s World<br><span style="font-size: 12px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">"Our Portfolio"</span>', 
     sectors_title:'Sectors',sectors_sub:'Choose a planet to explore its ventures',
-    partnerships_link:'🤝 Partnerships & Clients →', // Changed to "Clients" instead of "Consulting"
+    partnerships_link:'🤝 Partnerships & Clients →', 
     back_to_sectors:'← Back to sectors',partnerships_title:'Partnerships & Clients',partnerships_sub:'Client work and strategic partnerships outside our owned portfolio',no_ventures:'No ventures in this sector yet.',no_partnerships:'No partnerships added yet.',visit_website:'Visit website ↗',stat_ventures:'Ventures',stat_sectors:'Sectors',stat_partnerships:'Partnerships',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'Admin',about_link:'📖 About Intersect in detail →',about_title:'About Intersect',back_home:'← Back to home',vision_title:'Our Vision',mission_title:'Our Mission',values_title:'Our Core Values',services_title:'Our Services',team_title:'Our People',advisors_title:'Our Advisory',contact_title:'Get in Touch',kind_client:'Client',kind_partner:'Strategic Partner',
     bot_placeholder: 'Type your message here...',
     bot_ask_lang: 'Welcome! Please select your preferred language:\nمرحباً بك! يرجى اختيار لغتك المفضلة:',
@@ -852,13 +902,15 @@ const I18N = {
     bot_ready: 'Your details are saved! How can I assist you today? (Ask me about our services, projects, or anything about Intersect)',
     bot_skip_country: 'A global company, wonderful! We work with many international entities.',
     bot_fallback_prefix: '💡 I am experiencing server load, but found this in my local records:\n\n',
-    bot_fallback_empty: 'Sorry, I am currently facing server load and could not find a direct answer in my local records. Feel free to browse the site or contact us directly.'
+    bot_fallback_empty: 'Sorry, I am currently facing server load and could not find a direct answer in my local records. Feel free to browse the site or contact us directly.',
+    vm_title: 'Vision & Mission',
+    back_to_top: 'To Top ↑'
   },
   ja:{
     brand_name:'Intersect Holding Company',tagline_default:'アイデアが交差し、ベンチャーが構築される場所',
     explore_cta:'Intersectの世界を探索する<br><span style="font-size: 12px; font-weight: 500; opacity: 0.8; display: block; margin-top: 4px;">「ポートフォリオ」</span>',
     sectors_title:'セクター',sectors_sub:'惑星を選んでベンチャーを探索',
-    partnerships_link:'🤝 パートナーシップとクライアント ←', // Changed to "Clients"
+    partnerships_link:'🤝 パートナーシップとクライアント ←', 
     back_to_sectors:'← セクターに戻る',partnerships_title:'パートナーシップとクライアント',partnerships_sub:'クライアントワークと戦略的パートナーシップ',no_ventures:'このセクターにはまだベンチャーがありません。',no_partnerships:'パートナーシップはまだ追加されていません。',visit_website:'ウェブサイトを見る ↗',stat_ventures:'ベンチャー',stat_sectors:'セクター',stat_partnerships:'パートナーシップ',footer_rights:'© 2026 Intersect. All rights reserved.',footer_admin:'管理パネル',about_link:'📖 Intersect について詳しく ←',about_title:'Intersect について',back_home:'← ホームに戻る',vision_title:'私たちのビジョン',mission_title:'私たちのミッション',values_title:'コアバリュー',services_title:'サービス',team_title:'私たちのチーム',advisors_title:'アドバイザー',contact_title:'お問い合わせ',kind_client:'クライアント',kind_partner:'戦略的パートナー',
     bot_placeholder: 'ここにメッセージを入力してください...',
     bot_ask_lang: 'ようこそ！希望する言語を選択してください：',
@@ -870,7 +922,9 @@ const I18N = {
     bot_ready: 'あなたの詳細は保存されます！今日はどのようにお手伝いさせていただけますか？(サービス、プロジェクト、Intersectに関することなら何でも聞いてください)',
     bot_skip_country: 'グローバル企業ですね、素晴らしい！私たちは多くの国際的な組織と協力しています。',
     bot_fallback_prefix: '💡 現在サーバーの負荷が高いため、ローカルの記録から以下の情報を見つけました：\n\n',
-    bot_fallback_empty: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカル of 記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。'
+    bot_fallback_empty: '申し訳ありませんが、現在サーバーの負荷に直面しているため、ローカル of 記録で直接の答えが見つかりませんでした。お気軽にサイトをご覧いただくか、直接お問い合わせください。',
+    vm_title: 'ビジョン＆ミッション',
+    back_to_top: 'トップへ ↑'
   }
 };
 
@@ -1045,6 +1099,21 @@ function scrollToAboutSection(id, btn) {
     // Toggle Active tab style
     document.querySelectorAll('.about-nav-btn').forEach(b => b.classList.remove('active-tab'));
     if(btn) btn.classList.add('active-tab');
+  }
+}
+
+/* ============ SMOOTH SCROLL TO TOP OF ABOUT PAGE ============ */
+function scrollToAboutTop() {
+  const viewAbout = document.getElementById('view-about');
+  if(viewAbout) {
+    viewAbout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Reset active state to first tab
+    const tabs = document.querySelectorAll('.about-nav-btn');
+    tabs.forEach((tab, index) => {
+      if(index === 0) tab.classList.add('active-tab');
+      else tab.classList.remove('active-tab');
+    });
   }
 }
 
@@ -1652,11 +1721,11 @@ async function askGemini(question) {
     const data = await response.json();
 
     if (!response.ok || data.error) {
-        throw new Error("API Error"); // Force to catch block for local fallback
+        throw new Error("API Error"); 
     }
 
     if (!data.candidates || data.candidates.length === 0) {
-        throw new Error("No candidates"); // Force to catch block for local fallback
+        throw new Error("No candidates"); 
     }
 
     let answerText = data.candidates[0].content.parts[0].text;

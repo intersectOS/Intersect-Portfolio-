@@ -386,7 +386,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       </div>
     </div>
 
-    <!-- CONTACTS SECTION MOVED HERE -->
+    <!-- CONTACTS SECTION -->
     <div class="card" style="border-color:var(--gold);">
       <h3 style="color:var(--gold);">بيانات التواصل والسوشيال ميديا</h3>
       <div class="field"><label>الموقع الإلكتروني الرسمي</label><input id="contactWebsite" placeholder="https://"></div>
@@ -440,6 +440,13 @@ let KNOWLEDGE = [], CHAT_LOGS = [];
 let pendingBrandLogo = null, pendingCompLogo = null, pendingConLogo = null;
 let selectedIconKeys = new Set();
 
+/* ============ SESSION MEMORY (AUTO-LOGIN) ============ */
+document.addEventListener("DOMContentLoaded", () => {
+    if(sessionStorage.getItem('ix_admin_logged_in') === 'true'){
+        unlockShell();
+    }
+});
+
 /* ============ NEON ICON LIBRARY ============ */
 const ICON_LIBRARY = {
   ai: {label:'شبكة عصبية', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="13" r="5"/><circle cx="13" cy="47" r="5"/><circle cx="51" cy="47" r="5"/><path d="M32 18 L17 43 M32 18 L47 43 M18 47 H46"/><circle cx="32" cy="33" r="2.2" fill="currentColor" stroke="none"/></svg>`},
@@ -449,6 +456,7 @@ const ICON_LIBRARY = {
   intelligence: {label:'مدارات رادار', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="32" r="5.5"/><circle cx="32" cy="32" r="16" stroke-dasharray="3 6"/><circle cx="32" cy="32" r="26" stroke-dasharray="1.5 7"/><circle cx="32" cy="6" r="2.4" fill="currentColor" stroke="none"/><circle cx="55" cy="45" r="2.4" fill="currentColor" stroke="none"/></svg>`},
   generic: {label:'شكل هندسي عام', svg:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"><path d="M32 5 L55 18.5 V45.5 L32 59 L9 45.5 V18.5 Z"/><circle cx="32" cy="32" r="3.6" fill="currentColor" stroke="none"/><path d="M32 11 V21 M32 43 V53 M16.5 20 L24.5 26 M47.5 20 L39.5 26 M16.5 44 L24.5 38 M47.5 44 L39.5 38" stroke-width="1.4"/></svg>`}
 };
+
 function renderIconPicker(){
   const grid = document.getElementById('iconPickerGrid');
   grid.innerHTML = Object.keys(ICON_LIBRARY).map(key=>{
@@ -480,13 +488,21 @@ async function submitGate(){
   if(!pw){ return; }
   const {data} = await sb.from('intersect_site_settings').select('*').eq('key','admin_auth').single();
   const hash = await sha256(pw);
+  
   if(!data || !data.value || !data.value.password_hash){
     await sb.from('intersect_site_settings').upsert({key:'admin_auth', value:{password_hash:hash}});
+    sessionStorage.setItem('ix_admin_logged_in', 'true');
     unlockShell();
     return;
   }
-  if(data.value.password_hash === hash){ unlockShell(); } else { document.getElementById('gateError').textContent = 'كلمة المرور غير صحيحة'; }
+  if(data.value.password_hash === hash){ 
+      sessionStorage.setItem('ix_admin_logged_in', 'true');
+      unlockShell(); 
+  } else { 
+      document.getElementById('gateError').textContent = 'كلمة المرور غير صحيحة'; 
+  }
 }
+
 function unlockShell(){
   document.getElementById('gate').classList.add('hidden');
   document.getElementById('shell').classList.remove('hidden');
@@ -524,7 +540,7 @@ async function handleGenericLogo(e, cb){
   if(url) cb(url);
 }
 
-/* ============ LOAD ============ */
+/* ============ ROBUST LOAD SYSTEM ============ */
 let BRAND_DATA = {};
 let ABOUT = { 
   vision_mission:{}, core_values:[], services:[], industries:[], 
@@ -533,64 +549,84 @@ let ABOUT = {
 };
 
 async function loadAll(){
-  const [{data:settings},{data:sectors},{data:companies},{data:consulting},{data:knowledge}] = await Promise.all([
-    sb.from('intersect_site_settings').select('*'),
-    sb.from('intersect_sectors').select('*').order('sort_order'),
-    sb.from('intersect_companies').select('*').order('sort_order'),
-    sb.from('intersect_consulting').select('*').order('sort_order'),
-    sb.from('intersect_knowledge_base').select('*').order('created_at', {ascending: false})
-  ]);
-  
-  const settingsMap = {};
-  (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
-  const brand = settingsMap.brand || {};
-  BRAND_DATA = brand;
-  document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
-  document.getElementById('brandTaglineEn').value = brand.tagline_en||'';
-  document.getElementById('brandAboutAr').value = brand.about_ar||'';
-  document.getElementById('brandAboutEn').value = brand.about_en||'';
-  if(brand.logo_url){ pendingBrandLogo=brand.logo_url; const im=document.getElementById('brandLogoPreview'); im.src=brand.logo_url; im.style.display='block'; }
+  try {
+      const [{data:settings},{data:sectors},{data:companies},{data:consulting},{data:knowledge}] = await Promise.all([
+        sb.from('intersect_site_settings').select('*'),
+        sb.from('intersect_sectors').select('*').order('sort_order'),
+        sb.from('intersect_companies').select('*').order('sort_order'),
+        sb.from('intersect_consulting').select('*').order('sort_order'),
+        sb.from('intersect_knowledge_base').select('*').order('created_at', {ascending: false})
+      ]);
+      
+      const settingsMap = {};
+      (settings||[]).forEach(row=>settingsMap[row.key]=row.value);
+      
+      // BRAND
+      const brand = settingsMap.brand || {};
+      BRAND_DATA = brand;
+      document.getElementById('brandTaglineAr').value = brand.tagline_ar||'';
+      document.getElementById('brandTaglineEn').value = brand.tagline_en||'';
+      document.getElementById('brandAboutAr').value = brand.about_ar||'';
+      document.getElementById('brandAboutEn').value = brand.about_en||'';
+      if(brand.logo_url){ pendingBrandLogo=brand.logo_url; const im=document.getElementById('brandLogoPreview'); im.src=brand.logo_url; im.style.display='block'; }
 
-  ABOUT.vision_mission = settingsMap.vision_mission || {};
-  ABOUT.core_values = settingsMap.core_values || [];
-  ABOUT.services = settingsMap.services || [];
-  ABOUT.industries = settingsMap.industries || [];
-  ABOUT.stats = settingsMap.stats || [];
-  ABOUT.team = settingsMap.team || [];
-  ABOUT.advisors = settingsMap.advisors || [];
-  ABOUT.client_logos = settingsMap.client_logos || [];
-  ABOUT.contact_info = settingsMap.contact_info || {};
-  ABOUT.contact_emails = settingsMap.contact_emails || [];
-  ABOUT.contact_phones = settingsMap.contact_phones || [];
-  
-  if(ABOUT.contact_emails.length === 0 && ABOUT.contact_info.email) ABOUT.contact_emails.push(ABOUT.contact_info.email);
-  if(ABOUT.contact_phones.length === 0 && ABOUT.contact_info.phone) ABOUT.contact_phones.push(ABOUT.contact_info.phone);
-  
-  document.getElementById('visionEn').value = ABOUT.vision_mission.vision_en || '';
-  document.getElementById('missionEn').value = ABOUT.vision_mission.mission_en || '';
-  
-  document.getElementById('contactWebsite').value = ABOUT.contact_info.website || '';
-  document.getElementById('contactLinkedIn').value = ABOUT.contact_info.linkedin || '';
-  document.getElementById('contactTwitter').value = ABOUT.contact_info.twitter || '';
-  document.getElementById('contactInstagram').value = ABOUT.contact_info.instagram || '';
+      // BULLETPROOF ARRAYS (Prevents .map() crashes)
+      ABOUT.vision_mission = settingsMap.vision_mission || {};
+      ABOUT.core_values = Array.isArray(settingsMap.core_values) ? settingsMap.core_values : [];
+      ABOUT.services = Array.isArray(settingsMap.services) ? settingsMap.services : [];
+      ABOUT.industries = Array.isArray(settingsMap.industries) ? settingsMap.industries : [];
+      ABOUT.stats = Array.isArray(settingsMap.stats) ? settingsMap.stats : [];
+      ABOUT.team = Array.isArray(settingsMap.team) ? settingsMap.team : [];
+      ABOUT.advisors = Array.isArray(settingsMap.advisors) ? settingsMap.advisors : [];
+      ABOUT.client_logos = Array.isArray(settingsMap.client_logos) ? settingsMap.client_logos : [];
+      ABOUT.contact_info = settingsMap.contact_info || {};
+      ABOUT.contact_emails = Array.isArray(settingsMap.contact_emails) ? settingsMap.contact_emails : [];
+      ABOUT.contact_phones = Array.isArray(settingsMap.contact_phones) ? settingsMap.contact_phones : [];
+      
+      // Fallback
+      if(ABOUT.contact_emails.length === 0 && ABOUT.contact_info.email) ABOUT.contact_emails.push(ABOUT.contact_info.email);
+      if(ABOUT.contact_phones.length === 0 && ABOUT.contact_info.phone) ABOUT.contact_phones.push(ABOUT.contact_info.phone);
+      
+      document.getElementById('visionEn').value = ABOUT.vision_mission.vision_en || '';
+      document.getElementById('missionEn').value = ABOUT.vision_mission.mission_en || '';
+      
+      document.getElementById('contactWebsite').value = ABOUT.contact_info.website || '';
+      document.getElementById('contactLinkedIn').value = ABOUT.contact_info.linkedin || '';
+      document.getElementById('contactTwitter').value = ABOUT.contact_info.twitter || '';
+      document.getElementById('contactInstagram').value = ABOUT.contact_info.instagram || '';
 
-  renderListSection('core_values'); renderListSection('services'); renderListSection('stats');
-  renderListSection('team'); renderListSection('advisors');
-  renderSimpleListSection('industries'); renderSimpleListSection('client_logos');
-  
-  renderSimpleListSection('contact_emails');
-  renderSimpleListSection('contact_phones');
+      SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
+      KNOWLEDGE = knowledge || [];
 
-  const botStatus = settingsMap.bot_status || 'enabled';
-  document.getElementById('botStatusSelect').value = botStatus;
+      // SAFE RENDERING
+      const safeRender = (fn) => { try { fn(); } catch(e) { console.error('Safe Render Blocked a Crash:', e); } };
 
-  SECTORS = sectors||[]; COMPANIES = companies||[]; CONSULTING = consulting||[];
-  renderSectors(); renderCompanies(); renderConsulting();
-  const sel = document.getElementById('compSector');
-  sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
+      safeRender(() => renderListSection('core_values'));
+      safeRender(() => renderListSection('services'));
+      safeRender(() => renderListSection('stats'));
+      safeRender(() => renderListSection('team'));
+      safeRender(() => renderListSection('advisors'));
+      safeRender(() => renderSimpleListSection('industries'));
+      safeRender(() => renderSimpleListSection('client_logos'));
+      safeRender(() => renderSimpleListSection('contact_emails'));
+      safeRender(() => renderSimpleListSection('contact_phones'));
 
-  KNOWLEDGE = knowledge || [];
-  renderKnowledge();
+      safeRender(renderSectors); 
+      safeRender(renderCompanies); 
+      safeRender(renderConsulting);
+      safeRender(renderKnowledge);
+
+      const sel = document.getElementById('compSector');
+      if(sel) sel.innerHTML = SECTORS.map(s=>`<option value="${s.id}">${s.name_ar}</option>`).join('');
+
+      const botStatus = settingsMap.bot_status || 'enabled';
+      const botEl = document.getElementById('botStatusSelect');
+      if(botEl) botEl.value = botStatus;
+
+  } catch(e) {
+      console.error('Fatal Load Error:', e);
+      showToast('حدث خطأ أثناء جلب البيانات، راجع الكونسول.');
+  }
 }
 
 /* ============ BOT CONTROL ============ */
@@ -671,8 +707,9 @@ const HAS_PHOTO = {team:true, advisors:true, client_logos:true};
 
 function renderListSection(key){
   const container = document.getElementById(LIST_TABLES[key]);
+  if(!container) return;
   const fields = LIST_FIELD_SETS[key];
-  const arr = ABOUT[key];
+  const arr = ABOUT[key] || [];
   container.innerHTML = arr.map((item,i)=>`
     <div class="card" style="background:var(--panel-2);margin-bottom:10px;">
       ${HAS_PHOTO[key] ? `<div class="upload-row" style="margin-bottom:10px;"><img src="${item.photo_url||''}" style="${item.photo_url?'':'display:none'}" id="photo-${key}-${i}"><input type="file" accept="image/*" onchange="handleListPhoto(event,'${key}',${i})"></div>` : ''}
@@ -700,8 +737,9 @@ function renderSimpleListSection(key){
   
   const container = document.getElementById(containerId);
   if(!container) return;
+  const arr = ABOUT[key] || [];
   
-  container.innerHTML = ABOUT[key].map((name,i)=>`
+  container.innerHTML = arr.map((name,i)=>`
     <div class="item-row" style="padding:8px 12px; margin-bottom:8px;">
       <input style="flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;text-align:left;direction:ltr;" value="${(name||'').replace(/"/g,'&quot;')}" onblur="ABOUT['${key}'][${i}]=this.value">
       <button class="btn-danger btn-sm" onclick="ABOUT['${key}'].splice(${i},1); renderSimpleListSection('${key}')">حذف</button>
@@ -730,8 +768,8 @@ async function saveContactInfo(){
     instagram: document.getElementById('contactInstagram').value.trim()
   };
   
-  const cleanEmails = ABOUT.contact_emails.filter(e => e.trim() !== '');
-  const cleanPhones = ABOUT.contact_phones.filter(p => p.trim() !== '');
+  const cleanEmails = ABOUT.contact_emails.filter(e => typeof e==='string' && e.trim() !== '');
+  const cleanPhones = ABOUT.contact_phones.filter(p => typeof p==='string' && p.trim() !== '');
   
   try {
     await sb.from('intersect_site_settings').upsert({key:'contact_info', value});
@@ -764,13 +802,20 @@ async function saveBrand(){
 
 /* ============ SECTORS ============ */
 function renderSectors(){
-  document.getElementById('sectorsList').innerHTML = SECTORS.map(s=>`
-    <div class="item-row">
-      <div class="thumb-fallback" style="color:${s.color_primary}">${(s.icon_keys&&s.icon_keys.length&&ICON_LIBRARY[s.icon_keys[0]]) ? `<span style="width:24px;height:24px;display:inline-flex;">${ICON_LIBRARY[s.icon_keys[0]].svg}</span>` : (s.name_ar||'?').charAt(0)}</div>
+  document.getElementById('sectorsList').innerHTML = SECTORS.map(s=>{
+    let iconSvg = '';
+    if(s.icon_keys && s.icon_keys.length && ICON_LIBRARY[s.icon_keys[0]]) {
+       iconSvg = `<span style="width:24px;height:24px;display:inline-flex;">${ICON_LIBRARY[s.icon_keys[0]].svg}</span>`;
+    } else {
+       iconSvg = (s.name_ar||'?').charAt(0);
+    }
+
+    return `<div class="item-row">
+      <div class="thumb-fallback" style="color:${s.color_primary}">${iconSvg}</div>
       <div class="meta"><b>${s.name_ar}</b><span>${s.slug} · ${COMPANIES.filter(c=>c.sector_id===s.id).length} شركة</span></div>
       <div class="item-actions"><button class="btn-outline btn-sm" onclick="editSector('${s.id}')">✏️ تعديل</button><button class="btn-outline btn-sm" onclick="openTr('sectors','${s.id}')">🌐 ترجمات</button><button class="btn-danger btn-sm" onclick="deleteSector('${s.id}')">حذف</button></div>
-    </div>
-  `).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد قطاعات بعد.</p>';
+    </div>`;
+  }).join('') || '<p style="color:var(--muted);font-size:13px">لا توجد قطاعات بعد.</p>';
 }
 let editingSectorId = null;
 async function saveSector(){

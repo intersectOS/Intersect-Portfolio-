@@ -433,7 +433,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
 <script>
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let SECTORS = [], COMPANIES = [], CONSULTING = [];
 let KNOWLEDGE = [], CHAT_LOGS = [];
@@ -627,70 +627,6 @@ async function loadAll(){
       console.error('Fatal Load Error:', e);
       showToast('حدث خطأ أثناء جلب البيانات، راجع الكونسول.');
   }
-}
-
-/* ============ BOT CONTROL ============ */
-async function saveBotStatus() {
-  const val = document.getElementById('botStatusSelect').value;
-  const {error} = await sb.from('intersect_site_settings').upsert({key:'bot_status', value: val});
-  if(error){ showToast('خطأ: '+error.message); return; }
-  showToast('تم تحديث حالة البوت ✓');
-}
-
-/* ============ AI KNOWLEDGE BASE ============ */
-function renderKnowledge() {
-  const container = document.getElementById('knowledgeList');
-  if(!KNOWLEDGE || KNOWLEDGE.length === 0) {
-    container.innerHTML = '<p style="color:var(--muted);font-size:13px">لا توجد معلومات في القاعدة حالياً.</p>'; return;
-  }
-  container.innerHTML = KNOWLEDGE.map(k => `
-    <div class="item-row" style="align-items:flex-start;">
-      <div class="meta" style="white-space:pre-wrap; font-size:13.5px; line-height:1.6;">${k.content}</div>
-      <div class="item-actions"><button class="btn-danger btn-sm" onclick="deleteKnowledge('${k.id}')">حذف</button></div>
-    </div>
-  `).join('');
-}
-async function saveKnowledge() {
-  const input = document.getElementById('aiKnowledgeInput'); const content = input.value.trim();
-  if(!content) return;
-  const { data, error } = await sb.from('intersect_knowledge_base').insert({ content }).select();
-  if(error) { showToast('خطأ: ' + error.message); return; }
-  input.value = ''; if(data && data.length) KNOWLEDGE.unshift(data[0]);
-  renderKnowledge(); showToast('تمت إضافة المعلومة بنجاح ✓');
-}
-async function deleteKnowledge(id) {
-  if(!confirm('متأكد من حذف هذه المعلومة من عقل البوت؟')) return;
-  const { error } = await sb.from('intersect_knowledge_base').delete().eq('id', id);
-  if(error) { showToast('خطأ: ' + error.message); return; }
-  KNOWLEDGE = KNOWLEDGE.filter(k => k.id !== id); renderKnowledge(); showToast('تم الحذف');
-}
-
-/* ============ CHAT LOGS ============ */
-async function loadChatLogs() {
-  const container = document.getElementById('chatLogsContainer');
-  container.innerHTML = '<p style="color:var(--muted);font-size:13px">جاري جلب السجلات...</p>';
-  const { data, error } = await sb.from('intersect_chat_logs').select('*').order('created_at', { ascending: false }).limit(50);
-  if(error) { container.innerHTML = `<p style="color:var(--danger);font-size:13px">خطأ في جلب السجلات: ${error.message}</p>`; return; }
-  CHAT_LOGS = data || [];
-  if(CHAT_LOGS.length === 0) { container.innerHTML = '<p style="color:var(--muted);font-size:13px">لا توجد محادثات مسجلة بعد.</p>'; return; }
-  container.innerHTML = CHAT_LOGS.map(log => {
-    const lead = log.lead_data || {};
-    const ipStr = log.ip_location ? `${log.ip_location.city || ''}, ${log.ip_location.country_name || ''}` : 'غير معروف';
-    const date = new Date(log.created_at).toLocaleString('ar-SA', {timeZone: 'Asia/Riyadh'});
-    return `
-      <div class="chat-log-card">
-        <div class="chat-log-head">
-          <div class="lead-info">
-            <span title="المنطقة المستهدفة">📍 ${lead.region || '-'}</span>
-            <span title="القطاع">🏢 ${lead.sector || '-'}</span>
-            <span title="بيانات التواصل">📞 ${lead.contact || '-'}</span>
-          </div>
-          <div style="text-align:left; font-size:11px; color:var(--muted);"><div>${date}</div><div style="margin-top:4px;">🌐 IP: ${ipStr}</div></div>
-        </div>
-        <div class="chat-qa"><div class="chat-q">${log.question}</div><div class="chat-a">${log.answer}</div></div>
-      </div>
-    `;
-  }).join('');
 }
 
 /* ============ LISTS & SAVING ============ */
@@ -1055,5 +991,4 @@ async function saveTranslation(){
 
 </body>
 </html>
-
 

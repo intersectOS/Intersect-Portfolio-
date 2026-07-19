@@ -386,7 +386,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
       </div>
     </div>
 
-    <!-- CONTACTS SECTION -->
+    <!-- CONTACTS SECTION MOVED HERE -->
     <div class="card" style="border-color:var(--gold);">
       <h3 style="color:var(--gold);">بيانات التواصل والسوشيال ميديا</h3>
       <div class="field"><label>الموقع الإلكتروني الرسمي</label><input id="contactWebsite" placeholder="https://"></div>
@@ -433,7 +433,7 @@ body{background:var(--void);color:var(--text);font-family:var(--ff);min-height:1
 <script>
 const SUPABASE_URL = 'https://rcuhgbeqvtlrlnaygqzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_XDh0LgRL1X9NJRWH0YIaCQ_L_GI5YCW';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let SECTORS = [], COMPANIES = [], CONSULTING = [];
 let KNOWLEDGE = [], CHAT_LOGS = [];
@@ -960,7 +960,7 @@ function loadTrValues(){
     if(el) el.value = tr[f.key] || '';
   });
 }
-function closeTr(){ document.getElementById('trOverlay').classList.add('hidden'); trContext = null; }
+closeTr();
 async function saveTranslation(){
   if(!trContext) return;
   const lang = document.getElementById('trLang').value;
